@@ -229,3 +229,8 @@ projects/*/_data/remote/*
 !projects/*/_data/remote/.gitkeep
 projects/*/_data/processed/*
 !projects/*/_data/processed/.gitkeep
+
+# center-buildout-capacity: REMM parcels/buildings pickle tables are large
+# and manually provided (not REST-cached) -- exclude explicitly
+projects/center-buildout-capacity/_data/raw/remm/*
+!projects/center-buildout-capacity/_data/raw/remm/.gitkeep
