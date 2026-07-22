@@ -353,7 +353,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a></li>
   <li><a href="#load-center-boundaries" id="toc-load-center-boundaries" class="nav-link" data-scroll-target="#load-center-boundaries">Load center boundaries</a></li>
-  <li><a href="#remm-parcels-duckdb-spatial-setup" id="toc-remm-parcels-duckdb-spatial-setup" class="nav-link" data-scroll-target="#remm-parcels-duckdb-spatial-setup">REMM parcels: DuckDB spatial setup</a></li>
+  <li><a href="#remm-parcels-load-and-cache-as-parquet" id="toc-remm-parcels-load-and-cache-as-parquet" class="nav-link" data-scroll-target="#remm-parcels-load-and-cache-as-parquet">REMM parcels: load and cache as parquet</a></li>
   <li><a href="#parcels-within-each-center" id="toc-parcels-within-each-center" class="nav-link" data-scroll-target="#parcels-within-each-center">Parcels within each center</a></li>
   <li><a href="#daybreak-saratoga-springs-remm-developable-land" id="toc-daybreak-saratoga-springs-remm-developable-land" class="nav-link" data-scroll-target="#daybreak-saratoga-springs-remm-developable-land">Daybreak &amp; Saratoga Springs: REMM developable land</a>
   <ul class="collapse">
@@ -378,11 +378,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Daybreak</strong> and <strong>Saratoga Springs Downtown</strong>: from REMM-forecast post-2025 development, applying each center’s median dwelling-unit-per-acre and employment-density (FAR + job-space) assumptions to the forecast residential / commercial-employment development mix.</li>
 <li><strong>The Point</strong>: from the development schedule the Point team has provided directly, rather than from REMM.</li>
 </ul>
-<p>All spatial joins, filtering, and aggregation below run in DuckDB (with the <code>spatial</code> extension). The one exception: DuckDB’s bundled GDAL build cannot read <code>remm_base_year_data.gdb</code> at all (<code>ST_Read</code> returns 0 rows and strips every attribute down to <code>OGC_FID</code>/<code>Shape</code> on all four layers it contains, and errors outright on <code>parcels_ids_only</code>) – confirmed by testing all four layers directly. <code>pyogrio</code>/geopandas (a separate GDAL binding) reads it correctly, so it’s used once, up front, to cache the parcels and center boundaries as GeoParquet – geopandas’ own <code>to_parquet()</code> writes correct CRS metadata natively, which is simpler and more reliable than hand-constructing GeoParquet metadata ourselves. Every subsequent run reads that cached GeoParquet straight from DuckDB.</p>
+<p>Spatial joins, filtering, and aggregation below run in geopandas/pandas. The base-year parcels come from <code>remm_base_year_data.gdb</code>, which is cached as GeoParquet on first run (see below) so later runs just read that instead of re-parsing the FileGDB.</p>
 </section>
 <section id="load-center-boundaries" class="level2">
 <h2 class="anchored" data-anchor-id="load-center-boundaries">Load center boundaries</h2>
-<div id="5c6fe2ad" class="cell" data-execution_count="1">
+<div id="3b852d7f" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gis_adhoc_analyses.layer_cache <span class="im">import</span> ensure_layers</span>
@@ -441,110 +441,383 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="4e84b8bf" class="cell" data-execution_count="2">
+<div id="2404e54b" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> centers_preview.plot(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>), edgecolor<span class="op">=</span><span class="st">"white"</span>, linewidth<span class="op">=</span><span class="fl">0.3</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Daybreak, Saratoga Springs Downtown, The Point"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>centers_preview.explore(column<span class="op">=</span><span class="st">"CenterName"</span>, tooltip<span class="op">=</span>[<span class="st">"CenterName"</span>, <span class="st">"CenterType"</span>, <span class="st">"City"</span>], legend<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="2">
-<pre><code>Text(0.5, 1.0, 'Daybreak, Saratoga Springs Downtown, The Point')</code></pre>
-</div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-3-output-2.png" width="419" height="483" class="figure-img"></p>
-</figure>
-</div>
+<div style="width:100%;"><div style="position:relative;width:100%;height:0;padding-bottom:60%;"><span style="color:#565656">Make this Notebook Trusted to load map: File -&gt; Trust Notebook</span><iframe srcdoc="<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot; />
+    <script src=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js&quot;></script>
+    <script src=&quot;https://code.jquery.com/jquery-3.7.1.min.js&quot;></script>
+    <script src=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js&quot;></script>
+    <script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js&quot;></script>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css&quot;/>
+    <link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css&quot;/>
+    
+            <meta name=&quot;viewport&quot; content=&quot;width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; />
+            <style>
+                #map_cd76c2130bb1e0f27d224131c6b115a2 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    
+                    <style>
+                        .foliumtooltip {
+                            
+                        }
+                       .foliumtooltip table{
+                            margin: auto;
+                        }
+                        .foliumtooltip tr{
+                            text-align: left;
+                        }
+                        .foliumtooltip th{
+                            padding: 2px; padding-right: 8px;
+                        }
+                    </style>
+            
+</head>
+<body>
+    
+    
+            <div class=&quot;folium-map&quot; id=&quot;map_cd76c2130bb1e0f27d224131c6b115a2&quot; ></div>
+        
+</body>
+<script>
+    
+    
+            var map_cd76c2130bb1e0f27d224131c6b115a2 = L.map(
+                &quot;map_cd76c2130bb1e0f27d224131c6b115a2&quot;,
+                {
+                    center: [40.46758128851715, -111.9659370590035],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  &quot;zoom&quot;: 10,
+  &quot;zoomControl&quot;: true,
+  &quot;preferCanvas&quot;: false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_cd76c2130bb1e0f27d224131c6b115a2);
+
+            
+
+        
+    
+            var tile_layer_667e87f8eb862c852261a55900608f48 = L.tileLayer(
+                &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
+                {
+  &quot;minZoom&quot;: 0,
+  &quot;maxZoom&quot;: 19,
+  &quot;maxNativeZoom&quot;: 19,
+  &quot;noWrap&quot;: false,
+  &quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;,
+  &quot;subdomains&quot;: &quot;abc&quot;,
+  &quot;detectRetina&quot;: false,
+  &quot;tms&quot;: false,
+  &quot;opacity&quot;: 1,
+}
+
+            );
+        
+    
+            tile_layer_667e87f8eb862c852261a55900608f48.addTo(map_cd76c2130bb1e0f27d224131c6b115a2);
+        
+    
+            map_cd76c2130bb1e0f27d224131c6b115a2.fitBounds(
+                [[40.3728939863899, -112.040368429835], [40.5622685906444, -111.891505688172]],
+                {}
+            );
+        
+    
+        function geo_json_218e23c263362055fa35a425597ff31f_styler(feature) {
+            switch(feature.id) {
+                case &quot;0&quot;: 
+                    return {&quot;color&quot;: &quot;#1f77b4&quot;, &quot;fillColor&quot;: &quot;#1f77b4&quot;, &quot;fillOpacity&quot;: 0.5, &quot;weight&quot;: 2};
+                case &quot;1&quot;: 
+                    return {&quot;color&quot;: &quot;#9edae5&quot;, &quot;fillColor&quot;: &quot;#9edae5&quot;, &quot;fillOpacity&quot;: 0.5, &quot;weight&quot;: 2};
+                default:
+                    return {&quot;color&quot;: &quot;#8c564b&quot;, &quot;fillColor&quot;: &quot;#8c564b&quot;, &quot;fillOpacity&quot;: 0.5, &quot;weight&quot;: 2};
+            }
+        }
+        function geo_json_218e23c263362055fa35a425597ff31f_highlighter(feature) {
+            switch(feature.id) {
+                default:
+                    return {&quot;fillOpacity&quot;: 0.75};
+            }
+        }
+        function geo_json_218e23c263362055fa35a425597ff31f_pointToLayer(feature, latlng) {
+            var opts = {
+  &quot;stroke&quot;: true,
+  &quot;color&quot;: &quot;#3388ff&quot;,
+  &quot;weight&quot;: 3,
+  &quot;opacity&quot;: 1.0,
+  &quot;lineCap&quot;: &quot;round&quot;,
+  &quot;lineJoin&quot;: &quot;round&quot;,
+  &quot;dashArray&quot;: null,
+  &quot;dashOffset&quot;: null,
+  &quot;fill&quot;: true,
+  &quot;fillColor&quot;: &quot;#3388ff&quot;,
+  &quot;fillOpacity&quot;: 0.2,
+  &quot;fillRule&quot;: &quot;evenodd&quot;,
+  &quot;bubblingMouseEvents&quot;: true,
+  &quot;radius&quot;: 2,
+};
+            
+            let style = geo_json_218e23c263362055fa35a425597ff31f_styler(feature)
+            Object.assign(opts, style)
+            
+            return new L.CircleMarker(latlng, opts)
+        }
+
+        function geo_json_218e23c263362055fa35a425597ff31f_onEachFeature(feature, layer) {
+
+            layer.on({
+                mouseout: function(e) {
+                    if(typeof e.target.setStyle === &quot;function&quot;){
+                            geo_json_218e23c263362055fa35a425597ff31f.resetStyle(e.target);
+                    }
+                },
+                mouseover: function(e) {
+                    if(typeof e.target.setStyle === &quot;function&quot;){
+                        const highlightStyle = geo_json_218e23c263362055fa35a425597ff31f_highlighter(e.target.feature)
+                        e.target.setStyle(highlightStyle);
+                    }
+                },
+            });
+        };
+        var geo_json_218e23c263362055fa35a425597ff31f = L.geoJson(null, {
+                onEachFeature: geo_json_218e23c263362055fa35a425597ff31f_onEachFeature,
+            
+                style: geo_json_218e23c263362055fa35a425597ff31f_styler,
+                pointToLayer: geo_json_218e23c263362055fa35a425597ff31f_pointToLayer,
+            ...{
+}
+        });
+
+        function geo_json_218e23c263362055fa35a425597ff31f_add (data) {
+            geo_json_218e23c263362055fa35a425597ff31f
+                .addData(data);
+        }
+            geo_json_218e23c263362055fa35a425597ff31f_add({&quot;bbox&quot;: [-112.040368429835, 40.3728939863899, -111.891505688172, 40.5622685906444], &quot;features&quot;: [{&quot;bbox&quot;: [-112.040368429835, 40.5369339055923, -112.009565550882, 40.5622685906444], &quot;geometry&quot;: {&quot;coordinates&quot;: [[[-112.023687357304, 40.5616744744633], [-112.023208831041, 40.5611823448252], [-112.023555075887, 40.5608874043537], [-112.023314594191, 40.5605314390908], [-112.023125300296, 40.5599840350794], [-112.023065067358, 40.5594570190528], [-112.022666062658, 40.5594000634663], [-112.022466701343, 40.5594165678564], [-112.022268131445, 40.5594378884947], [-112.022235595364, 40.5594421887929], [-112.022070546998, 40.5594640062675], [-112.022070461658, 40.5591171159065], [-112.022070440099, 40.5590318991044], [-112.021515267778, 40.5590624593146], [-112.021505500396, 40.5587230073357], [-112.021486793879, 40.5584248046508], [-112.021476391388, 40.5583931856086], [-112.021413233535, 40.5582011382863], [-112.021161198606, 40.5579306725719], [-112.020912655428, 40.5576722477379], [-112.021298604912, 40.5575976583131], [-112.02155987003, 40.5574498858447], [-112.021418927956, 40.5573040581764], [-112.021191791631, 40.5570704494618], [-112.021761354064, 40.5567481394463], [-112.021763100389, 40.5567471525423], [-112.021777339584, 40.5567390948744], [-112.021786048751, 40.5567332287331], [-112.021793330495, 40.5567263217691], [-112.021798973711, 40.5567185753215], [-112.021802815806, 40.5567102118871], [-112.021804746285, 40.5567014723906], [-112.021804706759, 40.5566926100417], [-112.021802703516, 40.5566838800979], [-112.021798789557, 40.5566755357694], [-112.021793079865, 40.5566678172987], [-112.021664023399, 40.5565235433637], [-112.021573598085, 40.5564393558968], [-112.021546253367, 40.5564138976133], [-112.021537933171, 40.5564076574283], [-112.021528370605, 40.5564025536213], [-112.021517832468, 40.5563987295196], [-112.021506608917, 40.5563962922774], [-112.021495011667, 40.5563953046858], [-112.021483359619, 40.5563957967753], [-112.021471976168, 40.5563977562607], [-112.021461173927, 40.5564011271761], [-112.021451254729, 40.5564058166998], [-112.021438455533, 40.556413056079], [-112.020864100588, 40.5567379230112], [-112.020648662125, 40.5565163408519], [-112.020726869454, 40.5564721054142], [-112.021558432726, 40.5560017547686], [-112.021222983833, 40.5557373961989], [-112.021550892268, 40.5555516354426], [-112.020548783839, 40.5547270915732], [-112.019318764738, 40.5535027659683], [-112.017973511549, 40.5520985476164], [-112.017360203856, 40.5514907268441], [-112.017347702003, 40.5514776059972], [-112.016729554188, 40.5508287327836], [-112.01671791831, 40.5508168533957], [-112.016069676034, 40.55015437965], [-112.015368593956, 40.5494408368792], [-112.015248759595, 40.5493103628317], [-112.013786127141, 40.5478015428027], [-112.013479621966, 40.5474854134863], [-112.012082447052, 40.5460441032974], [-112.010917680675, 40.5448424466833], [-112.010238976528, 40.5441725482134], [-112.010132174926, 40.5440583119939], [-112.009908612998, 40.5438191864066], [-112.009565550882, 40.5434522408985], [-112.010423941442, 40.5429647510651], [-112.011170969652, 40.5425404800659], [-112.011782988262, 40.5421929702381], [-112.012058527611, 40.5420465973504], [-112.012211640061, 40.5419626456305], [-112.012687936706, 40.5417034239442], [-112.014683842351, 40.540622080554], [-112.015305852023, 40.540273833726], [-112.015718456318, 40.5400404837246], [-112.01626326208, 40.5396945317739], [-112.016539135602, 40.5394856245563], [-112.016870375888, 40.5392993817992], [-112.017678507504, 40.5388451626188], [-112.017985059392, 40.5386665212048], [-112.01849211525, 40.5383711600019], [-112.019502462129, 40.5378055993523], [-112.019926793031, 40.5375610505908], [-112.020629095022, 40.5372086424639], [-112.020900952176, 40.5371023697444], [-112.021255837918, 40.537012929689], [-112.021695419519, 40.5369568828116], [-112.022263595851, 40.5369576078474], [-112.024594959372, 40.5369339055923], [-112.024577638955, 40.5378759842374], [-112.024577675786, 40.5381230277858], [-112.024577713515, 40.5383700711059], [-112.024577750346, 40.5386171148804], [-112.024577789872, 40.5388916065912], [-112.02457781233, 40.5390425788057], [-112.024577853652, 40.5393170708214], [-112.02457789228, 40.5395838774546], [-112.024577931806, 40.5398476649041], [-112.02457796684, 40.5400988265919], [-112.024578005468, 40.5403458694528], [-112.024578042298, 40.5405929120853], [-112.024578078231, 40.5408399558547], [-112.024578114164, 40.5410869993957], [-112.024578150995, 40.5413340427084], [-112.024578186927, 40.5415810851099], [-112.024578223758, 40.5418281286484], [-112.024578258792, 40.5420751719584], [-112.024578296522, 40.5423222157226], [-112.024578346827, 40.5426578918302], [-112.024578372878, 40.5428364481918], [-112.024578442947, 40.5433062428031], [-112.024576455874, 40.5435468030845], [-112.024665142948, 40.5440475495621], [-112.024831403141, 40.5443132963392], [-112.024885308346, 40.5443014669929], [-112.025056794938, 40.5442639105626], [-112.025292622463, 40.5442251526757], [-112.025521693758, 40.544207984434], [-112.02576840078, 40.5441934525208], [-112.026036342178, 40.5442007123341], [-112.026520547591, 40.5442337074417], [-112.027197155069, 40.5442919258308], [-112.027730101273, 40.5443460128773], [-112.027888933297, 40.5443614458321], [-112.028481672264, 40.5444179705006], [-112.029007335825, 40.5444667117597], [-112.029529657654, 40.5445208853591], [-112.029981272189, 40.5445537956629], [-112.030545950481, 40.5446130820894], [-112.031163288914, 40.5446639687104], [-112.031355911067, 40.5446572038536], [-112.031923624767, 40.5446370901761], [-112.032798697042, 40.5445686421904], [-112.033159554783, 40.5445436142292], [-112.033571829396, 40.5445216389835], [-112.033721559689, 40.5448128124522], [-112.03397900607, 40.5453046371427], [-112.034315237396, 40.5457051279982], [-112.035393567876, 40.5469100244847], [-112.036224509514, 40.5478383095326], [-112.036366569992, 40.5479908144877], [-112.03553226596, 40.5484468399043], [-112.034023650543, 40.549266812724], [-112.033225906146, 40.5496984409445], [-112.033620533356, 40.550147328667], [-112.033775052568, 40.5504265675053], [-112.033854829253, 40.5506376480268], [-112.033874718852, 40.5514086162239], [-112.030284692549, 40.5515610447926], [-112.030445695801, 40.5518170783304], [-112.03052470802, 40.5519480805694], [-112.030602704244, 40.5520820653118], [-112.03067766057, 40.5522180585376], [-112.030752677083, 40.5523580150603], [-112.030826709042, 40.552503025569], [-112.030899606429, 40.5526510191806], [-112.030971707908, 40.5528010014053], [-112.03111265178, 40.5531040574505], [-112.03118267366, 40.5532570309234], [-112.031315663848, 40.5535650230715], [-112.031378632156, 40.5537200410547], [-112.031438678244, 40.5538770673807], [-112.031547698685, 40.5541930204627], [-112.031599626699, 40.554352010685], [-112.031650624956, 40.5545120004346], [-112.031698672247, 40.5546720164206], [-112.031744623769, 40.5548340331894], [-112.031789645534, 40.5549970487812], [-112.031811266186, 40.5550820338836], [-112.032377739313, 40.5550622673287], [-112.03238461951, 40.5550623137403], [-112.040365550735, 40.5550780998203], [-112.040368321139, 40.5573244082897], [-112.040368429835, 40.5574121818604], [-112.0403447736, 40.5574205035747], [-112.03975918163, 40.5576428785329], [-112.039559287614, 40.557700661435], [-112.039428783065, 40.5577413395745], [-112.039301191752, 40.5577870749814], [-112.03917684695, 40.5578377488912], [-112.039056080138, 40.5578932261589], [-112.038939206625, 40.5579533607187], [-112.036964397915, 40.5587010838343], [-112.036923616198, 40.5587165244008], [-112.032977406088, 40.5602160004746], [-112.032977283018, 40.5603770640674], [-112.032977236306, 40.5604399078435], [-112.032822473651, 40.5604792883116], [-112.032695065594, 40.5605081915117], [-112.032550254475, 40.5605009437033], [-112.032374838653, 40.560565861381], [-112.031222171684, 40.5608406412261], [-112.030995196158, 40.5608893548357], [-112.031014267392, 40.5610397546994], [-112.031134929999, 40.5611008411968], [-112.031152843304, 40.5612517374164], [-112.030977605348, 40.5613014402933], [-112.030800773781, 40.5613477403917], [-112.030622460892, 40.5613906083728], [-112.030490675345, 40.561419796447], [-112.030358201688, 40.5614471097958], [-112.030173480218, 40.5614818591949], [-112.029987644837, 40.5615129642527], [-112.029751879296, 40.5615469642796], [-112.029547144259, 40.5615716132645], [-112.029341586366, 40.5615918658542], [-112.029140821883, 40.5616073460189], [-112.028952744307, 40.5616180230515], [-112.028764366694, 40.5616250298319], [-112.028575821096, 40.561628361584], [-112.028012925959, 40.561628808593], [-112.027416165234, 40.5616289798895], [-112.026819403611, 40.5616291498211], [-112.026632178536, 40.5616292016878], [-112.026495375898, 40.5616313282218], [-112.026422094931, 40.5616347077456], [-112.026358794246, 40.5616376272937], [-112.026222653666, 40.5616480886653], [-112.026081343282, 40.5616634179942], [-112.025940994095, 40.5616832331019], [-112.025801853143, 40.5617074971318], [-112.025625768076, 40.5617411681164], [-112.025028838468, 40.5618553134336], [-112.024943410481, 40.5618716411452], [-112.024419779807, 40.5619859773266], [-112.024266920681, 40.5620300446502], [-112.024116994555, 40.5620796322973], [-112.02397034728, 40.562134625604], [-112.023827314826, 40.5621948996686], [-112.023688218789, 40.5622603173042], [-112.023671515514, 40.5622685906444], [-112.02361241625, 40.5622078730533], [-112.023536371166, 40.5621296703256], [-112.023490184286, 40.5620821730652], [-112.023274312835, 40.5618601738713], [-112.023541761956, 40.5617343026165], [-112.023687357304, 40.5616744744633]]], &quot;type&quot;: &quot;Polygon&quot;}, &quot;id&quot;: &quot;0&quot;, &quot;properties&quot;: {&quot;CatchmentPop&quot;: &quot;100,000&quot;, &quot;CenterName&quot;: &quot;Daybreak&quot;, &quot;CenterType&quot;: &quot;Urban Center&quot;, &quot;City&quot;: &quot;South Jordan&quot;, &quot;DwellingPerAcre&quot;: &quot;20-100&quot;, &quot;ImageURL&quot;: &quot;https://wfrc.org/app_images/Centers/UrbanCenters1.png&quot;, &quot;IndicatorLU&quot;: &quot;Unique entertainment, commerce and regional retail&quot;, &quot;MPO&quot;: &quot;WFRC&quot;, &quot;MinRoadway&quot;: &quot;Intersection of major arterials and/or freeway interchanges&quot;, &quot;NonResFAR&quot;: &quot;0.75-4.0&quot;, &quot;OBJECTID&quot;: 36, &quot;Shape__Area&quot;: 5882779.45703125, &quot;Shape__Length&quot;: 13507.585116555658, &quot;Stories&quot;: &quot;4-10&quot;, &quot;Transit&quot;: &quot;Junction points of the high capacity transit network&quot;, &quot;Walkable&quot;: &quot;Yes&quot;, &quot;__folium_color&quot;: &quot;#1f77b4&quot;}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;bbox&quot;: [-111.920754367597, 40.4854295121673, -111.891505688172, 40.5020612197052], &quot;geometry&quot;: {&quot;coordinates&quot;: [[[-111.891505698054, 40.5007186630895], [-111.891511563154, 40.4999807869787], [-111.89152901203, 40.498830363092], [-111.891599077927, 40.4964952666714], [-111.891594207262, 40.4942404198044], [-111.891627627285, 40.493463109301], [-111.891756372934, 40.4929256853487], [-111.891836315807, 40.49254669579], [-111.892046093088, 40.4920811205069], [-111.892267082241, 40.4916605027406], [-111.892508472134, 40.4912658518067], [-111.89298278979, 40.490728863204], [-111.894476969281, 40.4892425566526], [-111.895040601934, 40.4886868089676], [-111.89618578414, 40.487557633324], [-111.896482556069, 40.487284254776], [-111.896752194385, 40.4870912643746], [-111.897031946832, 40.4869224292586], [-111.897354481545, 40.4867766844718], [-111.897711301359, 40.4866360778692], [-111.899121447946, 40.486179176798], [-111.899715177755, 40.4859320374593], [-111.900148917612, 40.4856855100679], [-111.900572380742, 40.4854295121673], [-111.901226661492, 40.485828910334], [-111.901780206964, 40.4860182832642], [-111.902208467097, 40.4861032274132], [-111.90266704088, 40.4861609066755], [-111.905878014964, 40.4861604666785], [-111.911867594105, 40.4861382270112], [-111.913109889583, 40.4861454452875], [-111.914499545598, 40.4861780604083], [-111.914926545395, 40.4861689147575], [-111.91572816153, 40.4861683312833], [-111.918343347765, 40.4861725344841], [-111.919104263032, 40.4861636928678], [-111.919514802998, 40.4861589854462], [-111.9196366415, 40.4862593661863], [-111.91970624207, 40.486465835537], [-111.919747894255, 40.4865523498451], [-111.919887121446, 40.4866386276475], [-111.920754367597, 40.4870713534158], [-111.915066419373, 40.4954637420975], [-111.913972766329, 40.497026184741], [-111.913553933116, 40.4971204859101], [-111.913271462366, 40.4971758713734], [-111.912458013622, 40.4974102204125], [-111.91219505428, 40.4975122948298], [-111.911931146318, 40.4976314925729], [-111.911753897034, 40.497701358133], [-111.911554617467, 40.4978002262878], [-111.91135753967, 40.497887364688], [-111.910883095351, 40.4981460556773], [-111.910456942665, 40.4983980581144], [-111.909993781186, 40.498706204776], [-111.90973076525, 40.4988920562148], [-111.908326713733, 40.499974655612], [-111.907469512542, 40.5006355947292], [-111.907422953759, 40.5006714938749], [-111.907422939386, 40.5006716099981], [-111.907422933098, 40.5006716421027], [-111.907422858538, 40.5006715676473], [-111.907422796554, 40.5006716038504], [-111.905620531753, 40.5020612197052], [-111.90414325137, 40.5006854190906], [-111.891505688172, 40.5007199240496], [-111.891505698054, 40.5007186630895]]], &quot;type&quot;: &quot;Polygon&quot;}, &quot;id&quot;: &quot;1&quot;, &quot;properties&quot;: {&quot;CatchmentPop&quot;: &quot;100,000&quot;, &quot;CenterName&quot;: &quot;The Point&quot;, &quot;CenterType&quot;: &quot;Urban Center&quot;, &quot;City&quot;: &quot;Draper, Bluffdale&quot;, &quot;DwellingPerAcre&quot;: &quot;20-100&quot;, &quot;ImageURL&quot;: &quot;https://wfrc.org/app_images/Centers/UrbanCenters1.png&quot;, &quot;IndicatorLU&quot;: &quot;Unique entertainment, commerce and regional retail&quot;, &quot;MPO&quot;: &quot;WFRC&quot;, &quot;MinRoadway&quot;: &quot;Intersection of major arterials and/or freeway interchanges&quot;, &quot;NonResFAR&quot;: &quot;0.75-4.0&quot;, &quot;OBJECTID&quot;: 121, &quot;Shape__Area&quot;: 5453108.23046875, &quot;Shape__Length&quot;: 9516.434222618669, &quot;Stories&quot;: &quot;4-10&quot;, &quot;Transit&quot;: &quot;Junction points of the high capacity transit network&quot;, &quot;Walkable&quot;: &quot;Yes&quot;, &quot;__folium_color&quot;: &quot;#9edae5&quot;}, &quot;type&quot;: &quot;Feature&quot;}, {&quot;bbox&quot;: [-111.935547433828, 40.3728939863899, -111.922599420953, 40.383860482255], &quot;geometry&quot;: {&quot;coordinates&quot;: [[[-111.924290036843, 40.3763089458847], [-111.922599420953, 40.3743676807249], [-111.92278413344, 40.373607796576], [-111.923707691383, 40.3729604797289], [-111.935473457564, 40.3728939863899], [-111.935393506605, 40.3754258779498], [-111.935547433828, 40.383860482255], [-111.93043251194, 40.3837413932703], [-111.928791716615, 40.3822115451287], [-111.92658632205, 40.3793808591637], [-111.924290036843, 40.3763089458847]]], &quot;type&quot;: &quot;Polygon&quot;}, &quot;id&quot;: &quot;2&quot;, &quot;properties&quot;: {&quot;CatchmentPop&quot;: &quot;100,000&quot;, &quot;CenterName&quot;: &quot;Saratoga Springs Downtown&quot;, &quot;CenterType&quot;: &quot;Urban Center&quot;, &quot;City&quot;: &quot;Saratoga Springs&quot;, &quot;DwellingPerAcre&quot;: &quot;0-100&quot;, &quot;ImageURL&quot;: &quot;https://wfrc.org/app_images/Centers/UrbanCenters1.png&quot;, &quot;IndicatorLU&quot;: &quot;Unique entertainment, commerce and regional retail&quot;, &quot;MPO&quot;: &quot;MAG&quot;, &quot;MinRoadway&quot;: &quot;Intersection of major arterials and/or freeway interchanges&quot;, &quot;NonResFAR&quot;: &quot;0.75-4.0&quot;, &quot;OBJECTID&quot;: 562, &quot;Shape__Area&quot;: 1681498.66015625, &quot;Shape__Length&quot;: 5361.5579007915085, &quot;Stories&quot;: &quot;4-10&quot;, &quot;Transit&quot;: &quot;Junction points of the high capacity transit network&quot;, &quot;Walkable&quot;: &quot;Yes&quot;, &quot;__folium_color&quot;: &quot;#8c564b&quot;}, &quot;type&quot;: &quot;Feature&quot;}], &quot;type&quot;: &quot;FeatureCollection&quot;});
+
+        
+    
+    geo_json_218e23c263362055fa35a425597ff31f.bindTooltip(
+    function(layer){
+    let div = L.DomUtil.create('div');
+    
+    let handleObject = feature => {
+        if (feature === null) {
+            return '';
+        } else if (typeof(feature)=='object') {
+            return JSON.stringify(feature);
+        } else {
+            return feature;
+        }
+    }
+    let fields = [&quot;CenterName&quot;, &quot;CenterType&quot;, &quot;City&quot;];
+    let aliases = [&quot;CenterName&quot;, &quot;CenterType&quot;, &quot;City&quot;];
+    let table = '<table>' +
+        String(
+        fields.map(
+        (v,i)=>
+        `<tr>
+            <th>${aliases[i]}</th>
+            
+            <td>${handleObject(layer.feature.properties[v])}</td>
+        </tr>`).join(''))
+    +'</table>';
+    div.innerHTML=table;
+    
+    return div
+    }
+    ,{
+  &quot;sticky&quot;: true,
+  &quot;className&quot;: &quot;foliumtooltip&quot;,
+});
+                     
+    
+            geo_json_218e23c263362055fa35a425597ff31f.addTo(map_cd76c2130bb1e0f27d224131c6b115a2);
+        
+</script>
+</html>" style="position:absolute;width:100%;height:100%;left:0;top:0;border:none !important;" allowfullscreen="" webkitallowfullscreen="" mozallowfullscreen=""></iframe></div></div>
 </div>
 </div>
 </section>
-<section id="remm-parcels-duckdb-spatial-setup" class="level2">
-<h2 class="anchored" data-anchor-id="remm-parcels-duckdb-spatial-setup">REMM parcels: DuckDB spatial setup</h2>
-<div id="5d376956" class="cell" data-execution_count="3">
+<section id="remm-parcels-load-and-cache-as-parquet" class="level2">
+<h2 class="anchored" data-anchor-id="remm-parcels-load-and-cache-as-parquet">REMM parcels: load and cache as parquet</h2>
+<div id="ca0a4db1" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> duckdb</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>RAW_REMM <span class="op">=</span> Path(<span class="st">"_data/raw/remm"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>PROCESSED <span class="op">=</span> Path(<span class="st">"_data/processed"</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>PROCESSED.mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>GDB_PATH <span class="op">=</span> RAW_REMM <span class="op">/</span> <span class="st">"remm_base_year_data.gdb"</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>con <span class="op">=</span> duckdb.<span class="ex">connect</span>()</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"INSTALL spatial"</span>)</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"LOAD spatial"</span>)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># one-time geopandas/pyogrio read of the two vector sources DuckDB can't parse</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co"># itself (the gdb) or that we'd otherwise re-fetch every run (the gpkg), cached</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># as GeoParquet -- geopandas.to_parquet() writes correct CRS metadata natively.</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>parcels_geoparquet <span class="op">=</span> PROCESSED <span class="op">/</span> <span class="st">"parcels_2023.parquet"</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> parcels_geoparquet.exists():</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    parcels_gdf <span class="op">=</span> gpd.read_file(GDB_PATH, layer<span class="op">=</span><span class="st">"parcels"</span>, columns<span class="op">=</span>[<span class="st">"parcel_id"</span>, <span class="st">"parcel_acres"</span>])</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    parcels_gdf.to_parquet(parcels_geoparquet)</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>centers_geoparquet <span class="op">=</span> PROCESSED <span class="op">/</span> <span class="st">"centers.parquet"</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> centers_geoparquet.exists():</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    centers_gdf <span class="op">=</span> gpd.read_file(L[<span class="st">"center_boundaries"</span>], columns<span class="op">=</span>[<span class="st">"CenterName"</span>, <span class="st">"CenterType"</span>])</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    centers_gdf.to_parquet(centers_geoparquet)</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="ss">f"""</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ss">    CREATE OR REPLACE VIEW parcels AS</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT parcel_id, parcel_acres, geometry AS geom</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM read_parquet('</span><span class="sc">{</span>parcels_geoparquet<span class="sc">.</span>as_posix()<span class="sc">}</span><span class="ss">')</span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span>)</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="ss">f"""</span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="ss">    CREATE OR REPLACE VIEW centers AS</span></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT CenterName, CenterType, ST_Transform(geometry, 'EPSG:4326', 'EPSG:26912', true) AS geom</span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM read_parquet('</span><span class="sc">{</span>centers_geoparquet<span class="sc">.</span>as_posix()<span class="sc">}</span><span class="ss">')</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-display" data-execution_count="3">
-<pre><code>&lt;_duckdb.DuckDBPyConnection at 0x2976c3567f0&gt;</code></pre>
-</div>
-</div>
-<div id="3a015bea" class="cell" data-execution_count="4">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only the parcel-level progression metrics tables for now -- they already carry</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># year_built, was_developed/was_redeveloped, developable, and acreage_dev/redev</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># (split res vs. nonres) per parcel, so the building-level tables aren't needed</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># for this step. Converted once to parquet so DuckDB doesn't round-trip pandas.</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>PROGRESSION_PICKLES <span class="op">=</span> {</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progression_2023"</span>: <span class="st">"run_1842_year_2023_parcel_progression_metrics.pkl"</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"progression_2055"</span>: <span class="st">"run_1842_year_2055_parcel_progression_metrics.pkl"</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> key, filename <span class="kw">in</span> PROGRESSION_PICKLES.items():</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    dst <span class="op">=</span> PROCESSED <span class="op">/</span> <span class="ss">f"</span><span class="sc">{</span>key<span class="sc">}</span><span class="ss">.parquet"</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> dst.exists():</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        pd.read_pickle(RAW_REMM <span class="op">/</span> filename).to_parquet(dst)</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    con.execute(<span class="ss">f"CREATE OR REPLACE VIEW </span><span class="sc">{</span>key<span class="sc">}</span><span class="ss"> AS SELECT * FROM read_parquet('</span><span class="sc">{</span>dst<span class="sc">.</span>as_posix()<span class="sc">}</span><span class="ss">')"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>paths <span class="op">=</span> {</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"raw"</span>: Path(<span class="st">"_data/raw"</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"processed"</span>: Path(<span class="st">"_data/processed"</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>paths[<span class="st">"processed"</span>].mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>paths.update({</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"gdb"</span>: paths[<span class="st">"raw"</span>] <span class="op">/</span> <span class="st">"remm"</span> <span class="op">/</span> <span class="st">"remm_base_year_data.gdb"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"buildings_2055_pkl"</span>: paths[<span class="st">"raw"</span>] <span class="op">/</span> <span class="st">"remm"</span> <span class="op">/</span> <span class="st">"run1842year2055allbuildings.pkl"</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"parcels_geoparquet"</span>: paths[<span class="st">"processed"</span>] <span class="op">/</span> <span class="st">"parcels_2023.parquet"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"centers_geoparquet"</span>: paths[<span class="st">"processed"</span>] <span class="op">/</span> <span class="st">"centers.parquet"</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"buildings_2055_parquet"</span>: paths[<span class="st">"processed"</span>] <span class="op">/</span> <span class="st">"buildings_2055.parquet"</span>,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># one-time read of the two vector sources, cached as GeoParquet so later runs</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co"># don't re-parse the FileGDB or re-fetch the REST layer.</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> paths[<span class="st">"parcels_geoparquet"</span>].exists():</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    parcels_gdf <span class="op">=</span> gpd.read_file(paths[<span class="st">"gdb"</span>], layer<span class="op">=</span><span class="st">"parcels"</span>, columns<span class="op">=</span>[<span class="st">"parcel_id"</span>, <span class="st">"parcel_acres"</span>])</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>    parcels_gdf.to_parquet(paths[<span class="st">"parcels_geoparquet"</span>])</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> paths[<span class="st">"centers_geoparquet"</span>].exists():</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    centers_gdf <span class="op">=</span> gpd.read_file(L[<span class="st">"center_boundaries"</span>], columns<span class="op">=</span>[<span class="st">"CenterName"</span>, <span class="st">"CenterType"</span>])</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    centers_gdf.to_parquet(paths[<span class="st">"centers_geoparquet"</span>])</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> paths[<span class="st">"buildings_2055_parquet"</span>].exists():</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    buildings_full <span class="op">=</span> pd.read_pickle(paths[<span class="st">"buildings_2055_pkl"</span>]).reset_index()</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 'note' mixes strings with an int 0 sentinel (no dedicated null), which pyarrow</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># can't write as a single column type -- cast to string so every row survives</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    <span class="co"># as-is (0 -&gt; "0") rather than dropping columns to sidestep the type error.</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    buildings_full[<span class="st">"note"</span>] <span class="op">=</span> buildings_full[<span class="st">"note"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    buildings_full.to_parquet(paths[<span class="st">"buildings_2055_parquet"</span>])</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>parcels <span class="op">=</span> gpd.read_parquet(paths[<span class="st">"parcels_geoparquet"</span>])</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>centers <span class="op">=</span> gpd.read_parquet(paths[<span class="st">"centers_geoparquet"</span>]).to_crs(parcels.crs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="parcels-within-each-center" class="level2">
 <h2 class="anchored" data-anchor-id="parcels-within-each-center">Parcels within each center</h2>
-<p>Centroid-in-polygon join (not <code>ST_Intersects</code>) so a parcel straddling a center boundary is assigned to exactly one center, not double-counted.</p>
-<div id="ec1f1bef" class="cell" data-execution_count="5">
+<p>Centroid-in-polygon join (not a straight intersection) so a parcel straddling a center boundary is assigned to exactly one center, not double-counted.</p>
+<div id="10e5e138" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="st">    CREATE OR REPLACE VIEW parcels_in_centers AS</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT c.CenterName, p.parcel_id, p.parcel_acres</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM parcels p</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">    JOIN centers c ON ST_Within(ST_Centroid(p.geom), c.geom)</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>con.execute(<span class="st">"""</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT CenterName, count(*) AS n_parcels, sum(parcel_acres) AS total_acres</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM parcels_in_centers</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY 1</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>parcel_centroids <span class="op">=</span> parcels.set_geometry(parcels.geometry.centroid)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>parcels_in_centers <span class="op">=</span> gpd.sjoin(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    parcel_centroids, centers[[<span class="st">"CenterName"</span>, <span class="st">"geometry"</span>]], predicate<span class="op">=</span><span class="st">"within"</span>, how<span class="op">=</span><span class="st">"inner"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>)[[<span class="st">"parcel_id"</span>, <span class="st">"parcel_acres"</span>, <span class="st">"CenterName"</span>]]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>parcels_in_centers.groupby(<span class="st">"CenterName"</span>).agg(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    n_parcels<span class="op">=</span>(<span class="st">"parcel_id"</span>, <span class="st">"count"</span>), total_acres<span class="op">=</span>(<span class="st">"parcel_acres"</span>, <span class="st">"sum"</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="4">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">n_parcels</th>
+<th data-quarto-table-cell-role="th">total_acres</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">CenterName</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Daybreak</th>
+<td>178</td>
+<td>656.151874</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Saratoga Springs Downtown</th>
+<td>40</td>
+<td>238.963509</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">The Point</th>
+<td>64</td>
+<td>739.545359</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="daybreak-saratoga-springs-remm-developable-land" class="level2">
+<h2 class="anchored" data-anchor-id="daybreak-saratoga-springs-remm-developable-land">Daybreak &amp; Saratoga Springs: REMM developable land</h2>
+<p>Follows the original pseudocode directly: filter the 2055 buildings table (<code>run1842year2055allbuildings.pkl</code>, one row per <em>building</em>) to parcels within our two centers, keep buildings with <code>year_built &gt; 2025</code>, take the unique parcel ids from that, then sum <code>parcel_acres</code> for those parcels.</p>
+<p>An earlier version of this shortcut off the parcel-level <code>parcel_progression_metrics</code> table instead, since it already carries a single <code>year_built</code> per parcel. That’s only valid if every building on a parcel always shares the same year/type – checked directly: 162 parcels regionwide have more than one building, 2 of them are in our two centers, and in both cases the buildings on that parcel happened to share the same <code>year_built</code>. That was a coincidence of this dataset, not something the data guarantees in general, so this now filters at the building level as originally specified rather than relying on it holding elsewhere.</p>
+<div id="3078ace5" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>buildings_2055 <span class="op">=</span> pd.read_parquet(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    paths[<span class="st">"buildings_2055_parquet"</span>],</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"parcel_id"</span>, <span class="st">"year_built"</span>, <span class="st">"general_type"</span>, <span class="st">"residential_units"</span>, <span class="st">"job_spaces"</span>],</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>our_parcels <span class="op">=</span> parcels_in_centers[</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    parcels_in_centers[<span class="st">"CenterName"</span>].isin([<span class="st">"Daybreak"</span>, <span class="st">"Saratoga Springs Downtown"</span>, <span class="st">"The Point"</span>])</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>buildings_in_centers <span class="op">=</span> buildings_2055.merge(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    our_parcels[[<span class="st">"parcel_id"</span>, <span class="st">"CenterName"</span>]], on<span class="op">=</span><span class="st">"parcel_id"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>post_2025_parcel_ids <span class="op">=</span> buildings_in_centers.loc[</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    buildings_in_centers[<span class="st">"year_built"</span>] <span class="op">&gt;</span> <span class="dv">2025</span>, <span class="st">"parcel_id"</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>].unique()</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>developable_land <span class="op">=</span> (</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    our_parcels[our_parcels[<span class="st">"parcel_id"</span>].isin(post_2025_parcel_ids)]</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">"CenterName"</span>)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    .agg(n_parcels<span class="op">=</span>(<span class="st">"parcel_id"</span>, <span class="st">"count"</span>), total_acres<span class="op">=</span>(<span class="st">"parcel_acres"</span>, <span class="st">"sum"</span>))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>developable_land</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
@@ -562,91 +835,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tbody>
 <tr class="odd">
 <th data-quarto-table-cell-role="th">0</th>
-<td>Saratoga Springs Downtown</td>
-<td>40</td>
-<td>238.963509</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">1</th>
-<td>The Point</td>
-<td>64</td>
-<td>739.545359</td>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">2</th>
-<td>Daybreak</td>
-<td>178</td>
-<td>656.151874</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-</section>
-<section id="daybreak-saratoga-springs-remm-developable-land" class="level2">
-<h2 class="anchored" data-anchor-id="daybreak-saratoga-springs-remm-developable-land">Daybreak &amp; Saratoga Springs: REMM developable land</h2>
-<p>Parcels within each center boundary where REMM develops or redevelops after 2025, per <code>run_1842_year_2055_parcel_progression_metrics.pkl</code>.</p>
-<p><strong>Note on this table’s columns:</strong> <code>was_developed</code>, <code>was_redeveloped</code>, <code>acreage_dev</code>, <code>acreage_redev</code> (and their <code>_res</code>/<code>_nonres</code> splits) turned out to describe only the single simulated year this snapshot is for (2055 itself) – e.g.&nbsp;a Daybreak parcel with <code>year_built = 2035</code> (already built) shows <code>was_developed = 0</code> and <code>acreage_dev = 0</code> here, because that development event happened in 2035, not 2055. <code>developable = 0</code> for it too, meaning “developable” flags what’s <em>still</em> vacant as of 2055, not what became vacant after 2025. So the filter below uses <code>year_built</code> (reliable and cumulative per parcel) against each parcel’s own <code>parcel_acres</code>, per the original approach, rather than those event-only columns. Residential vs. commercial/employment acreage is split using the parcel’s current building type flags (<code>is_sf</code>/<code>is_mf</code> vs.&nbsp;everything else).</p>
-<p><strong>Still open:</strong> excluding development already reflected in the post-base-year housing inventory isn’t applied yet – that source hasn’t been identified (see <code>sources.md</code>). Once it is, add an anti-join here.</p>
-<div id="706df9a9" class="cell" data-execution_count="6">
-<details class="code-fold">
-<summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>developable_land <span class="op">=</span> con.execute(<span class="st">"""</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="st">        pc.CenterName,</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="st">        count(*) AS n_parcels,</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="st">        sum(pc.parcel_acres) AS total_acres,</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="st">        sum(CASE WHEN pm.is_sf = 1 OR pm.is_mf = 1 THEN pc.parcel_acres ELSE 0 END) AS res_acres,</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">        sum(CASE WHEN pm.is_sf = 0 AND pm.is_mf = 0 THEN pc.parcel_acres ELSE 0 END) AS nonres_acres,</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">        sum(pm.residential_units) AS res_units,</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="st">        sum(pm.job_spaces) AS job_spaces</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="st">    FROM parcels_in_centers pc</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="st">    JOIN progression_2055 pm ON pm.parcel_id = pc.parcel_id</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="st">    WHERE pc.CenterName IN ('Daybreak', 'Saratoga Springs Downtown')</span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="st">      AND pm.year_built &gt; 2025</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="st">    GROUP BY 1</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>).df()</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>developable_land</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-<div class="cell-output cell-output-display" data-execution_count="6">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">CenterName</th>
-<th data-quarto-table-cell-role="th">n_parcels</th>
-<th data-quarto-table-cell-role="th">total_acres</th>
-<th data-quarto-table-cell-role="th">res_acres</th>
-<th data-quarto-table-cell-role="th">nonres_acres</th>
-<th data-quarto-table-cell-role="th">res_units</th>
-<th data-quarto-table-cell-role="th">job_spaces</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">0</th>
-<td>Saratoga Springs Downtown</td>
-<td>31</td>
-<td>158.428793</td>
-<td>137.437893</td>
-<td>20.990900</td>
-<td>1489.0</td>
-<td>4374.0</td>
-</tr>
-<tr class="even">
-<th data-quarto-table-cell-role="th">1</th>
 <td>Daybreak</td>
 <td>29</td>
 <td>135.664032</td>
-<td>60.555030</td>
-<td>75.109002</td>
-<td>6032.0</td>
-<td>14971.0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Saratoga Springs Downtown</td>
+<td>31</td>
+<td>158.428793</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>The Point</td>
+<td>4</td>
+<td>600.890209</td>
 </tr>
 </tbody>
 </table>
@@ -656,27 +859,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="forecast-development-mix-and-buildout-capacity" class="level3">
 <h3 class="anchored" data-anchor-id="forecast-development-mix-and-buildout-capacity">Forecast development mix and buildout capacity</h3>
-<div id="de404d49" class="cell" data-execution_count="7">
+<div id="9a53ce59" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># residential vs. commercial/employment forecast ratio (2050 or 2055) -- confirm</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># whether to derive this from progression_2055's res_units_added/job_spaces_added</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># directly, or from the allbuildings tables (not yet converted/loaded)</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># apply center's median DwellingPerAcre to residential share of acreage -&gt; housing units</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># apply center's median employment density (NonResFAR + job-space assumption) to</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># commercial/employment share of acreage -&gt; jobs</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># residential vs. commercial/employment forecast ratio (2050 or 2055) from</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># buildings_in_centers (year_built &gt; 2025): sum residential_units and</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># job_spaces (or building_sqft by general_type) rather than trying to label</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># a whole parcel's acreage as "residential" or "nonres" -- some parcels mix both.</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># apply center's median DwellingPerAcre to residential share of acreage -&gt; housing units</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># apply center's median employment density (NonResFAR + job-space assumption) to</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># commercial/employment share of acreage -&gt; jobs</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 </section>
 <section id="the-point-buildout-from-development-schedule" class="level2">
 <h2 class="anchored" data-anchor-id="the-point-buildout-from-development-schedule">The Point: buildout from development schedule</h2>
-<div id="d0af8fec" class="cell" data-execution_count="8">
+<div id="91fff6a4" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load The Point's development schedule (format </span><span class="al">TBD</span><span class="co">, see sources.md)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># report full buildout as provided; estimate any residual undeveloped area</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only if the schedule doesn't cover the full center boundary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load The Point's development schedule (format </span><span class="al">TBD</span><span class="co">, see sources.md)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># report full buildout as provided; estimate any residual undeveloped area</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only if the schedule doesn't cover the full center boundary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
