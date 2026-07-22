@@ -1,0 +1,27 @@
+# sources.yml
+# Registry of ArcGIS REST data sources used by this analysis only.
+#
+# Each entry defines:
+#   url:         Full ArcGIS FeatureServer (or MapServer) layer URL
+#   cache:       Local .gpkg file path written by ensure_layers(), relative
+#                to this sources.yml (not the repo root)
+#   description: Human-readable label
+#   access:      (optional) "private" = requires a login; token auto-generated
+#                from .env credentials by ensure_layers(). Omit for public layers.
+#   where:       (optional) SQL where clause to filter features server-side
+#   pagination:  (optional) "offset" for query-layer/joined services with
+#                unstable OBJECTIDs (see arcgis_utils.py docstring). Requires order_by.
+#   order_by:    (optional) stable sort field, required when pagination: offset
+#
+# Call ensure_layers([...]) from gis_tools.layer_cache to verify caches exist
+# before reading with gpd.read_file(L["key"]).
+#
+# To re-download a specific layer: ensure_layers(["center_boundaries"], force=["center_boundaries"])
+# To re-download every layer used:  ensure_layers([...], force=True)
+
+layers:
+
+  center_boundaries:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/ArcGIS/rest/services/WCV_Centers_and_Regional_Land_Uses/FeatureServer/0
+    cache: _data/remote/center_boundaries.gpkg
+    description: Wasatch Choice Vision centers and regional land uses

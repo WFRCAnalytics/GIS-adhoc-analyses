@@ -1,0 +1,63 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "**/*.qmd"
+    - "!_templates/**"
+
+brand: _extensions/WFRCAnalytics/wfrc-brand/brand.yml
+
+website:
+  title: "GIS Ad Hoc Analyses"
+  description: >
+    Wasatch Front Regional Council -- small, one-off GIS analyses, tracked
+    for code, process, and results.
+  site-url: "https://wfrcanalytics.github.io/GIS-adhoc-analyses"
+  favicon: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_color_transparent.png"
+
+  page-navigation: false
+  back-to-top-navigation: true
+
+  navbar:
+    logo: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_white_transparent.png"
+    logo-alt: "Wasatch Front Regional Council"
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Template Example"
+        href: projects/_template/index.qmd
+
+  page-footer:
+    left: "© 2026 [Wasatch Front Regional Council](https://wfrc.utah.gov/)"
+
+execute:
+  eval: true
+  warning: false
+  message: false
+
+jupyter: python3
+
+format:
+  html:
+    theme:
+      light:
+        - cosmo
+        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc.scss
+        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc-light.scss
+      dark:
+        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc.scss
+        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc-dark.scss
+    respect-user-color-scheme: true
+    highlight-style:
+      light: github
+      dark: dracula
+    toc: true
+    code-fold: true
+    code-summary: "Show the code"
+
+title-block-banner: true
+citation: false
+
+# freeze computational output
+# (see https://quarto.org/docs/projects/code-execution.html#freeze)
+freeze: auto

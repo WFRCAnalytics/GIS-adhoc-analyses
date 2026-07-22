@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Quarto
+/.quarto/
+**/*.quarto_ipynb
+_freeze/
+
+# Per-project data (ad hoc analyses: remote/processed are reproducible caches;
+# raw is tracked by default -- add explicit per-file excludes here if a raw
+# source exceeds ~50-100MB and is superseded by a REST-cached equivalent)
+projects/*/_data/remote/*
+!projects/*/_data/remote/.gitkeep
+projects/*/_data/processed/*
+!projects/*/_data/processed/.gitkeep
