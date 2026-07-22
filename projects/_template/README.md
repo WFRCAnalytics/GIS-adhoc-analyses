@@ -11,7 +11,7 @@ for it, and any deadline or downstream use.
 
 See `sources.yml` (machine-readable registry) and `sources.md` (human
 registry with vintage/status/contact). Run cells in `index.qmd` to download
-via `gis_tools.layer_cache.ensure_layers()`.
+via `gis_adhoc_analyses.layer_cache.ensure_layers()`.
 
 ## Layout
 

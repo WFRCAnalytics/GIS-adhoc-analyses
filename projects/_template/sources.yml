@@ -13,7 +13,7 @@
 #                unstable OBJECTIDs (see arcgis_utils.py docstring). Requires order_by.
 #   order_by:    (optional) stable sort field, required when pagination: offset
 #
-# Call ensure_layers([...]) from gis_tools.layer_cache to verify caches exist
+# Call ensure_layers([...]) from gis_adhoc_analyses.layer_cache to verify caches exist
 # before reading with gpd.read_file(L["key"]).
 #
 # To re-download a specific layer: ensure_layers(["center_boundaries"], force=["center_boundaries"])

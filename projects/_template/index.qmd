@@ -6,13 +6,13 @@ subtitle: "Copy this folder to start a new analysis"
 ## Purpose
 
 Replace this page with a description of the analysis. This template proves
-the pipeline end to end: ArcGIS REST -> `gis_tools` cache -> geopandas ->
-Quarto page.
+the pipeline end to end: ArcGIS REST -> `gis_adhoc_analyses` cache ->
+geopandas -> Quarto page.
 
 ## Load data
 
 ```{python}
-from gis_tools.layer_cache import ensure_layers
+from gis_adhoc_analyses.layer_cache import ensure_layers
 import geopandas as gpd
 
 L = ensure_layers(["center_boundaries"])

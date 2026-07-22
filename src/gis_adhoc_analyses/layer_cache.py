@@ -13,7 +13,7 @@ self-contained and portable when copied from projects/_template.
 
 Usage
 -----
-    from gis_tools.layer_cache import ensure_layers
+    from gis_adhoc_analyses.layer_cache import ensure_layers
 
     L = ensure_layers(["bikeways", "at_point_projects"])
 
@@ -36,7 +36,7 @@ from pathlib import Path
 
 import yaml
 
-from gis_tools.arcgis_utils import download_layer, download_zip_layer, generate_token
+from gis_adhoc_analyses.arcgis_utils import download_layer, download_zip_layer, generate_token
 
 
 def _load_sources(sources_path: Path) -> dict:
@@ -100,7 +100,9 @@ def ensure_layers(
     for key in keys:
         if key not in sources:
             available = ", ".join(sorted(sources))
-            raise KeyError(f"Unknown layer key {key!r}. Available keys in sources.yml:\n  {available}")
+            raise KeyError(
+                f"Unknown layer key {key!r}. Available keys in sources.yml:\n  {available}"
+            )
 
         entry = sources[key]
         cache_path = base_dir / entry["cache"]
@@ -110,10 +112,9 @@ def ensure_layers(
 
         should_force = force is True or (isinstance(force, list) and key in force)
 
-        if should_force or not cache_path.exists():
-            if is_private and auto_token is None:
-                print(f"Layer '{key}' is private -- generating token from .env credentials")
-                auto_token = generate_token()
+        if (should_force or not cache_path.exists()) and is_private and auto_token is None:
+            print(f"Layer '{key}' is private -- generating token from .env credentials")
+            auto_token = generate_token()
 
         layer_token = auto_token if is_private else None
 

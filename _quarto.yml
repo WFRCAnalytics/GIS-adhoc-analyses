@@ -24,8 +24,6 @@ website:
     left:
       - text: "Home"
         href: index.qmd
-      - text: "Template Example"
-        href: projects/_template/index.qmd
 
   page-footer:
     left: "© 2026 [Wasatch Front Regional Council](https://wfrc.utah.gov/)"

@@ -14,9 +14,16 @@ Python environment and one set of downloader utilities.
 
 - **Package manager**: `uv` -- do not use `conda` or `pip` directly.
 - **Python**: 3.14, pinned in `.python-version`.
-- **Setup**: `uv sync`.
+- **Setup**: `uv venv --prompt "GIS-adhoc-analyses"` then `uv sync` -- the
+  explicit `--prompt` must come first. `uv sync` alone would create the venv
+  itself and set the prompt from the PEP 503-normalized project name
+  (`gis-adhoc-analyses`, lowercase) instead of the literal repo casing; once
+  the venv already exists with an explicit prompt, `uv sync` leaves it alone.
 - **Render a page**: `uv run quarto render <path/to/index.qmd>`
 - **Preview interactively**: `uv run quarto preview <path/to/index.qmd>`
+- **Lint/format** (`.py` files only -- ruff doesn't parse `.qmd` code fences):
+  `uv run ruff check --fix .` and `uv run ruff format .`. Config lives in
+  `[tool.ruff]` in `pyproject.toml`.
 - One-off packages needed by a single analysis: add to root `pyproject.toml`
   via `uv add <pkg>`, or use `uv run --with <pkg>` for a throwaway need.
   There are no per-project virtual environments.
@@ -30,7 +37,7 @@ cp -r projects/_template projects/<name>
 Then fill in `sources.yml`/`sources.md`, write `index.qmd`, and add a navbar
 entry in the root `_quarto.yml`.
 
-## ArcGIS REST data (`sources.yml` + `gis_tools`)
+## ArcGIS REST data (`sources.yml` + `gis_adhoc_analyses`)
 
 Each project defines its own `sources.yml` (url + local `.gpkg` cache path +
 description, per layer -- see `projects/_template/sources.yml` for the
@@ -39,7 +46,7 @@ schema and `sources.md` for the human-readable vintage/status registry).
 Call `ensure_layers()` at the top of a project's data-loading section:
 
 ```python
-from gis_tools.layer_cache import ensure_layers
+from gis_adhoc_analyses.layer_cache import ensure_layers
 L = ensure_layers(["some_layer_key"])
 gdf = gpd.read_file(L["some_layer_key"])
 ```
@@ -49,8 +56,8 @@ gdf = gpd.read_file(L["some_layer_key"])
 - Secured layers (`access: private` in sources.yml): put credentials in
   `.env` (copy `.env.example`); a token is generated automatically.
 
-**Do not use the Esri `arcgis` SDK.** `src/gis_tools/arcgis_utils.py` talks
-to the ArcGIS REST API directly via `requests` -- deliberately, to avoid the
+**Do not use the Esri `arcgis` SDK.** `src/gis_adhoc_analyses/arcgis_utils.py`
+talks to the ArcGIS REST API directly via `requests` -- deliberately, to avoid the
 SDK's heavy/pinned dependency tree conflicting with geopandas/duckdb, and to
 guard against a known failure mode: query-layer/joined services can
 regenerate OBJECTIDs non-deterministically between requests, which silently

@@ -7,8 +7,9 @@ repo per analysis.
 ## Setup
 
 ```bash
+uv venv --prompt "GIS-adhoc-analyses"   # sets the venv/IDE display name; plain `uv sync` alone creates it lowercased
 uv sync
-quarto add WFRCAnalytics/wfrc-brand   # already installed; re-run after a clean clone if _extensions/ is missing
+quarto add WFRCAnalytics/wfrc-brand      # already installed; re-run after a clean clone if _extensions/ is missing
 ```
 
 ## Starting a new analysis
@@ -37,20 +38,20 @@ Settings -> Pages -> Source: `main` branch, `/docs` folder.
 
 ## Downloading ArcGIS REST data
 
-Every project calls `gis_tools.layer_cache.ensure_layers()` against its own
-`sources.yml`:
+Every project calls `gis_adhoc_analyses.layer_cache.ensure_layers()` against
+its own `sources.yml`:
 
 ```python
-from gis_tools.layer_cache import ensure_layers
+from gis_adhoc_analyses.layer_cache import ensure_layers
 import geopandas as gpd
 
 L = ensure_layers(["some_layer_key"])
 gdf = gpd.read_file(L["some_layer_key"])
 ```
 
-See `src/gis_tools/arcgis_utils.py` for the downloader itself -- plain
-`requests` (no Esri SDK), objectId-batched with dedup/ordering safeguards for
-services that don't behave consistently across requests.
+See `src/gis_adhoc_analyses/arcgis_utils.py` for the downloader itself --
+plain `requests` (no Esri SDK), objectId-batched with dedup/ordering
+safeguards for services that don't behave consistently across requests.
 
 Secured/private layers need `ARCGIS_USERNAME` / `ARCGIS_PASSWORD` in a local
 `.env` (copy `.env.example`) -- never commit `.env`.

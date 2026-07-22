@@ -53,7 +53,7 @@ import os
 import time
 import warnings
 import zipfile
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import geopandas as gpd
@@ -106,7 +106,7 @@ def generate_token(
     portal_url = portal_url or os.getenv("ARCGIS_PORTAL_URL", "https://www.arcgis.com")
 
     if not username or not password:
-        raise EnvironmentError(
+        raise OSError(
             "ArcGIS credentials not found. Set ARCGIS_USERNAME and ARCGIS_PASSWORD "
             "in a .env file at the repo root, or pass them explicitly."
         )
@@ -162,7 +162,7 @@ def _fetch_batch_geojson(
     headers: dict,
     retries: int = 1,
 ) -> gpd.GeoDataFrame:
-    """POST a single objectId batch and return it as a GeoDataFrame, retrying short responses once."""
+    """POST one objectId batch, returning it as a GeoDataFrame; retries short responses once."""
     last_gdf: gpd.GeoDataFrame | None = None
     for attempt in range(retries + 1):
         resp = requests.post(
@@ -190,9 +190,9 @@ def _fetch_batch_geojson(
         if attempt < retries:
             print(
                 f"    Batch returned {len(chunk)}/{len(object_ids)} features -- "
-                f"retrying in {2 ** attempt}s ..."
+                f"retrying in {2**attempt}s ..."
             )
-            time.sleep(2 ** attempt)
+            time.sleep(2**attempt)
 
     return last_gdf if last_gdf is not None else gpd.GeoDataFrame()
 
@@ -206,7 +206,7 @@ def _fetch_by_object_ids(
     auth: dict,
     headers: dict,
 ) -> list[gpd.GeoDataFrame]:
-    """Sort ids for deterministic batching, then batch-fetch by objectId (POST avoids URI-too-long)."""
+    """Sort ids for deterministic batching, then batch-fetch by objectId (POST avoids long URIs)."""
     all_ids = sorted(all_ids)
     gdfs = []
     for batch_start in range(0, len(all_ids), max_count):
@@ -335,7 +335,9 @@ def fetch_feature_layer(
     print(f"Service maxRecordCount: {max_count}, objectIdField: {id_field}")
 
     if pagination == "offset":
-        gdfs = _fetch_by_offset(query_url, order_by, max_count, where, out_fields, out_sr, auth, headers)
+        gdfs = _fetch_by_offset(
+            query_url, order_by, max_count, where, out_fields, out_sr, auth, headers
+        )
         expected_count = None
     else:
         id_resp = requests.get(
@@ -354,12 +356,16 @@ def fetch_feature_layer(
         expected_count = len(all_ids)
         print(f"Total features to fetch: {expected_count}")
 
-        gdfs = _fetch_by_object_ids(query_url, all_ids, max_count, out_fields, out_sr, auth, headers)
+        gdfs = _fetch_by_object_ids(
+            query_url, all_ids, max_count, out_fields, out_sr, auth, headers
+        )
 
     if not gdfs:
         raise ValueError(f"No features returned from {service_url}")
 
-    gdf = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True), geometry="geometry", crs=f"EPSG:{out_sr}")
+    gdf = gpd.GeoDataFrame(
+        pd.concat(gdfs, ignore_index=True), geometry="geometry", crs=f"EPSG:{out_sr}"
+    )
 
     if id_field in gdf.columns:
         before = len(gdf)
@@ -392,8 +398,8 @@ _STALE_WARNING_DAYS = 365  # warn if cache is older than this
 
 def _print_cache_age(cache_path: Path) -> None:
     """Print cache age; warn if stale."""
-    mtime = datetime.fromtimestamp(cache_path.stat().st_mtime, tz=timezone.utc)
-    age_days = (datetime.now(tz=timezone.utc) - mtime).days
+    mtime = datetime.fromtimestamp(cache_path.stat().st_mtime, tz=UTC)
+    age_days = (datetime.now(tz=UTC) - mtime).days
     if age_days > _STALE_WARNING_DAYS:
         warnings.warn(
             f"Cache file is {age_days} days old ({cache_path.name}). "
@@ -406,7 +412,7 @@ def _print_cache_age(cache_path: Path) -> None:
 
 
 def download_layer(
-    cache_path: "Path | str",
+    cache_path: Path | str,
     service_url: str,
     force: bool = False,
     token: str | None = None,
@@ -449,7 +455,7 @@ def download_layer(
 
 
 def download_zip_layer(
-    cache_path: "Path | str",
+    cache_path: Path | str,
     url: str,
     layer_name: str | None = None,
     gdb_name: str | None = None,

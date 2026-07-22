@@ -4,13 +4,13 @@
     "href": "index.html",
     "title": "GIS Ad Hoc Analyses",
     "section": "",
-    "text": "A working index of small, one-off GIS analyses for WFRC. Each analysis lives in its own folder under projects/, with its own data sources, script/notebook, and outputs. See README.md and CLAUDE.md at the repo root for conventions, and projects/_template/ as the starting point for a new analysis."
+    "text": "A working index of small, one-off GIS analyses for WFRC. Each analysis lives in its own folder under projects/, with its own data sources, script/notebook, and outputs. See README.md and CLAUDE.md at the repo root for conventions.\nTo start a new analysis, copy projects/_template/ (its underscore prefix keeps it – and any other in-progress scaffold folder – out of this published site by convention)."
   },
   {
     "objectID": "index.html#analyses",
     "href": "index.html#analyses",
     "title": "GIS Ad Hoc Analyses",
     "section": "Analyses",
-    "text": "Analyses\n\n_template – example page proving the ArcGIS REST -&gt; geopandas -&gt; Quarto pipeline. Copy this folder to start a real analysis."
+    "text": "Analyses\nNo analyses published yet."
   }
 ]
