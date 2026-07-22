@@ -25,10 +25,8 @@ layers:
     url: https://services1.arcgis.com/taguadKoI1XFwivx/ArcGIS/rest/services/WCV_Centers_and_Regional_Land_Uses/FeatureServer/0
     cache: _data/remote/center_boundaries.gpkg
     description: >
-      WCV centers boundaries for this analysis only: Daybreak ("Downtown
-      Daybreak"), Saratoga Springs Downtown, and The Point. The Point's
-      "Employment District" polygon is excluded at the user's request --
-      only its "Urban Center" polygon is in scope.
-    where: >
-      CenterName IN ('Daybreak', 'Saratoga Springs Downtown')
-      OR (CenterName = 'The Point' AND CenterType = 'Urban Center')
+      All WCV centers and regional land uses -- fetched in full (no
+      server-side `where`) so this analysis's centers-of-interest list
+      (defined in index.qmd) can be extended later without re-fetching.
+      Filtering down to Daybreak, Saratoga Springs Downtown, and The Point
+      happens client-side at read time in index.qmd.
