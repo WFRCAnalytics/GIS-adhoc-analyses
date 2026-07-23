@@ -209,7 +209,7 @@ post_2025_parcel_ids
 developable_land = (
     our_parcels[our_parcels["parcel_id"].isin(post_2025_parcel_ids)]
     .groupby("CenterName")
-    .agg(n_parcels=("parcel_id", "count"), total_acres=("parcel_acres", "sum"))
+    .agg(n_parcels=("parcel_id", "count"), dev_acres=("parcel_acres", "sum"))
     .reset_index()
 )
 developable_land
@@ -271,10 +271,10 @@ dev_mix
 # and a non-residential/employment share, using the res_share/nonres_share
 # computed above -- this is the "assume full buildout follows this same mix" step.
 acreage_allocation = developable_land.set_index("CenterName").loc[
-    CENTERS_OF_INTEREST, ["total_acres"]
+    CENTERS_OF_INTEREST, ["dev_acres"]
 ].join(dev_mix[["res_share", "nonres_share"]])
-acreage_allocation["res_acres"] = acreage_allocation["total_acres"] * acreage_allocation["res_share"]
-acreage_allocation["nonres_acres"] = acreage_allocation["total_acres"] * acreage_allocation["nonres_share"]
+acreage_allocation["res_acres"] = acreage_allocation["dev_acres"] * acreage_allocation["res_share"]
+acreage_allocation["nonres_acres"] = acreage_allocation["dev_acres"] * acreage_allocation["nonres_share"]
 acreage_allocation
 ```
 
@@ -344,14 +344,55 @@ capacity["housing_units"] = capacity["res_acres"] * capacity["median_dua"]
 capacity["nonres_sqft"] = capacity["nonres_acres"] * capacity["median_far"] * SQFT_PER_ACRE
 # building sqft / sqft-per-job = additional jobs
 capacity["jobs"] = capacity["nonres_sqft"] / capacity["sqft_per_job"]
-capacity[["total_acres", "res_acres", "nonres_acres", "housing_units", "jobs"]]
+capacity[["dev_acres", "res_acres", "nonres_acres", "housing_units", "jobs"]]
 ```
 
-## The Point: buildout from development schedule
+## The Point: full buildout
+
+No separate development schedule document was ever provided, and The Point
+is already REMM-modeled -- so "the development schedule" here means REMM's
+own full-buildout simulation for The Point's parcels. Unlike tasks 1/2,
+this doesn't need acreage allocation or density assumptions: REMM's
+simulated buildings already give unit/job counts directly, so this is just
+a sum, plus a check that nothing's left undeveloped (rather than an
+estimate of it).
+
+#### (1) The Point's parcels, with full-buildout attributes
 
 ```{python}
-#| eval: false
-# load The Point's development schedule (format TBD, see sources.md)
-# report full buildout as provided; estimate any residual undeveloped area
-# only if the schedule doesn't cover the full center boundary
+# residential_units/job_spaces here are absolute totals as of the 2055 run
+# (not "_added" deltas) -- i.e. REMM's full-buildout state, not "new since 2025".
+# developable/year_built/max_far/max_dua are pulled too, for the check in step (2).
+point_progression = pd.read_parquet(
+    paths["progression_2055_parquet"],
+    columns=["parcel_id", "residential_units", "job_spaces", "developable", "year_built", "max_far", "max_dua"],
+)
+
+point_parcels = parcels_in_centers[parcels_in_centers["CenterName"] == "The Point"]
+point_buildout = point_parcels[["parcel_id", "parcel_acres"]].merge(point_progression, on="parcel_id")
+```
+
+#### (2) Confirm no developable land remains (a check, not an estimate)
+
+```{python}
+# developable == 1 would mean "still vacant and buildable as of 2055" -- expect
+# none, confirming there's no residual land to separately estimate.
+still_developable = point_buildout[point_buildout["developable"] == 1]
+print(f"parcels still flagged developable: {len(still_developable)}")
+
+# parcels with no building recorded (year_built == 0) are only a gap if they
+# also have real zoning capacity -- if max_far/max_dua are both 0 too, they're
+# non-buildable infrastructure (roads, open space), not missed development.
+unbuilt = point_buildout[point_buildout["year_built"] == 0]
+print(f"parcels never built ({unbuilt['parcel_acres'].sum():.1f} acres), of which zero-capacity:",
+      ((unbuilt["max_far"] == 0) & (unbuilt["max_dua"] == 0)).sum(), "/", len(unbuilt))
+```
+
+#### (3) Report The Point's full buildout
+
+```{python}
+point_capacity = point_buildout[["residential_units", "job_spaces"]].sum().rename({
+    "residential_units": "housing_units", "job_spaces": "jobs"
+})
+point_capacity
 ```

@@ -360,7 +360,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#forecast-development-mix-and-buildout-capacity" id="toc-forecast-development-mix-and-buildout-capacity" class="nav-link" data-scroll-target="#forecast-development-mix-and-buildout-capacity">Forecast development mix and buildout capacity</a></li>
   </ul></li>
-  <li><a href="#the-point-buildout-from-development-schedule" id="toc-the-point-buildout-from-development-schedule" class="nav-link" data-scroll-target="#the-point-buildout-from-development-schedule">The Point: buildout from development schedule</a></li>
+  <li><a href="#the-point-full-buildout" id="toc-the-point-full-buildout" class="nav-link" data-scroll-target="#the-point-full-buildout">The Point: full buildout</a></li>
   </ul>
 </nav>
     </div>
@@ -385,7 +385,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="centers-of-interest">Centers of interest</h2>
 <p>Single ordered list to extend if more centers are added later. <code>center_boundaries</code> is fetched in full from the REST service (no server-side <code>where</code>), so adding a center here doesn’t require touching <code>sources.yml</code> or re-fetching – just delete <code>_data/processed/centers.parquet</code> to force it to rebuild with the updated list.</p>
 <p>Every <code>gpd.read_file()</code> call below passes an OGR SQL <code>where</code> built straight from that list, restricted to “Urban Center” polygons (drops The Point’s separate “Employment District” polygon, since every center in scope for this analysis is its Urban Center polygon).</p>
-<div id="a278be51" class="cell" data-execution_count="1">
+<div id="384c16e1" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>CENTERS_OF_INTEREST <span class="op">=</span> [<span class="st">"Daybreak"</span>, <span class="st">"Saratoga Springs Downtown"</span>, <span class="st">"The Point"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -394,7 +394,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="load-center-boundaries" class="level2">
 <h2 class="anchored" data-anchor-id="load-center-boundaries">Load center boundaries</h2>
-<div id="fbed80e3" class="cell" data-execution_count="2">
+<div id="cfdf261b" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gis_adhoc_analyses.layer_cache <span class="im">import</span> ensure_layers</span>
@@ -456,7 +456,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="f29726b7" class="cell" data-execution_count="3">
+<div id="b3f1d613" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>centers_preview.explore(</span>
@@ -467,7 +467,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="remm-parcels-load-and-cache-as-parquet" class="level2">
 <h2 class="anchored" data-anchor-id="remm-parcels-load-and-cache-as-parquet">REMM parcels: load and cache as parquet</h2>
-<div id="6306adef" class="cell" data-execution_count="4">
+<div id="dddd4c29" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -537,7 +537,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parcels-within-each-center" class="level2">
 <h2 class="anchored" data-anchor-id="parcels-within-each-center">Parcels within each center</h2>
 <p>Centroid-in-polygon join (not a straight intersection) so a parcel straddling a center boundary is assigned to exactly one center, not double-counted.</p>
-<div id="f3a004a2" class="cell" data-execution_count="5">
+<div id="560b0825" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># swap each parcel's polygon for its centroid point -- a polygon can legitimately</span></span>
@@ -601,7 +601,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>An earlier version of this shortcut off the parcel-level <code>parcel_progression_metrics</code> table instead, since it already carries a single <code>year_built</code> per parcel. That’s only valid if every building on a parcel always shares the same year/type – checked directly: 162 parcels regionwide have more than one building, 2 of them are in our centers of interest, and in both cases the buildings on that parcel happened to share the same <code>year_built</code>. That was a coincidence of this dataset, not something the data guarantees in general, so this now filters at the building level as originally specified rather than relying on it holding elsewhere.</p>
 <section id="restrict-to-parcels-within-our-centers-of-interest" class="level4">
 <h4 class="anchored" data-anchor-id="restrict-to-parcels-within-our-centers-of-interest">(1) Restrict to parcels within our centers of interest</h4>
-<div id="cc8cef9d" class="cell" data-execution_count="6">
+<div id="cb4034c3" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parcels_in_centers already only contains parcels inside Daybreak, Saratoga</span></span>
@@ -614,7 +614,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="filter-the-2055-buildings-table-to-post-2025-buildings-on-those-parcels" class="level4">
 <h4 class="anchored" data-anchor-id="filter-the-2055-buildings-table-to-post-2025-buildings-on-those-parcels">(2) Filter the 2055 buildings table to post-2025 buildings on those parcels</h4>
-<div id="cf737ce4" class="cell" data-execution_count="7">
+<div id="17189b89" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># only the columns this step needs -- year_built to filter, general_type/</span></span>
@@ -651,13 +651,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="sum-developable-acreage-for-those-parcels-per-center" class="level4">
 <h4 class="anchored" data-anchor-id="sum-developable-acreage-for-those-parcels-per-center">(3) Sum developable acreage for those parcels, per center</h4>
-<div id="fe9edf05" class="cell" data-execution_count="8">
+<div id="b1c06a4c" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>developable_land <span class="op">=</span> (</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    our_parcels[our_parcels[<span class="st">"parcel_id"</span>].isin(post_2025_parcel_ids)]</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">"CenterName"</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    .agg(n_parcels<span class="op">=</span>(<span class="st">"parcel_id"</span>, <span class="st">"count"</span>), total_acres<span class="op">=</span>(<span class="st">"parcel_acres"</span>, <span class="st">"sum"</span>))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    .agg(n_parcels<span class="op">=</span>(<span class="st">"parcel_id"</span>, <span class="st">"count"</span>), dev_acres<span class="op">=</span>(<span class="st">"parcel_acres"</span>, <span class="st">"sum"</span>))</span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    .reset_index()</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>developable_land</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -672,7 +672,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">CenterName</th>
 <th data-quarto-table-cell-role="th">n_parcels</th>
-<th data-quarto-table-cell-role="th">total_acres</th>
+<th data-quarto-table-cell-role="th">dev_acres</th>
 </tr>
 </thead>
 <tbody>
@@ -704,7 +704,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="forecast-development-mix-and-buildout-capacity" class="level3">
 <h3 class="anchored" data-anchor-id="forecast-development-mix-and-buildout-capacity">Forecast development mix and buildout capacity</h3>
 <p>All three centers – The Point’s REMM-based estimate here is a cross-check alongside its own development-schedule-based buildout (below), not a replacement for it.</p>
-<div id="32a81583" class="cell" data-execution_count="9">
+<div id="a3c31074" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># our_parcels/post_2025_parcel_ids are already scoped to all of</span></span>
@@ -736,7 +736,7 @@ Name: parcel_id, Length: 64, dtype: int32</code></pre>
 <section id="forecast-residential-commercialemployment-development-ratio" class="level4">
 <h4 class="anchored" data-anchor-id="forecast-residential-commercialemployment-development-ratio">(1) Forecast residential : commercial/employment development ratio</h4>
 <p>Sum <code>residential_units</code> and <code>job_spaces</code> from <code>parcel_progression_metrics</code> for the post-2025 developable parcels identified above (2055 run). These two fields were checked directly against the buildings table and are reliable per-parcel sums across all of a parcel’s buildings (unlike <code>year_built</code>, which only reflects one representative building) – see note above. Full buildout of each center is assumed to follow this same mix, so each center’s total developable acreage (from task 1) is allocated between residential and commercial/employment by this ratio.</p>
-<div id="94c4e664" class="cell" data-execution_count="10">
+<div id="7eb165b3" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>progression_2055 <span class="op">=</span> pd.read_parquet(</span>
@@ -812,17 +812,17 @@ Name: parcel_id, Length: 64, dtype: int32</code></pre>
 </div>
 </div>
 </div>
-<div id="06ed547b" class="cell" data-execution_count="11">
+<div id="ddc98c3a" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split each center's total developable acreage (task 1) into a residential</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># and a non-residential/employment share, using the res_share/nonres_share</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># computed above -- this is the "assume full buildout follows this same mix" step.</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>acreage_allocation <span class="op">=</span> developable_land.set_index(<span class="st">"CenterName"</span>).loc[</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    CENTERS_OF_INTEREST, [<span class="st">"total_acres"</span>]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    CENTERS_OF_INTEREST, [<span class="st">"dev_acres"</span>]</span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>].join(dev_mix[[<span class="st">"res_share"</span>, <span class="st">"nonres_share"</span>]])</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>acreage_allocation[<span class="st">"res_acres"</span>] <span class="op">=</span> acreage_allocation[<span class="st">"total_acres"</span>] <span class="op">*</span> acreage_allocation[<span class="st">"res_share"</span>]</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>acreage_allocation[<span class="st">"nonres_acres"</span>] <span class="op">=</span> acreage_allocation[<span class="st">"total_acres"</span>] <span class="op">*</span> acreage_allocation[<span class="st">"nonres_share"</span>]</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>acreage_allocation[<span class="st">"res_acres"</span>] <span class="op">=</span> acreage_allocation[<span class="st">"dev_acres"</span>] <span class="op">*</span> acreage_allocation[<span class="st">"res_share"</span>]</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>acreage_allocation[<span class="st">"nonres_acres"</span>] <span class="op">=</span> acreage_allocation[<span class="st">"dev_acres"</span>] <span class="op">*</span> acreage_allocation[<span class="st">"nonres_share"</span>]</span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>acreage_allocation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="10">
@@ -833,7 +833,7 @@ Name: parcel_id, Length: 64, dtype: int32</code></pre>
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">total_acres</th>
+<th data-quarto-table-cell-role="th">dev_acres</th>
 <th data-quarto-table-cell-role="th">res_share</th>
 <th data-quarto-table-cell-role="th">nonres_share</th>
 <th data-quarto-table-cell-role="th">res_acres</th>
@@ -883,7 +883,7 @@ Name: parcel_id, Length: 64, dtype: int32</code></pre>
 <section id="apply-density-assumptions-to-each-acreage-share" class="level4">
 <h4 class="anchored" data-anchor-id="apply-density-assumptions-to-each-acreage-share">(2) Apply density assumptions to each acreage share</h4>
 <p><strong>Median dwelling-units-per-acre and FAR.</strong> <code>max_far</code>/<code>max_dua</code> live on the <code>parcels</code> table (per-parcel zoning capacity, not a text range), so this takes the statistical median across <em>all</em> parcels in each center – not just the post-2025 developable ones, since the assumption is about the center’s overall zoned capacity, not only what’s forecast to redevelop. Josh noted REMM’s own FAR/DUA-driven numbers assume a parcel develops wall-to-wall (no roads, parking, or common space carved out), so if that assumption changes later, override the values directly here (e.g. <code>capacities.loc["Daybreak", "median_far"] = 2.0</code>) and rerun from this cell down.</p>
-<div id="b773d091" class="cell" data-execution_count="12">
+<div id="17c7a0c4" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># our_parcels only has parcel_id/parcel_acres/CenterName -- pull max_far/max_dua</span></span>
@@ -941,7 +941,7 @@ Name: parcel_id, Length: 64, dtype: int32</code></pre>
 </div>
 </div>
 <p><strong>Median employment density, from FAR and a job-space assumption.</strong> <code>sqft_per_job</code> (needed to turn FAR-driven building sqft into a job count) comes from each center’s own non-residential buildings (all of them, not just post-2025 – there aren’t many non-res buildings in Saratoga Springs Downtown yet, so restricting to post-2025 only left a very thin sample). It turns out to be a fixed constant per building <code>general_type</code> region-wide (Office 633, Retail 374, Industrial 975, …), so the median here reflects each center’s non-res building mix rather than sampling noise.</p>
-<div id="6ccde51d" class="cell" data-execution_count="13">
+<div id="4432870d" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>buildings_full <span class="op">=</span> pd.read_parquet(</span>
@@ -968,7 +968,7 @@ Name: sqft_per_job, dtype: float64</code></pre>
 </section>
 <section id="estimate-additional-housing-units-and-jobs-at-full-buildout" class="level4">
 <h4 class="anchored" data-anchor-id="estimate-additional-housing-units-and-jobs-at-full-buildout">(3) Estimate additional housing units and jobs at full buildout</h4>
-<div id="6dc14709" class="cell" data-execution_count="14">
+<div id="3369535d" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>SQFT_PER_ACRE <span class="op">=</span> <span class="dv">43_560</span></span>
@@ -980,7 +980,7 @@ Name: sqft_per_job, dtype: float64</code></pre>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>capacity[<span class="st">"nonres_sqft"</span>] <span class="op">=</span> capacity[<span class="st">"nonres_acres"</span>] <span class="op">*</span> capacity[<span class="st">"median_far"</span>] <span class="op">*</span> SQFT_PER_ACRE</span>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># building sqft / sqft-per-job = additional jobs</span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>capacity[<span class="st">"jobs"</span>] <span class="op">=</span> capacity[<span class="st">"nonres_sqft"</span>] <span class="op">/</span> capacity[<span class="st">"sqft_per_job"</span>]</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>capacity[[<span class="st">"total_acres"</span>, <span class="st">"res_acres"</span>, <span class="st">"nonres_acres"</span>, <span class="st">"housing_units"</span>, <span class="st">"jobs"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>capacity[[<span class="st">"dev_acres"</span>, <span class="st">"res_acres"</span>, <span class="st">"nonres_acres"</span>, <span class="st">"housing_units"</span>, <span class="st">"jobs"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="13">
 <div>
@@ -990,7 +990,7 @@ Name: sqft_per_job, dtype: float64</code></pre>
 <thead>
 <tr class="header">
 <th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">total_acres</th>
+<th data-quarto-table-cell-role="th">dev_acres</th>
 <th data-quarto-table-cell-role="th">res_acres</th>
 <th data-quarto-table-cell-role="th">nonres_acres</th>
 <th data-quarto-table-cell-role="th">housing_units</th>
@@ -1039,18 +1039,69 @@ Name: sqft_per_job, dtype: float64</code></pre>
 </section>
 </section>
 </section>
-<section id="the-point-buildout-from-development-schedule" class="level2">
-<h2 class="anchored" data-anchor-id="the-point-buildout-from-development-schedule">The Point: buildout from development schedule</h2>
-<div id="17611a27" class="cell" data-execution_count="15">
+<section id="the-point-full-buildout" class="level2">
+<h2 class="anchored" data-anchor-id="the-point-full-buildout">The Point: full buildout</h2>
+<p>No separate development schedule document was ever provided, and The Point is already REMM-modeled – so “the development schedule” here means REMM’s own full-buildout simulation for The Point’s parcels. Unlike tasks 1/2, this doesn’t need acreage allocation or density assumptions: REMM’s simulated buildings already give unit/job counts directly, so this is just a sum, plus a check that nothing’s left undeveloped (rather than an estimate of it).</p>
+<section id="the-points-parcels-with-full-buildout-attributes" class="level4">
+<h4 class="anchored" data-anchor-id="the-points-parcels-with-full-buildout-attributes">(1) The Point’s parcels, with full-buildout attributes</h4>
+<div id="67d4df10" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load The Point's development schedule (format </span><span class="al">TBD</span><span class="co">, see sources.md)</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># report full buildout as provided; estimate any residual undeveloped area</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># only if the schedule doesn't cover the full center boundary</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># residential_units/job_spaces here are absolute totals as of the 2055 run</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (not "_added" deltas) -- i.e. REMM's full-buildout state, not "new since 2025".</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># developable/year_built/max_far/max_dua are pulled too, for the check in step (2).</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>point_progression <span class="op">=</span> pd.read_parquet(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    paths[<span class="st">"progression_2055_parquet"</span>],</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"parcel_id"</span>, <span class="st">"residential_units"</span>, <span class="st">"job_spaces"</span>, <span class="st">"developable"</span>, <span class="st">"year_built"</span>, <span class="st">"max_far"</span>, <span class="st">"max_dua"</span>],</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>point_parcels <span class="op">=</span> parcels_in_centers[parcels_in_centers[<span class="st">"CenterName"</span>] <span class="op">==</span> <span class="st">"The Point"</span>]</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>point_buildout <span class="op">=</span> point_parcels[[<span class="st">"parcel_id"</span>, <span class="st">"parcel_acres"</span>]].merge(point_progression, on<span class="op">=</span><span class="st">"parcel_id"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
+</div>
+</section>
+<section id="confirm-no-developable-land-remains-a-check-not-an-estimate" class="level4">
+<h4 class="anchored" data-anchor-id="confirm-no-developable-land-remains-a-check-not-an-estimate">(2) Confirm no developable land remains (a check, not an estimate)</h4>
+<div id="521295ac" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># developable == 1 would mean "still vacant and buildable as of 2055" -- expect</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># none, confirming there's no residual land to separately estimate.</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>still_developable <span class="op">=</span> point_buildout[point_buildout[<span class="st">"developable"</span>] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"parcels still flagged developable: </span><span class="sc">{</span><span class="bu">len</span>(still_developable)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># parcels with no building recorded (year_built == 0) are only a gap if they</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># also have real zoning capacity -- if max_far/max_dua are both 0 too, they're</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># non-buildable infrastructure (roads, open space), not missed development.</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>unbuilt <span class="op">=</span> point_buildout[point_buildout[<span class="st">"year_built"</span>] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"parcels never built (</span><span class="sc">{</span>unbuilt[<span class="st">'parcel_acres'</span>]<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:.1f}</span><span class="ss"> acres), of which zero-capacity:"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>      ((unbuilt[<span class="st">"max_far"</span>] <span class="op">==</span> <span class="dv">0</span>) <span class="op">&amp;</span> (unbuilt[<span class="st">"max_dua"</span>] <span class="op">==</span> <span class="dv">0</span>)).<span class="bu">sum</span>(), <span class="st">"/"</span>, <span class="bu">len</span>(unbuilt))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>parcels still flagged developable: 0
+parcels never built (31.4 acres), of which zero-capacity: 7 / 7</code></pre>
+</div>
+</div>
+</section>
+<section id="report-the-points-full-buildout" class="level4">
+<h4 class="anchored" data-anchor-id="report-the-points-full-buildout">(3) Report The Point’s full buildout</h4>
+<div id="fc802896" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>point_capacity <span class="op">=</span> point_buildout[[<span class="st">"residential_units"</span>, <span class="st">"job_spaces"</span>]].<span class="bu">sum</span>().rename({</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"residential_units"</span>: <span class="st">"housing_units"</span>, <span class="st">"job_spaces"</span>: <span class="st">"jobs"</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>point_capacity</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>housing_units     6660.0
+jobs             28382.0
+dtype: float64</code></pre>
+</div>
 </div>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
