@@ -5,16 +5,19 @@ subtitle: "Daybreak, Saratoga Springs Downtown, and The Point"
 
 ## Purpose
 
-Estimate additional housing units and jobs at full buildout for three WCV
-centers:
+For three WCV centers -- Daybreak, Saratoga Springs Downtown, and The Point
+-- this answers three questions per center:
 
-- **All three centers**: from REMM-forecast post-2025 development, applying
-  each center's median dwelling-unit-per-acre and employment-density (FAR +
-  job-space) assumptions to the forecast residential / commercial-employment
-  development mix.
-- **The Point**: additionally, from the development schedule the Point team
-  has provided directly -- that schedule-based figure is the one that
-  matters for The Point; the REMM-based estimate above is a cross-check.
+1. **Current year (2025)** homes and jobs -- where things stand today.
+2. **2055 forecast** homes and jobs -- REMM's own simulated outcome by 2055.
+3. **Full REMM capacity** homes and jobs -- see `## Full REMM capacity`
+   below; the method differs by center, since The Point's is already fully
+   built out by 2055 per REMM (nothing developable left), while Daybreak and
+   Saratoga Springs Downtown still have land redeveloping past 2025 whose
+   *additional* capacity has to be estimated from density assumptions.
+
+Metrics 1 and 2 use one shared calculation for all three centers. See
+`## Summary` for the combined results and CSV exports (chart pending).
 
 Spatial joins, filtering, and aggregation below run in geopandas/pandas.
 The base-year parcels come from `remm_base_year_data.gdb`, which is cached
@@ -143,20 +146,103 @@ parcels_in_centers = gpd.sjoin(
     parcel_centroids, centers[["CenterName", "geometry"]], predicate="within", how="inner"
 )[["parcel_id", "parcel_acres", "CenterName"]]
 
-parcels_in_centers.groupby("CenterName").agg(
+parcels_per_center = parcels_in_centers.groupby("CenterName").agg(
     n_parcels=("parcel_id", "count"), total_acres=("parcel_acres", "sum")
 )
+parcels_per_center
 ```
 
-## REMM developable land
+```{python}
+# parcels within our 3 centers of interest, reused by every metric below.
+# parcels_in_centers already only contains parcels inside Daybreak, Saratoga
+# Springs Downtown, and The Point (centers.parquet was itself built from the
+# 3-row where-filtered fetch) -- this isin() is a defensive, explicit filter
+# so downstream cells don't silently depend on that upstream scoping.
+our_parcels = parcels_in_centers[parcels_in_centers["CenterName"].isin(CENTERS_OF_INTEREST)]
+```
+
+## Metric 1: current year (2025) homes and jobs
+
+No dedicated 2025 REMM run exists (only "2023" and "2055" pickles), so this
+derives 2025 by filtering the 2055 run's buildings table
+(`run1842year2055allbuildings.pkl`, one row per *building*) to
+`year_built <= 2025` and summing `residential_units`/`job_spaces` per
+center. One shared calculation for all three centers.
+
+**Data quality note:** filtering to `year_built <= 2023` instead reproduces
+the dedicated `run1842year2023allbuildings.pkl` exactly for Daybreak (905
+units/2,389 jobs) and Saratoga Springs Downtown (0/0), but not for The Point
+(2023 pickle: 0 units/2,474 jobs vs. 2055-run-filtered: 0/978) -- the two
+REMM runs disagree on The Point's historical baseline. Proceeding with the
+uniform `year_built <= 2025` method regardless: The Point was a state
+prison site until recently, so a real drop from ~2,474 jobs (2023,
+pre-closure) to ~978 (2025, post-closure/pre-redevelopment) is a plausible
+read, not necessarily a data error -- consistent with satellite imagery
+showing The Point still mostly undeveloped today.
+
+```{python}
+buildings_2055 = pd.read_parquet(
+    paths["buildings_2055_parquet"],
+    columns=["parcel_id", "year_built", "general_type", "residential_units", "job_spaces"],
+)
+
+current_year = (
+    buildings_2055[buildings_2055["year_built"] <= 2025]
+    .merge(our_parcels[["parcel_id", "CenterName"]], on="parcel_id")
+    .groupby("CenterName")[["residential_units", "job_spaces"]]
+    .sum()
+    .rename(columns={"residential_units": "homes", "job_spaces": "jobs"})
+)
+current_year
+```
+
+## Metric 2: 2055 forecast homes and jobs
+
+REMM's own simulated outcome by 2055 -- sum `parcel_progression_metrics`'s
+`residential_units`/`job_spaces` (verified reliable per-parcel sums across
+all of a parcel's buildings, unlike `year_built`, which only reflects one
+representative building) across **all** parcels in each center, not just
+the ones that redevelop after 2025. Same shared calculation for all three
+centers -- this is exactly what The Point's full-buildout figure below
+already is, since REMM shows nothing left developable there by 2055.
+
+```{python}
+progression_2055 = pd.read_parquet(
+    paths["progression_2055_parquet"], columns=["parcel_id", "residential_units", "job_spaces"]
+)
+
+forecast_2055 = (
+    our_parcels.merge(progression_2055, on="parcel_id")
+    .groupby("CenterName")[["residential_units", "job_spaces"]]
+    .sum()
+    .rename(columns={"residential_units": "homes", "job_spaces": "jobs"})
+)
+forecast_2055
+```
+
+## Full REMM capacity (metric 3)
+
+Method differs by center:
+
+- **Daybreak & Saratoga Springs Downtown**: developable acreage (parcels
+  with a building `year_built > 2025`) x forecast res/nonres mix ratio x
+  median density assumptions = **additional** housing units/jobs on top of
+  today's baseline (metric 1) -- not an absolute total by itself. Combined
+  with metric 1 in `## Summary` to get a comparable absolute figure.
+- **The Point**: no separate development schedule document was ever
+  provided, and The Point is already REMM-modeled, so "the development
+  schedule" here means REMM's own full-buildout simulation directly (no
+  density-assumption modeling needed) -- REMM shows 0 parcels still
+  developable there as of 2055, so this figure already **is** an absolute
+  total, identical to its metric 2 (2055 forecast).
+
+### Daybreak & Saratoga Springs Downtown: developable land
 
 Follows the original pseudocode directly: filter the 2055 buildings table
-(`run1842year2055allbuildings.pkl`, one row per *building*) to parcels
-within our centers of interest, keep buildings with `year_built > 2025`,
-take the unique parcel ids from that, then sum `parcel_acres` for those
-parcels. Computed for all three centers -- The Point's result here is a
-cross-check alongside its own development-schedule-based buildout, not a
-replacement for it.
+to parcels within our centers of interest, keep buildings with
+`year_built > 2025`, take the unique parcel ids from that, then sum
+`parcel_acres` for those parcels. Computed for all three centers here too
+(The Point's result is an exploratory cross-check only -- see above).
 
 An earlier version of this shortcut off the parcel-level
 `parcel_progression_metrics` table instead, since it already carries a
@@ -165,34 +251,12 @@ parcel always shares the same year/type -- checked directly: 162 parcels
 regionwide have more than one building, 2 of them are in our centers of
 interest, and in both cases the buildings on that parcel happened to share
 the same `year_built`. That was a coincidence of this dataset, not
-something the data guarantees in general, so this now filters at the
-building level as originally specified rather than relying on it holding
-elsewhere.
-
-#### (1) Restrict to parcels within our centers of interest
+something the data guarantees in general, so this filters at the building
+level as originally specified rather than relying on it holding elsewhere.
 
 ```{python}
-# parcels_in_centers already only contains parcels inside Daybreak, Saratoga
-# Springs Downtown, and The Point (centers.parquet was itself built from the
-# 3-row where-filtered fetch) -- this isin() is a defensive, explicit filter
-# so this cell doesn't silently depend on that upstream scoping.
-our_parcels = parcels_in_centers[parcels_in_centers["CenterName"].isin(CENTERS_OF_INTEREST)]
-```
-
-#### (2) Filter the 2055 buildings table to post-2025 buildings on those parcels
-
-```{python}
-# only the columns this step needs -- year_built to filter, general_type/
-# residential_units/job_spaces are read later (task 2) from the same cache.
-buildings_2055 = pd.read_parquet(
-    paths["buildings_2055_parquet"],
-    columns=["parcel_id", "year_built", "general_type", "residential_units", "job_spaces"],
-)
-
 # inner join: only buildings whose parcel_id is one of our centers' parcels survive.
-buildings_in_centers = buildings_2055.merge(
-    our_parcels[["parcel_id", "CenterName"]], on="parcel_id"
-)
+buildings_in_centers = buildings_2055.merge(our_parcels[["parcel_id", "CenterName"]], on="parcel_id")
 
 # a parcel can have multiple buildings (see note above) -- .unique() collapses
 # "one row per building built after 2025" down to "one row per qualifying parcel".
@@ -200,12 +264,6 @@ post_2025_parcel_ids = buildings_in_centers.loc[
     buildings_in_centers["year_built"] > 2025, "parcel_id"
 ].unique()
 
-post_2025_parcel_ids
-```
-
-#### (3) Sum developable acreage for those parcels, per center
-
-```{python}
 developable_land = (
     our_parcels[our_parcels["parcel_id"].isin(post_2025_parcel_ids)]
     .groupby("CenterName")
@@ -217,41 +275,17 @@ developable_land
 
 ### Forecast development mix and buildout capacity
 
-All three centers -- The Point's REMM-based estimate here is a cross-check
-alongside its own development-schedule-based buildout (below), not a
-replacement for it.
-
-```{python}
-# our_parcels/post_2025_parcel_ids are already scoped to all of
-# CENTERS_OF_INTEREST from task 1 -- kept explicit in case task 2's
-# center scope ever needs to differ from task 1's again.
-task2_parcel_ids = our_parcels.loc[
-    our_parcels["CenterName"].isin(CENTERS_OF_INTEREST)
-    & our_parcels["parcel_id"].isin(post_2025_parcel_ids),
-    "parcel_id",
-]
-
-task2_parcel_ids
-```
-
 #### (1) Forecast residential : commercial/employment development ratio
 
 Sum `residential_units` and `job_spaces` from `parcel_progression_metrics`
-for the post-2025 developable parcels identified above (2055 run). These
-two fields were checked directly against the buildings table and are
-reliable per-parcel sums across all of a parcel's buildings (unlike
-`year_built`, which only reflects one representative building) -- see note
-above. Full buildout of each center is assumed to follow this same mix, so
-each center's total developable acreage (from task 1) is allocated between
-residential and commercial/employment by this ratio.
+for the post-2025 developable parcels identified above (2055 run). Full
+buildout of each center is assumed to follow this same mix, so each
+center's total developable acreage is allocated between residential and
+commercial/employment by this ratio.
 
 ```{python}
-progression_2055 = pd.read_parquet(
-    paths["progression_2055_parquet"], columns=["parcel_id", "residential_units", "job_spaces"]
-)
-
 dev_mix = (
-    our_parcels[our_parcels["parcel_id"].isin(task2_parcel_ids)][["parcel_id", "CenterName"]]
+    our_parcels[our_parcels["parcel_id"].isin(post_2025_parcel_ids)][["parcel_id", "CenterName"]]
     .merge(progression_2055, on="parcel_id")
     .groupby("CenterName")[["residential_units", "job_spaces"]]
     .sum()
@@ -267,8 +301,8 @@ dev_mix
 ```
 
 ```{python}
-# split each center's total developable acreage (task 1) into a residential
-# and a non-residential/employment share, using the res_share/nonres_share
+# split each center's total developable acreage into a residential and a
+# non-residential/employment share, using the res_share/nonres_share
 # computed above -- this is the "assume full buildout follows this same mix" step.
 acreage_allocation = developable_land.set_index("CenterName").loc[
     CENTERS_OF_INTEREST, ["dev_acres"]
@@ -290,6 +324,21 @@ wall-to-wall (no roads, parking, or common space carved out), so if that
 assumption changes later, override the values directly here (e.g.
 `capacities.loc["Daybreak", "median_far"] = 2.0`) and rerun from this cell
 down.
+
+**Known limitation:** for Daybreak specifically, several of its post-2025
+developable parcels are large master-planned "super-parcels" whose actual
+REMM-simulated density (up to ~280 units/acre on parcels with a recorded
+`max_dua` of just 30) far exceeds their generic zoning entitlement --
+Daybreak's real approved density (high-rise towers via a specific
+development agreement) isn't fully captured by the `max_far`/`max_dua`
+fields. This makes the density-assumption-based capacity estimate
+understate what REMM's own simulation already achieves -- visible in
+`## Summary` below, where **both** Daybreak's and Saratoga Springs
+Downtown's metric 3 homes figures come in *below* their metric 2 (2055
+forecast) despite being meant as a ceiling on top of it. Left as-is for now
+(including in the `## Plots` chart below, where it makes the nested bar
+encoding render oddly for these two) pending a fix to the density
+assumption itself.
 
 ```{python}
 # our_parcels only has parcel_id/parcel_acres/CenterName -- pull max_far/max_dua
@@ -347,22 +396,21 @@ capacity["jobs"] = capacity["nonres_sqft"] / capacity["sqft_per_job"]
 capacity[["dev_acres", "res_acres", "nonres_acres", "housing_units", "jobs"]]
 ```
 
-## The Point: full buildout
+### The Point: full buildout
 
-No separate development schedule document was ever provided, and The Point
-is already REMM-modeled -- so "the development schedule" here means REMM's
-own full-buildout simulation for The Point's parcels. Unlike tasks 1/2,
-this doesn't need acreage allocation or density assumptions: REMM's
-simulated buildings already give unit/job counts directly, so this is just
-a sum, plus a check that nothing's left undeveloped (rather than an
-estimate of it).
-
-#### (1) The Point's parcels, with full-buildout attributes
+Unlike Daybreak/Saratoga Springs Downtown, this doesn't need acreage
+allocation or density assumptions: REMM's simulated buildings already give
+unit/job counts directly, so this is just a sum, plus a check that
+nothing's left undeveloped (rather than an estimate of it). **This is the
+actual full-capacity figure for The Point** -- the developable-land/density-
+assumption method above was computed for The Point too, but only as an
+exploratory cross-check (see `capacity.loc["The Point"]`, which is NaN for
+housing_units since none of its parcels have a `max_dua` entitlement yet).
 
 ```{python}
 # residential_units/job_spaces here are absolute totals as of the 2055 run
 # (not "_added" deltas) -- i.e. REMM's full-buildout state, not "new since 2025".
-# developable/year_built/max_far/max_dua are pulled too, for the check in step (2).
+# developable/year_built/max_far/max_dua are pulled too, for the check below.
 point_progression = pd.read_parquet(
     paths["progression_2055_parquet"],
     columns=["parcel_id", "residential_units", "job_spaces", "developable", "year_built", "max_far", "max_dua"],
@@ -370,11 +418,7 @@ point_progression = pd.read_parquet(
 
 point_parcels = parcels_in_centers[parcels_in_centers["CenterName"] == "The Point"]
 point_buildout = point_parcels[["parcel_id", "parcel_acres"]].merge(point_progression, on="parcel_id")
-```
 
-#### (2) Confirm no developable land remains (a check, not an estimate)
-
-```{python}
 # developable == 1 would mean "still vacant and buildable as of 2055" -- expect
 # none, confirming there's no residual land to separately estimate.
 still_developable = point_buildout[point_buildout["developable"] == 1]
@@ -386,13 +430,267 @@ print(f"parcels still flagged developable: {len(still_developable)}")
 unbuilt = point_buildout[point_buildout["year_built"] == 0]
 print(f"parcels never built ({unbuilt['parcel_acres'].sum():.1f} acres), of which zero-capacity:",
       ((unbuilt["max_far"] == 0) & (unbuilt["max_dua"] == 0)).sum(), "/", len(unbuilt))
-```
 
-#### (3) Report The Point's full buildout
-
-```{python}
 point_capacity = point_buildout[["residential_units", "job_spaces"]].sum().rename({
     "residential_units": "housing_units", "job_spaces": "jobs"
 })
 point_capacity
+```
+
+## Summary
+
+```{python}
+import numpy as np
+
+# Full REMM capacity, as an absolute total comparable to metrics 1/2:
+# Daybreak/Saratoga Springs Downtown = current year + additional capacity
+# (task 2's density-assumption estimate); The Point = its own full-buildout
+# sum directly (task 3), NOT the exploratory `capacity.loc["The Point"]` row.
+housing_capacity = pd.Series(index=CENTERS_OF_INTEREST, dtype=float)
+jobs_capacity = pd.Series(index=CENTERS_OF_INTEREST, dtype=float)
+for center in ["Daybreak", "Saratoga Springs Downtown"]:
+    housing_capacity[center] = current_year.loc[center, "homes"] + capacity.loc[center, "housing_units"]
+    jobs_capacity[center] = current_year.loc[center, "jobs"] + capacity.loc[center, "jobs"]
+housing_capacity["The Point"] = point_capacity["housing_units"]
+jobs_capacity["The Point"] = point_capacity["jobs"]
+
+summary = pd.DataFrame({
+    "total_acres": parcels_per_center["total_acres"],
+    "housing_2025": current_year["homes"],
+    "jobs_2025": current_year["jobs"],
+    "housing_2055": forecast_2055["homes"],
+    "jobs_2055": forecast_2055["jobs"],
+    "housing_capacity": housing_capacity,
+    "jobs_capacity": jobs_capacity,
+}).loc[CENTERS_OF_INTEREST]
+summary.index.name = "CenterName"
+summary
+```
+
+**Note:** both Daybreak's `housing_capacity` (2,214 vs. `housing_2055`
+7,077) and Saratoga Springs Downtown's (625 vs. 1,712) come in *below*
+their own 2055 forecast -- see the "known limitation" callout above. The
+density-assumption method understates real achievable density for both;
+REMM's own 2055 simulation is itself evidence of what's actually achievable.
+Decided to implement the `## Plots` housing chart as-is despite this (no
+flooring at `max(capacity, housing_2055)`), accepting that the nested bar
+encoding renders oddly for these two centers until the density assumption
+itself is revisited.
+
+### CSV exports
+
+```{python}
+output_dir = Path("output")
+output_dir.mkdir(exist_ok=True)
+
+summary.to_csv(output_dir / "center_buildout_summary.csv")
+```
+
+```{python}
+# every intermediate number computed along the way, one row per center, so
+# follow-up questions can be answered without re-running the notebook.
+detail = pd.DataFrame({
+    "total_acres": parcels_per_center["total_acres"],
+    "dev_acres": developable_land.set_index("CenterName")["dev_acres"],
+    "unit_job_ratio": dev_mix["unit_job_ratio"],
+    "res_share": dev_mix["res_share"],
+    "res_acres": acreage_allocation["res_acres"],
+    "housing_2025": current_year["homes"],
+    "housing_2055": forecast_2055["homes"],
+    "median_dua": capacities["median_dua"],
+    "housing_capacity": housing_capacity,
+    "nonres_share": dev_mix["nonres_share"],
+    "nonres_acres": acreage_allocation["nonres_acres"],
+    "jobs_2025": current_year["jobs"],
+    "jobs_2055": forecast_2055["jobs"],
+    "median_far": capacities["median_far"],
+    "sqft_per_job": sqft_per_job,
+    "jobs_capacity": jobs_capacity,
+}).reindex(CENTERS_OF_INTEREST)
+detail.index.name = "CenterName"
+
+detail.to_csv(output_dir / "center_buildout_detail.csv")
+detail
+```
+
+### Plots
+
+Employment only for now -- jobs is monotonic (current <= 2055 forecast <=
+capacity) for all three centers, so the nested bullet-chart encoding below
+works cleanly. Housing isn't yet, pending the Daybreak capacity-nesting
+question above; the same chart will extend to housing once that's
+resolved.
+
+Horizontal bars, editorial styling inspired by Tanya Shapiro's ggplot work:
+left-aligned bold title/subtitle, bars sorted largest-to-smallest, direct
+value labels instead of relying on axis ticks, minimal chart junk (no
+spines, no gridlines), and the WFRC brand's own typeface (Poppins) instead
+of matplotlib's default font -- `Inter` (the brand's heading font) turned
+out to only be installed as a variable font at weight 400, so `Poppins
+SemiBold` (a proper static weight) carries the title/value labels instead,
+keeping one cohesive typeface throughout rather than mixing families.
+
+Each bar is a **Meter**-style nested encoding (see the `dataviz` skill:
+fill = value, track = a lighter step of the same hue), extended from 2
+tiers to 3, with all three values labeled (not just capacity):
+
+- **Track** (full bar length): full REMM capacity -- lightest tint of the
+  center's hue.
+- **Hatch overlay** (0 to the 2055 figure): tone-on-tone diagonal texture --
+  how much of that capacity REMM's own simulation reaches by 2055. Skipped
+  for The Point, where 2055 forecast == capacity exactly (nothing left
+  developable), to avoid labeling the same value twice.
+- **Solid fill** (0 to the 2025 figure): full-saturation hue -- where things
+  stand today.
+
+Colors are 3 categorical hues from the WFRC brand's Core Palette (`blue
+#036fa8`, `orange #ea7b00`, `green #007426`), chosen over the "Wasatch
+Choice Center" colors since all three centers share the same `CenterType`
+and would collide under that scheme. Validated with the `dataviz` skill's
+`validate_palette.js` six-checks script: all pass except a contrast WARN on
+orange (2.79, below 3:1) -- satisfied by the visible value labels here and
+the table above, per the skill's relief rule.
+
+```{python}
+import matplotlib
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+
+matplotlib.rcParams["hatch.linewidth"] = 2.2
+matplotlib.rcParams["font.family"] = "Poppins"
+
+CENTER_COLORS = {
+    "Daybreak": "#036fa8",
+    "Saratoga Springs Downtown": "#ea7b00",
+    "The Point": "#007426",
+}
+CENTER_LABELS = {
+    "Daybreak": "Daybreak",
+    "Saratoga Springs Downtown": "Saratoga Springs\nDowntown",
+    "The Point": "The Point",
+}
+SURFACE = "#fcfcfb"
+TEXT_PRIMARY = "#151515"
+TEXT_MUTED = "#7f7a76"
+LEFT, RIGHT = 0.205, 0.92
+
+
+def lighten(hex_color, amount):
+    """Blend hex_color toward white by `amount` (0=no change, 1=white)."""
+    hex_color = hex_color.lstrip("#")
+    r, g, b = (int(hex_color[i:i + 2], 16) for i in (0, 2, 4))
+    r, g, b = (int(c + (255 - c) * amount) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+order = summary["jobs_capacity"].sort_values(ascending=True).index.tolist()
+
+fig, ax = plt.subplots(figsize=(9.5, 5.9), dpi=140)
+fig.patch.set_facecolor(SURFACE)
+ax.set_facecolor(SURFACE)
+
+bar_height = 0.5
+xmax = summary["jobs_capacity"].max()
+
+for i, center in enumerate(order):
+    hue = CENTER_COLORS[center]
+    cap = summary.loc[center, "jobs_capacity"]
+    forecast = summary.loc[center, "jobs_2055"]
+    current = summary.loc[center, "jobs_2025"]
+
+    ax.barh(i, cap, height=bar_height, color=lighten(hue, 0.8), zorder=1)
+    ax.barh(i, forecast, height=bar_height, facecolor="none", hatch="///", edgecolor=lighten(hue, 0.25), linewidth=0, zorder=2)
+    ax.barh(i, current, height=bar_height, color=hue, zorder=3)
+
+    top_y = i + bar_height / 2
+    if current > 0:
+        ax.text(current, top_y + 0.07, f"{current:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
+    else:
+        ax.text(current, top_y + 0.07, "0", ha="left", va="bottom", fontsize=8.5, color=TEXT_MUTED)
+    if forecast < cap * 0.999:  # skip if 2055 == capacity (The Point) -- would duplicate the bold label
+        ax.text(forecast, top_y + 0.07, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
+    ax.text(cap + xmax * 0.015, i, f"{cap:,.0f}", ha="left", va="center", fontsize=11, color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+
+ax.set_yticks(range(len(order)))
+ax.set_yticklabels([CENTER_LABELS[c] for c in order], fontsize=11, color=TEXT_PRIMARY)
+ax.set_xlim(0, xmax * 1.18)
+ax.set_ylim(-0.6, len(order) - 1 + 0.75)
+ax.get_xaxis().set_visible(False)
+
+for spine in ax.spines.values():
+    spine.set_visible(False)
+ax.tick_params(left=False)
+
+fig.suptitle("Employment capacity across three WCV centers", x=0.03, y=0.975, fontsize=17, color=TEXT_PRIMARY, ha="left", fontfamily="Poppins SemiBold")
+fig.text(0.03, 0.875, "Current jobs (2025), REMM's 2055 forecast, and full buildout capacity", fontsize=11, color=TEXT_MUTED, ha="left")
+
+tier_legend = [
+    Patch(facecolor=TEXT_MUTED, label="2025 (current)"),
+    Patch(facecolor="none", edgecolor=TEXT_MUTED, hatch="///", label="2055 (forecast)"),
+    Patch(facecolor=lighten(TEXT_MUTED, 0.7), label="Full REMM capacity"),
+]
+fig.legend(handles=tier_legend, loc="upper center", bbox_to_anchor=((LEFT + RIGHT) / 2, 0.82), ncol=3, frameon=False, fontsize=9.5, labelcolor=TEXT_MUTED, handlelength=1.5, columnspacing=1.2)
+
+fig.text(0.97, 0.02, "Source: REMM 2055 run (WFRC)", fontsize=8, color=TEXT_MUTED, ha="right", style="italic")
+
+plt.subplots_adjust(top=0.76, bottom=0.08, left=LEFT, right=RIGHT)
+plt.savefig(output_dir / "employment_buildout.png", facecolor=fig.get_facecolor())
+plt.show()
+```
+
+Same chart, for housing. Implemented as-is despite the known limitation
+above: for Daybreak and Saratoga Springs Downtown, `housing_capacity` is
+*less than* `housing_2055`, so the hatch overlay (2055) extends past the
+light-shade track (capacity) instead of nesting inside it -- an honest
+reflection of the density-assumption method understating real achievable
+density there, not a rendering bug. `xmax` is taken as the max of both
+`housing_capacity` and `housing_2055` (rather than just capacity, as in the
+employment chart) so nothing gets clipped by this. Centers stay in the same
+`order` as the employment chart (sorted by `jobs_capacity`) rather than
+re-sorting by `housing_capacity`, so a center sits in the same row in both.
+
+```{python}
+xmax = max(summary["housing_capacity"].max(), summary["housing_2055"].max())
+
+fig, ax = plt.subplots(figsize=(9.5, 5.9), dpi=140)
+fig.patch.set_facecolor(SURFACE)
+ax.set_facecolor(SURFACE)
+
+for i, center in enumerate(order):
+    hue = CENTER_COLORS[center]
+    cap = summary.loc[center, "housing_capacity"]
+    forecast = summary.loc[center, "housing_2055"]
+    current = summary.loc[center, "housing_2025"]
+
+    ax.barh(i, cap, height=bar_height, color=lighten(hue, 0.8), zorder=1)
+    ax.barh(i, forecast, height=bar_height, facecolor="none", hatch="///", edgecolor=lighten(hue, 0.25), linewidth=0, zorder=2)
+    ax.barh(i, current, height=bar_height, color=hue, zorder=3)
+
+    top_y = i + bar_height / 2
+    if current > 0:
+        ax.text(current, top_y + 0.07, f"{current:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
+    else:
+        ax.text(current, top_y + 0.07, "0", ha="left", va="bottom", fontsize=8.5, color=TEXT_MUTED)
+    if not np.isclose(forecast, cap, rtol=0.001):  # skip only when 2055 == capacity (The Point) -- avoids a duplicate label
+        ax.text(forecast, top_y + 0.07, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
+    ax.text(cap + xmax * 0.015, i, f"{cap:,.0f}", ha="left", va="center", fontsize=11, color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+
+ax.set_yticks(range(len(order)))
+ax.set_yticklabels([CENTER_LABELS[c] for c in order], fontsize=11, color=TEXT_PRIMARY)
+ax.set_xlim(0, xmax * 1.18)
+ax.set_ylim(-0.6, len(order) - 1 + 0.75)
+ax.get_xaxis().set_visible(False)
+
+for spine in ax.spines.values():
+    spine.set_visible(False)
+ax.tick_params(left=False)
+
+fig.suptitle("Housing capacity across three WCV centers", x=0.03, y=0.975, fontsize=17, color=TEXT_PRIMARY, ha="left", fontfamily="Poppins SemiBold")
+fig.text(0.03, 0.875, "Current homes (2025), REMM's 2055 forecast, and full buildout capacity", fontsize=11, color=TEXT_MUTED, ha="left")
+fig.legend(handles=tier_legend, loc="upper center", bbox_to_anchor=((LEFT + RIGHT) / 2, 0.82), ncol=3, frameon=False, fontsize=9.5, labelcolor=TEXT_MUTED, handlelength=1.5, columnspacing=1.2)
+fig.text(0.97, 0.02, "Source: REMM 2055 run (WFRC)", fontsize=8, color=TEXT_MUTED, ha="right", style="italic")
+
+plt.subplots_adjust(top=0.76, bottom=0.08, left=LEFT, right=RIGHT)
+plt.savefig(output_dir / "housing_buildout.png", facecolor=fig.get_facecolor())
+plt.show()
 ```
