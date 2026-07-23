@@ -437,6 +437,88 @@ point_capacity = point_buildout[["residential_units", "job_spaces"]].sum().renam
 point_capacity
 ```
 
+## Sensitivity: DUA/FAR scenarios
+
+The density assumptions above (`median_dua`/`median_far`, from each center's
+own zoning entitlements) turn out to badly understate what REMM's own
+simulation actually builds on this land. Walking Metric 3's formula
+backward from REMM's 2055 forecast for the post-2025 developable parcels
+themselves (same `res_acres`/`nonres_acres`, just solving for density
+instead of units) gives implied densities around 155 DUA / 1.3 FAR for
+Daybreak and 37 DUA / 0.3 FAR for Saratoga Springs Downtown, vs. zoning
+medians of 30 DUA/7.0 FAR and 10 DUA/0.5 FAR respectively -- a real gap, not
+noise. Rather than committing to one "fixed" density assumption, this
+applies the same `res_acres`/`nonres_acres` x density formula across a
+fixed grid of alternative densities, so the capacity estimate can be shown
+as a range instead of a single number.
+
+Applied to all three centers, including The Point -- even though its own
+"current" capacity estimate uses REMM's full-buildout simulation directly
+rather than a density assumption (`median_dua` isn't even defined for it;
+none of its parcels carry a `max_dua` entitlement yet), the constant
+dua/far scenarios below still apply the same acreage-based formula to it
+using its own `res_acres`/`nonres_acres`/`sqft_per_job` (computed earlier
+only as an exploratory cross-check), so it can be compared on the same
+scenario grid as the other two centers.
+
+- **Residential**: `dua` = each center's own zoning median (current
+  method, undefined for The Point) or a fixed 50/100/150 du/acre.
+- **Nonresidential**: `far` = each center's own zoning median (current
+  method) or a fixed 0.75/4.0 FAR.
+
+For Daybreak/Saratoga Springs Downtown, the "current" row reproduces
+`capacity.loc[center]`/`housing_capacity`/`jobs_capacity` from above exactly
+(same formula, same inputs) -- included here as a consistency check as much
+as a scenario. For The Point, "current" instead pulls `point_capacity`
+directly, so `capacity_added` is left blank there: REMM's full-buildout
+simulation is a direct absolute total, not decomposed into a 2025-baseline-
+plus-added-development estimate the way the formula-based scenarios are.
+
+```{python}
+DUA_SCENARIOS = {"current (zoning median)": None, "dua_50": 50, "dua_100": 100, "dua_150": 150}
+FAR_SCENARIOS = {"current (zoning median)": None, "far_0.75": 0.75, "far_4.0": 4.0}
+
+
+def residential_scenario(center, label, dua):
+    if label == "current (zoning median)" and center == "The Point":
+        return {"assumption_value": float("nan"), "capacity_added": float("nan"),
+                "capacity_total": point_capacity["housing_units"]}
+    dua = capacities.loc[center, "median_dua"] if dua is None else dua
+    added = acreage_allocation.loc[center, "res_acres"] * dua
+    return {"assumption_value": dua, "capacity_added": added, "capacity_total": added + current_year.loc[center, "homes"]}
+
+
+def nonres_scenario(center, label, far):
+    if label == "current (zoning median)" and center == "The Point":
+        return {"assumption_value": float("nan"), "capacity_added": float("nan"),
+                "capacity_total": point_capacity["jobs"]}
+    far = capacities.loc[center, "median_far"] if far is None else far
+    added = acreage_allocation.loc[center, "nonres_acres"] * far * SQFT_PER_ACRE / sqft_per_job.loc[center]
+    return {"assumption_value": far, "capacity_added": added, "capacity_total": added + current_year.loc[center, "jobs"]}
+
+
+rows = []
+for center in CENTERS_OF_INTEREST:
+    for label, dua in DUA_SCENARIOS.items():
+        row = {"CenterName": center, "domain": "residential", "scenario_label": label,
+               "is_current_method": label.startswith("current"), "assumption_unit": "du/acre",
+               "capacity_unit": "housing units"}
+        row.update(residential_scenario(center, label, dua))
+        rows.append(row)
+    for label, far in FAR_SCENARIOS.items():
+        row = {"CenterName": center, "domain": "nonres", "scenario_label": label,
+               "is_current_method": label.startswith("current"), "assumption_unit": "FAR",
+               "capacity_unit": "jobs"}
+        row.update(nonres_scenario(center, label, far))
+        rows.append(row)
+
+sensitivity = pd.DataFrame(rows)[[
+    "CenterName", "domain", "scenario_label", "is_current_method",
+    "assumption_value", "assumption_unit", "capacity_added", "capacity_unit", "capacity_total",
+]]
+sensitivity
+```
+
 ## Summary
 
 ```{python}
@@ -513,22 +595,29 @@ detail.to_csv(output_dir / "center_buildout_detail.csv")
 detail
 ```
 
+```{python}
+sensitivity.to_csv(output_dir / "center_buildout_sensitivity.csv", index=False)
+```
+
 ### Plots
 
-Employment only for now -- jobs is monotonic (current <= 2055 forecast <=
-capacity) for all three centers, so the nested bullet-chart encoding below
-works cleanly. Housing isn't yet, pending the Daybreak capacity-nesting
-question above; the same chart will extend to housing once that's
-resolved.
+Both employment and housing render below, each extended with the
+sensitivity scenarios from `## Sensitivity: DUA/FAR scenarios` as an
+overlay on top of the original chart -- not a separate chart -- so the
+density-assumption uncertainty shows up right on the same bars analysts
+already read.
 
 Horizontal bars, editorial styling inspired by Tanya Shapiro's ggplot work:
-left-aligned bold title/subtitle, bars sorted largest-to-smallest, direct
-value labels instead of relying on axis ticks, minimal chart junk (no
-spines, no gridlines), and the WFRC brand's own typeface (Poppins) instead
-of matplotlib's default font -- `Inter` (the brand's heading font) turned
-out to only be installed as a variable font at weight 400, so `Poppins
-SemiBold` (a proper static weight) carries the title/value labels instead,
-keeping one cohesive typeface throughout rather than mixing families.
+left-aligned bold title/subtitle, direct value labels instead of relying on
+axis ticks, minimal chart junk (no spines, no gridlines), and the WFRC
+brand's own typeface (Poppins) instead of matplotlib's default font --
+`Inter` (the brand's heading font) turned out to only be installed as a
+variable font at weight 400, so `Poppins SemiBold` (a proper static weight)
+carries the title/value labels instead, keeping one cohesive typeface
+throughout rather than mixing families. Centers are fixed to `index.qmd`'s
+own canonical `CENTERS_OF_INTEREST` order (Daybreak, Saratoga Springs
+Downtown, The Point) in both charts -- rather than each chart sorting by
+its own capacity column -- so a center sits in the same row in both.
 
 Each bar is a **Meter**-style nested encoding (see the `dataviz` skill:
 fill = value, track = a lighter step of the same hue), extended from 2
@@ -539,9 +628,12 @@ tiers to 3, with all three values labeled (not just capacity):
 - **Hatch overlay** (0 to the 2055 figure): tone-on-tone diagonal texture --
   how much of that capacity REMM's own simulation reaches by 2055. Skipped
   for The Point, where 2055 forecast == capacity exactly (nothing left
-  developable), to avoid labeling the same value twice.
-- **Solid fill** (0 to the 2025 figure): full-saturation hue -- where things
-  stand today.
+  developable), to avoid labeling the same value twice. For Daybreak and
+  Saratoga Springs Downtown's *housing* chart specifically, `housing_2055`
+  is actually *above* `housing_capacity` (the density-assumption method's
+  known limitation, discussed above) -- an honest reflection of that, not a
+  rendering bug, so the hatch overlay extends past the light-shade track
+  there instead of nesting inside it.
 
 Colors are 3 categorical hues from the WFRC brand's Core Palette (`blue
 #036fa8`, `orange #ea7b00`, `green #007426`), chosen over the "Wasatch
@@ -551,9 +643,36 @@ and would collide under that scheme. Validated with the `dataviz` skill's
 orange (2.79, below 3:1) -- satisfied by the visible value labels here and
 the table above, per the skill's relief rule.
 
+**Sensitivity overlay**, drawn directly on top of each existing bar:
+
+- A small vertical **tick** at each alternate scenario's `capacity_total`,
+  plus a thin neutral **bracket** connecting the tested range into one
+  span. Ticks (and their value labels) get their own fixed color *per
+  scenario* -- not per center, since centers are already distinguished by
+  row + the tier hues -- from a light-to-dark purple **ordinal ramp** (50 <
+  100 < 150 du/ac; 0.75 < 4.0 FAR is an ordered category, not an arbitrary
+  categorical palette), with a second legend row mapping each color to its
+  scenario.
+- **The Point's** `dua_100`/`dua_150`/`far_4.0` scenarios are genuine
+  order-of-magnitude outliers (its land area dwarfs Daybreak/SSD's, so a
+  flat per-acre assumption blows past everything else) -- stretching the
+  shared axis to fit them would compress every other bar into a sliver, so
+  the axis instead caps at 1.3x the existing capacity-tier max, and
+  anything past that renders as an off-scale `>` marker with an asterisked
+  value instead of distorting the whole plot.
+- Every label -- the pre-existing 2025/2055/capacity labels and the new
+  scenario labels -- draws at a higher `zorder` than the bracket/tick
+  lines, and the bold capacity label additionally gets a surface-colored
+  `path_effects` halo: the tested range regularly extends past capacity, so
+  without this the bracket line would render *through* that number instead
+  of behind it.
+
 ```{python}
 import matplotlib
+import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
 matplotlib.rcParams["hatch.linewidth"] = 2.2
@@ -572,7 +691,32 @@ CENTER_LABELS = {
 SURFACE = "#fcfcfb"
 TEXT_PRIMARY = "#151515"
 TEXT_MUTED = "#7f7a76"
+BRACKET_INK = "#a19b94"  # neutral connecting line -- just context, not identity
 LEFT, RIGHT = 0.205, 0.92
+
+# Scenarios get their own fixed hue, one shared ramp reused across both
+# domains and all three centers. Purple family: distinct from every
+# CENTER_COLORS hue and from the neutral bracket ink.
+SCENARIO_LOW, SCENARIO_MID, SCENARIO_HIGH = "#b088d9", "#8347c2", "#5b2c86"
+
+DOMAIN_CFG = {
+    "jobs": {
+        "col": "nonres", "summary_cap": "jobs_capacity", "summary_2055": "jobs_2055", "summary_2025": "jobs_2025",
+        "alt_scenarios": ["far_0.75", "far_4.0"], "alt_ticks": ["0.75 FAR", "4.0 FAR"],
+        "scenario_colors": {"0.75 FAR": SCENARIO_LOW, "4.0 FAR": SCENARIO_HIGH},
+        "title": "Employment capacity across three WCV centers",
+        "subtitle": "Current jobs (2025), REMM's 2055 forecast, full buildout capacity, and alternate FAR scenarios",
+        "out": "employment_buildout.png",
+    },
+    "housing": {
+        "col": "residential", "summary_cap": "housing_capacity", "summary_2055": "housing_2055", "summary_2025": "housing_2025",
+        "alt_scenarios": ["dua_50", "dua_100", "dua_150"], "alt_ticks": ["50 du/ac", "100 du/ac", "150 du/ac"],
+        "scenario_colors": {"50 du/ac": SCENARIO_LOW, "100 du/ac": SCENARIO_MID, "150 du/ac": SCENARIO_HIGH},
+        "title": "Housing capacity across three WCV centers",
+        "subtitle": "Current homes (2025), REMM's 2055 forecast, full buildout capacity, and alternate DUA scenarios",
+        "out": "housing_buildout.png",
+    },
+}
 
 
 def lighten(hex_color, amount):
@@ -583,114 +727,131 @@ def lighten(hex_color, amount):
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
-order = summary["jobs_capacity"].sort_values(ascending=True).index.tolist()
+# fixed to CENTERS_OF_INTEREST, reversed since barh renders list[0] at the
+# bottom row and list[-1] at the top -- this reads top-to-bottom as
+# Daybreak, Saratoga Springs Downtown, The Point in both charts.
+CENTER_ORDER = list(reversed(CENTERS_OF_INTEREST))
 
-fig, ax = plt.subplots(figsize=(9.5, 5.9), dpi=140)
-fig.patch.set_facecolor(SURFACE)
-ax.set_facecolor(SURFACE)
 
-bar_height = 0.5
-xmax = summary["jobs_capacity"].max()
+def make_chart(domain_key):
+    cfg = DOMAIN_CFG[domain_key]
+    alt = sensitivity[sensitivity["domain"] == cfg["col"]].set_index(["CenterName", "scenario_label"])["capacity_total"]
+    order = CENTER_ORDER
 
-for i, center in enumerate(order):
-    hue = CENTER_COLORS[center]
-    cap = summary.loc[center, "jobs_capacity"]
-    forecast = summary.loc[center, "jobs_2055"]
-    current = summary.loc[center, "jobs_2025"]
+    # modest extra row spacing (vs. a plain unit-spaced chart) so the
+    # per-scenario tick labels below each bar have room to breathe
+    row_gap = 1.2
+    fig_height = 5.9 + (row_gap - 1) * 1.6
+    ys = [i * row_gap for i in range(len(order))]
 
-    ax.barh(i, cap, height=bar_height, color=lighten(hue, 0.8), zorder=1)
-    ax.barh(i, forecast, height=bar_height, facecolor="none", hatch="///", edgecolor=lighten(hue, 0.25), linewidth=0, zorder=2)
-    ax.barh(i, current, height=bar_height, color=hue, zorder=3)
+    fig, ax = plt.subplots(figsize=(9.5, fig_height), dpi=140)
+    fig.patch.set_facecolor(SURFACE)
+    ax.set_facecolor(SURFACE)
 
-    top_y = i + bar_height / 2
-    if current > 0:
-        ax.text(current, top_y + 0.07, f"{current:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
-    else:
-        ax.text(current, top_y + 0.07, "0", ha="left", va="bottom", fontsize=8.5, color=TEXT_MUTED)
-    if forecast < cap * 0.999:  # skip if 2055 == capacity (The Point) -- would duplicate the bold label
-        ax.text(forecast, top_y + 0.07, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
-    ax.text(cap + xmax * 0.015, i, f"{cap:,.0f}", ha="left", va="center", fontsize=11, color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+    bar_height = 0.5
+    base_max = summary[cfg["summary_cap"]].max()
+    clip_limit = base_max * 1.3
+    in_range_alts = [alt[(c, s)] for c in order for s in cfg["alt_scenarios"] if alt[(c, s)] <= clip_limit]
+    xmax = max([base_max, *in_range_alts])
+    any_clipped = False
 
-ax.set_yticks(range(len(order)))
-ax.set_yticklabels([CENTER_LABELS[c] for c in order], fontsize=11, color=TEXT_PRIMARY)
-ax.set_xlim(0, xmax * 1.18)
-ax.set_ylim(-0.6, len(order) - 1 + 0.75)
-ax.get_xaxis().set_visible(False)
+    for i, center in enumerate(order):
+        y = ys[i]
+        hue = CENTER_COLORS[center]
+        cap = summary.loc[center, cfg["summary_cap"]]
+        forecast = summary.loc[center, cfg["summary_2055"]]
+        current = summary.loc[center, cfg["summary_2025"]]
 
-for spine in ax.spines.values():
-    spine.set_visible(False)
-ax.tick_params(left=False)
+        ax.barh(y, cap, height=bar_height, color=lighten(hue, 0.8), zorder=1)
+        ax.barh(y, forecast, height=bar_height, facecolor="none", hatch="///", edgecolor=lighten(hue, 0.25), linewidth=0, zorder=2)
+        ax.barh(y, current, height=bar_height, color=hue, zorder=3)
 
-fig.suptitle("Employment capacity across three WCV centers", x=0.03, y=0.975, fontsize=17, color=TEXT_PRIMARY, ha="left", fontfamily="Poppins SemiBold")
-fig.text(0.03, 0.875, "Current jobs (2025), REMM's 2055 forecast, and full buildout capacity", fontsize=11, color=TEXT_MUTED, ha="left")
+        top_y = y + bar_height / 2
+        LABEL_Z = 6  # every label out-ranks the bracket (4) and tick (5) lines
+        if current > 0:
+            ax.text(current, top_y + 0.07, f"{current:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
+        else:
+            ax.text(current, top_y + 0.07, "0", ha="left", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
+        if not np.isclose(forecast, cap, rtol=0.001):  # skip only when 2055 == capacity (The Point) -- avoids a duplicate label
+            ax.text(forecast, top_y + 0.07, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
+        ax.text(cap + xmax * 0.015, y, f"{cap:,.0f}", ha="left", va="center", fontsize=11, color=TEXT_PRIMARY,
+                fontfamily="Poppins SemiBold", zorder=LABEL_Z,
+                path_effects=[pe.withStroke(linewidth=3, foreground=SURFACE)])
 
-tier_legend = [
-    Patch(facecolor=TEXT_MUTED, label="2025 (current)"),
-    Patch(facecolor="none", edgecolor=TEXT_MUTED, hatch="///", label="2055 (forecast)"),
-    Patch(facecolor=lighten(TEXT_MUTED, 0.7), label="Full REMM capacity"),
-]
-fig.legend(handles=tier_legend, loc="upper center", bbox_to_anchor=((LEFT + RIGHT) / 2, 0.82), ncol=3, frameon=False, fontsize=9.5, labelcolor=TEXT_MUTED, handlelength=1.5, columnspacing=1.2)
+        # --- sensitivity overlay ---
+        alt_pairs = list(zip(cfg["alt_ticks"], (alt[(center, s)] for s in cfg["alt_scenarios"])))
+        in_range = [(lab, v) for lab, v in alt_pairs if v <= clip_limit]
+        clipped = [(lab, v) for lab, v in alt_pairs if v > clip_limit]
+        tick_top, tick_bot = y + bar_height / 2 + 0.09, y - bar_height / 2 - 0.09
 
-fig.text(0.97, 0.02, "Source: REMM 2055 run (WFRC)", fontsize=8, color=TEXT_MUTED, ha="right", style="italic")
+        if in_range:
+            vals = [v for _, v in in_range]
+            ax.plot([min(vals), max(vals)], [y, y], color=BRACKET_INK, linewidth=1.4, zorder=4, solid_capstyle="round")
+            for lab, v in in_range:
+                sc_color = cfg["scenario_colors"][lab]
+                ax.plot([v, v], [tick_bot, tick_top], color=sc_color, linewidth=2, zorder=5)
+                ax.text(v, tick_bot - 0.03, f"{v:,.0f}", ha="center", va="top", fontsize=7.6,
+                        color=sc_color, fontfamily="Poppins SemiBold", zorder=LABEL_Z)
+        if clipped:
+            any_clipped = True
+            edge_x = xmax * 0.955
+            ax.plot([edge_x], [y], marker=">", markersize=6, color=BRACKET_INK, zorder=5)
+            for idx, (lab, v) in enumerate(sorted(clipped, key=lambda t: t[1])):
+                sc_color = cfg["scenario_colors"][lab]
+                ax.text(edge_x + xmax * 0.01, tick_bot - 0.03 - idx * 0.15, f"{v:,.0f}*", ha="left", va="top",
+                        fontsize=7.6, color=sc_color, fontfamily="Poppins SemiBold", zorder=LABEL_Z)
 
-plt.subplots_adjust(top=0.76, bottom=0.08, left=LEFT, right=RIGHT)
-plt.savefig(output_dir / "employment_buildout.png", facecolor=fig.get_facecolor())
-plt.show()
+    ax.set_yticks(ys)
+    ax.set_yticklabels([CENTER_LABELS[c] for c in order], fontsize=11, color=TEXT_PRIMARY)
+    ax.set_xlim(0, xmax * 1.2)
+    ax.set_ylim(-0.75, ys[-1] + 0.95)
+    ax.get_xaxis().set_visible(False)
+
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.tick_params(left=False)
+
+    fig.suptitle(cfg["title"], x=0.03, y=0.975, fontsize=17, color=TEXT_PRIMARY, ha="left", fontfamily="Poppins SemiBold")
+    fig.text(0.03, 0.875, cfg["subtitle"], fontsize=10.5, color=TEXT_MUTED, ha="left")
+
+    tier_legend = [
+        Patch(facecolor=TEXT_MUTED, label="2025 (current)"),
+        Patch(facecolor="none", edgecolor=TEXT_MUTED, hatch="///", label="2055 (forecast)"),
+        Patch(facecolor=lighten(TEXT_MUTED, 0.7), label="Full REMM capacity"),
+    ]
+    scenario_legend = [
+        Line2D([0], [0], color=color, marker="|", markersize=10, markeredgewidth=2.2, linestyle="-", linewidth=1.6, label=lab)
+        for lab, color in cfg["scenario_colors"].items()
+    ]
+    # Two independently self-centered legend rows (not one grid -- forcing
+    # jobs's 2 scenario items into a 3-wide grid to match the 3 tier items
+    # packs them left instead of centering them). Anchor x is 0.5 (true
+    # figure center), not the axes' own geometric center: the axes reserves
+    # ~20% of extra width on its right for value labels beyond the bars
+    # (xlim goes to xmax*1.2) with nothing mirrored on the left, so the bars
+    # themselves visually center close to figure fraction 0.5.
+    legend_kwargs = dict(loc="upper center", frameon=False, fontsize=9, handlelength=1.4,
+                          columnspacing=1.3, bbox_transform=fig.transFigure)
+    legend1 = fig.legend(handles=tier_legend, bbox_to_anchor=(0.5, 0.82), ncol=3,
+                          labelcolor=TEXT_MUTED, **legend_kwargs)
+    fig.add_artist(legend1)
+    fig.legend(handles=scenario_legend, bbox_to_anchor=(0.5, 0.775),
+               ncol=len(scenario_legend), **legend_kwargs)
+
+    if any_clipped:
+        fig.text(0.03, 0.02, "* beyond this chart's scale -- marked > on its row", fontsize=8, color=TEXT_MUTED,
+                  ha="left", style="italic")
+    fig.text(0.97, 0.02, "Source: REMM 2055 run (WFRC)", fontsize=8, color=TEXT_MUTED, ha="right", style="italic")
+
+    plt.subplots_adjust(top=0.68, bottom=0.08, left=LEFT, right=RIGHT)
+    plt.savefig(output_dir / cfg["out"], facecolor=fig.get_facecolor())
+    plt.show()
 ```
 
-Same chart, for housing. Implemented as-is despite the known limitation
-above: for Daybreak and Saratoga Springs Downtown, `housing_capacity` is
-*less than* `housing_2055`, so the hatch overlay (2055) extends past the
-light-shade track (capacity) instead of nesting inside it -- an honest
-reflection of the density-assumption method understating real achievable
-density there, not a rendering bug. `xmax` is taken as the max of both
-`housing_capacity` and `housing_2055` (rather than just capacity, as in the
-employment chart) so nothing gets clipped by this. Centers stay in the same
-`order` as the employment chart (sorted by `jobs_capacity`) rather than
-re-sorting by `housing_capacity`, so a center sits in the same row in both.
+```{python}
+make_chart("jobs")
+```
 
 ```{python}
-xmax = max(summary["housing_capacity"].max(), summary["housing_2055"].max())
-
-fig, ax = plt.subplots(figsize=(9.5, 5.9), dpi=140)
-fig.patch.set_facecolor(SURFACE)
-ax.set_facecolor(SURFACE)
-
-for i, center in enumerate(order):
-    hue = CENTER_COLORS[center]
-    cap = summary.loc[center, "housing_capacity"]
-    forecast = summary.loc[center, "housing_2055"]
-    current = summary.loc[center, "housing_2025"]
-
-    ax.barh(i, cap, height=bar_height, color=lighten(hue, 0.8), zorder=1)
-    ax.barh(i, forecast, height=bar_height, facecolor="none", hatch="///", edgecolor=lighten(hue, 0.25), linewidth=0, zorder=2)
-    ax.barh(i, current, height=bar_height, color=hue, zorder=3)
-
-    top_y = i + bar_height / 2
-    if current > 0:
-        ax.text(current, top_y + 0.07, f"{current:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
-    else:
-        ax.text(current, top_y + 0.07, "0", ha="left", va="bottom", fontsize=8.5, color=TEXT_MUTED)
-    if not np.isclose(forecast, cap, rtol=0.001):  # skip only when 2055 == capacity (The Point) -- avoids a duplicate label
-        ax.text(forecast, top_y + 0.07, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED)
-    ax.text(cap + xmax * 0.015, i, f"{cap:,.0f}", ha="left", va="center", fontsize=11, color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
-
-ax.set_yticks(range(len(order)))
-ax.set_yticklabels([CENTER_LABELS[c] for c in order], fontsize=11, color=TEXT_PRIMARY)
-ax.set_xlim(0, xmax * 1.18)
-ax.set_ylim(-0.6, len(order) - 1 + 0.75)
-ax.get_xaxis().set_visible(False)
-
-for spine in ax.spines.values():
-    spine.set_visible(False)
-ax.tick_params(left=False)
-
-fig.suptitle("Housing capacity across three WCV centers", x=0.03, y=0.975, fontsize=17, color=TEXT_PRIMARY, ha="left", fontfamily="Poppins SemiBold")
-fig.text(0.03, 0.875, "Current homes (2025), REMM's 2055 forecast, and full buildout capacity", fontsize=11, color=TEXT_MUTED, ha="left")
-fig.legend(handles=tier_legend, loc="upper center", bbox_to_anchor=((LEFT + RIGHT) / 2, 0.82), ncol=3, frameon=False, fontsize=9.5, labelcolor=TEXT_MUTED, handlelength=1.5, columnspacing=1.2)
-fig.text(0.97, 0.02, "Source: REMM 2055 run (WFRC)", fontsize=8, color=TEXT_MUTED, ha="right", style="italic")
-
-plt.subplots_adjust(top=0.76, bottom=0.08, left=LEFT, right=RIGHT)
-plt.savefig(output_dir / "housing_buildout.png", facecolor=fig.get_facecolor())
-plt.show()
+make_chart("housing")
 ```

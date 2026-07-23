@@ -1,0 +1,22 @@
+CenterName,domain,scenario_label,is_current_method,assumption_value,assumption_unit,capacity_added,capacity_unit,capacity_total
+Daybreak,residential,current (zoning median),True,30.0,du/acre,1168.86936294837,housing units,2213.86936294837
+Daybreak,residential,dua_50,False,50.0,du/acre,1948.11560491395,housing units,2993.11560491395
+Daybreak,residential,dua_100,False,100.0,du/acre,3896.2312098279,housing units,4941.2312098279
+Daybreak,residential,dua_150,False,150.0,du/acre,5844.34681474185,housing units,6889.34681474185
+Daybreak,nonres,current (zoning median),True,7.0,FAR,78840.34339900354,jobs,81979.34339900354
+Daybreak,nonres,far_0.75,False,0.75,FAR,8447.179649893238,jobs,11586.179649893238
+Daybreak,nonres,far_4.0,False,4.0,FAR,45051.624799430596,jobs,48190.624799430596
+Saratoga Springs Downtown,residential,current (zoning median),True,10.0,du/acre,402.35454952943485,housing units,625.3545495294348
+Saratoga Springs Downtown,residential,dua_50,False,50.0,du/acre,2011.7727476471741,housing units,2234.772747647174
+Saratoga Springs Downtown,residential,dua_100,False,100.0,du/acre,4023.5454952943483,housing units,4246.545495294348
+Saratoga Springs Downtown,residential,dua_150,False,150.0,du/acre,6035.318242941523,housing units,6258.318242941523
+Saratoga Springs Downtown,nonres,current (zoning median),True,0.5,FAR,6883.02378874622,jobs,6883.02378874622
+Saratoga Springs Downtown,nonres,far_0.75,False,0.75,FAR,10324.535683119328,jobs,10324.535683119328
+Saratoga Springs Downtown,nonres,far_4.0,False,4.0,FAR,55064.19030996976,jobs,55064.19030996976
+The Point,residential,current (zoning median),True,,du/acre,,housing units,6660.0
+The Point,residential,dua_50,False,50.0,du/acre,5874.132205459441,housing units,5874.132205459441
+The Point,residential,dua_100,False,100.0,du/acre,11748.264410918882,housing units,11748.264410918882
+The Point,residential,dua_150,False,150.0,du/acre,17622.396616378323,housing units,17622.396616378323
+The Point,nonres,current (zoning median),True,,FAR,,jobs,28382.0
+The Point,nonres,far_0.75,False,0.75,FAR,24949.32879975365,jobs,25927.32879975365
+The Point,nonres,far_4.0,False,4.0,FAR,133063.08693201945,jobs,134041.08693201945

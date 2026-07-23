@@ -364,6 +364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#forecast-development-mix-and-buildout-capacity" id="toc-forecast-development-mix-and-buildout-capacity" class="nav-link" data-scroll-target="#forecast-development-mix-and-buildout-capacity">Forecast development mix and buildout capacity</a></li>
   <li><a href="#the-point-full-buildout" id="toc-the-point-full-buildout" class="nav-link" data-scroll-target="#the-point-full-buildout">The Point: full buildout</a></li>
   </ul></li>
+  <li><a href="#sensitivity-duafar-scenarios" id="toc-sensitivity-duafar-scenarios" class="nav-link" data-scroll-target="#sensitivity-duafar-scenarios">Sensitivity: DUA/FAR scenarios</a></li>
   <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a>
   <ul class="collapse">
   <li><a href="#csv-exports" id="toc-csv-exports" class="nav-link" data-scroll-target="#csv-exports">CSV exports</a></li>
@@ -395,7 +396,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="centers-of-interest">Centers of interest</h2>
 <p>Single ordered list to extend if more centers are added later. <code>center_boundaries</code> is fetched in full from the REST service (no server-side <code>where</code>), so adding a center here doesn’t require touching <code>sources.yml</code> or re-fetching – just delete <code>_data/processed/centers.parquet</code> to force it to rebuild with the updated list.</p>
 <p>Every <code>gpd.read_file()</code> call below passes an OGR SQL <code>where</code> built straight from that list, restricted to “Urban Center” polygons (drops The Point’s separate “Employment District” polygon, since every center in scope for this analysis is its Urban Center polygon).</p>
-<div id="b207329c" class="cell" data-execution_count="1">
+<div id="1773a064" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>CENTERS_OF_INTEREST <span class="op">=</span> [<span class="st">"Daybreak"</span>, <span class="st">"Saratoga Springs Downtown"</span>, <span class="st">"The Point"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -404,7 +405,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="load-center-boundaries" class="level2">
 <h2 class="anchored" data-anchor-id="load-center-boundaries">Load center boundaries</h2>
-<div id="0163bd91" class="cell" data-execution_count="2">
+<div id="1b004e20" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gis_adhoc_analyses.layer_cache <span class="im">import</span> ensure_layers</span>
@@ -418,7 +419,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>centers_preview[[<span class="st">"CenterName"</span>, <span class="st">"CenterType"</span>, <span class="st">"City"</span>, <span class="st">"DwellingPerAcre"</span>, <span class="st">"NonResFAR"</span>]]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Using cached file (0d old): center_boundaries.gpkg</code></pre>
+<pre><code>Using cached file (1d old): center_boundaries.gpkg</code></pre>
 </div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
@@ -466,7 +467,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="38db7c29" class="cell" data-execution_count="3">
+<div id="e9571a4e" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>centers_preview.explore(</span>
@@ -477,7 +478,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="remm-parcels-load-and-cache-as-parquet" class="level2">
 <h2 class="anchored" data-anchor-id="remm-parcels-load-and-cache-as-parquet">REMM parcels: load and cache as parquet</h2>
-<div id="634ab41a" class="cell" data-execution_count="4">
+<div id="94620f35" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -547,7 +548,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parcels-within-each-center" class="level2">
 <h2 class="anchored" data-anchor-id="parcels-within-each-center">Parcels within each center</h2>
 <p>Centroid-in-polygon join (not a straight intersection) so a parcel straddling a center boundary is assigned to exactly one center, not double-counted.</p>
-<div id="d33bf496" class="cell" data-execution_count="5">
+<div id="a0e3ca05" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># swap each parcel's polygon for its centroid point -- a polygon can legitimately</span></span>
@@ -605,7 +606,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="e03c8ebe" class="cell" data-execution_count="6">
+<div id="14bf0a5d" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># parcels within our 3 centers of interest, reused by every metric below.</span></span>
@@ -621,7 +622,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="metric-1-current-year-2025-homes-and-jobs">Metric 1: current year (2025) homes and jobs</h2>
 <p>No dedicated 2025 REMM run exists (only “2023” and “2055” pickles), so this derives 2025 by filtering the 2055 run’s buildings table (<code>run1842year2055allbuildings.pkl</code>, one row per <em>building</em>) to <code>year_built &lt;= 2025</code> and summing <code>residential_units</code>/<code>job_spaces</code> per center. One shared calculation for all three centers.</p>
 <p><strong>Data quality note:</strong> filtering to <code>year_built &lt;= 2023</code> instead reproduces the dedicated <code>run1842year2023allbuildings.pkl</code> exactly for Daybreak (905 units/2,389 jobs) and Saratoga Springs Downtown (0/0), but not for The Point (2023 pickle: 0 units/2,474 jobs vs.&nbsp;2055-run-filtered: 0/978) – the two REMM runs disagree on The Point’s historical baseline. Proceeding with the uniform <code>year_built &lt;= 2025</code> method regardless: The Point was a state prison site until recently, so a real drop from ~2,474 jobs (2023, pre-closure) to ~978 (2025, post-closure/pre-redevelopment) is a plausible read, not necessarily a data error – consistent with satellite imagery showing The Point still mostly undeveloped today.</p>
-<div id="abf0ea8e" class="cell" data-execution_count="7">
+<div id="c2e34d4e" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>buildings_2055 <span class="op">=</span> pd.read_parquet(</span>
@@ -681,7 +682,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="metric-2-2055-forecast-homes-and-jobs" class="level2">
 <h2 class="anchored" data-anchor-id="metric-2-2055-forecast-homes-and-jobs">Metric 2: 2055 forecast homes and jobs</h2>
 <p>REMM’s own simulated outcome by 2055 – sum <code>parcel_progression_metrics</code>’s <code>residential_units</code>/<code>job_spaces</code> (verified reliable per-parcel sums across all of a parcel’s buildings, unlike <code>year_built</code>, which only reflects one representative building) across <strong>all</strong> parcels in each center, not just the ones that redevelop after 2025. Same shared calculation for all three centers – this is exactly what The Point’s full-buildout figure below already is, since REMM shows nothing left developable there by 2055.</p>
-<div id="66cbb366" class="cell" data-execution_count="8">
+<div id="93f36ae2" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>progression_2055 <span class="op">=</span> pd.read_parquet(</span>
@@ -747,7 +748,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="daybreak-saratoga-springs-downtown-developable-land">Daybreak &amp; Saratoga Springs Downtown: developable land</h3>
 <p>Follows the original pseudocode directly: filter the 2055 buildings table to parcels within our centers of interest, keep buildings with <code>year_built &gt; 2025</code>, take the unique parcel ids from that, then sum <code>parcel_acres</code> for those parcels. Computed for all three centers here too (The Point’s result is an exploratory cross-check only – see above).</p>
 <p>An earlier version of this shortcut off the parcel-level <code>parcel_progression_metrics</code> table instead, since it already carries a single <code>year_built</code> per parcel. That’s only valid if every building on a parcel always shares the same year/type – checked directly: 162 parcels regionwide have more than one building, 2 of them are in our centers of interest, and in both cases the buildings on that parcel happened to share the same <code>year_built</code>. That was a coincidence of this dataset, not something the data guarantees in general, so this filters at the building level as originally specified rather than relying on it holding elsewhere.</p>
-<div id="8d409e69" class="cell" data-execution_count="9">
+<div id="c9813112" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># inner join: only buildings whose parcel_id is one of our centers' parcels survive.</span></span>
@@ -811,7 +812,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="forecast-residential-commercialemployment-development-ratio" class="level4">
 <h4 class="anchored" data-anchor-id="forecast-residential-commercialemployment-development-ratio">(1) Forecast residential : commercial/employment development ratio</h4>
 <p>Sum <code>residential_units</code> and <code>job_spaces</code> from <code>parcel_progression_metrics</code> for the post-2025 developable parcels identified above (2055 run). Full buildout of each center is assumed to follow this same mix, so each center’s total developable acreage is allocated between residential and commercial/employment by this ratio.</p>
-<div id="7057c550" class="cell" data-execution_count="10">
+<div id="7a72507e" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dev_mix <span class="op">=</span> (</span>
@@ -883,7 +884,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="50cf4cc6" class="cell" data-execution_count="11">
+<div id="85f736ca" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># split each center's total developable acreage into a residential and a</span></span>
@@ -955,7 +956,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="apply-density-assumptions-to-each-acreage-share">(2) Apply density assumptions to each acreage share</h4>
 <p><strong>Median dwelling-units-per-acre and FAR.</strong> <code>max_far</code>/<code>max_dua</code> live on the <code>parcels</code> table (per-parcel zoning capacity, not a text range), so this takes the statistical median across <em>all</em> parcels in each center – not just the post-2025 developable ones, since the assumption is about the center’s overall zoned capacity, not only what’s forecast to redevelop. Josh noted REMM’s own FAR/DUA-driven numbers assume a parcel develops wall-to-wall (no roads, parking, or common space carved out), so if that assumption changes later, override the values directly here (e.g. <code>capacities.loc["Daybreak", "median_far"] = 2.0</code>) and rerun from this cell down.</p>
 <p><strong>Known limitation:</strong> for Daybreak specifically, several of its post-2025 developable parcels are large master-planned “super-parcels” whose actual REMM-simulated density (up to ~280 units/acre on parcels with a recorded <code>max_dua</code> of just 30) far exceeds their generic zoning entitlement – Daybreak’s real approved density (high-rise towers via a specific development agreement) isn’t fully captured by the <code>max_far</code>/<code>max_dua</code> fields. This makes the density-assumption-based capacity estimate understate what REMM’s own simulation already achieves – visible in <code>## Summary</code> below, where <strong>both</strong> Daybreak’s and Saratoga Springs Downtown’s metric 3 homes figures come in <em>below</em> their metric 2 (2055 forecast) despite being meant as a ceiling on top of it. Left as-is for now (including in the <code>## Plots</code> chart below, where it makes the nested bar encoding render oddly for these two) pending a fix to the density assumption itself.</p>
-<div id="72b34342" class="cell" data-execution_count="12">
+<div id="3344360d" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># our_parcels only has parcel_id/parcel_acres/CenterName -- pull max_far/max_dua</span></span>
@@ -1013,7 +1014,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><strong>Median employment density, from FAR and a job-space assumption.</strong> <code>sqft_per_job</code> (needed to turn FAR-driven building sqft into a job count) comes from each center’s own non-residential buildings (all of them, not just post-2025 – there aren’t many non-res buildings in Saratoga Springs Downtown yet, so restricting to post-2025 only left a very thin sample). It turns out to be a fixed constant per building <code>general_type</code> region-wide (Office 633, Retail 374, Industrial 975, …), so the median here reflects each center’s non-res building mix rather than sampling noise.</p>
-<div id="9a13c92a" class="cell" data-execution_count="13">
+<div id="5f833cff" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>buildings_full <span class="op">=</span> pd.read_parquet(</span>
@@ -1040,7 +1041,7 @@ Name: sqft_per_job, dtype: float64</code></pre>
 </section>
 <section id="estimate-additional-housing-units-and-jobs-at-full-buildout" class="level4">
 <h4 class="anchored" data-anchor-id="estimate-additional-housing-units-and-jobs-at-full-buildout">(3) Estimate additional housing units and jobs at full buildout</h4>
-<div id="4c684ed6" class="cell" data-execution_count="14">
+<div id="42c63aa2" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>SQFT_PER_ACRE <span class="op">=</span> <span class="dv">43_560</span></span>
@@ -1113,7 +1114,7 @@ Name: sqft_per_job, dtype: float64</code></pre>
 <section id="the-point-full-buildout" class="level3">
 <h3 class="anchored" data-anchor-id="the-point-full-buildout">The Point: full buildout</h3>
 <p>Unlike Daybreak/Saratoga Springs Downtown, this doesn’t need acreage allocation or density assumptions: REMM’s simulated buildings already give unit/job counts directly, so this is just a sum, plus a check that nothing’s left undeveloped (rather than an estimate of it). <strong>This is the actual full-capacity figure for The Point</strong> – the developable-land/density- assumption method above was computed for The Point too, but only as an exploratory cross-check (see <code>capacity.loc["The Point"]</code>, which is NaN for housing_units since none of its parcels have a <code>max_dua</code> entitlement yet).</p>
-<div id="f2368294" class="cell" data-execution_count="15">
+<div id="41674ee7" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># residential_units/job_spaces here are absolute totals as of the 2055 run</span></span>
@@ -1156,38 +1157,372 @@ dtype: float64</code></pre>
 </div>
 </section>
 </section>
-<section id="summary" class="level2">
-<h2 class="anchored" data-anchor-id="summary">Summary</h2>
-<div id="473c6acb" class="cell" data-execution_count="16">
+<section id="sensitivity-duafar-scenarios" class="level2">
+<h2 class="anchored" data-anchor-id="sensitivity-duafar-scenarios">Sensitivity: DUA/FAR scenarios</h2>
+<p>The density assumptions above (<code>median_dua</code>/<code>median_far</code>, from each center’s own zoning entitlements) turn out to badly understate what REMM’s own simulation actually builds on this land. Walking Metric 3’s formula backward from REMM’s 2055 forecast for the post-2025 developable parcels themselves (same <code>res_acres</code>/<code>nonres_acres</code>, just solving for density instead of units) gives implied densities around 155 DUA / 1.3 FAR for Daybreak and 37 DUA / 0.3 FAR for Saratoga Springs Downtown, vs.&nbsp;zoning medians of 30 DUA/7.0 FAR and 10 DUA/0.5 FAR respectively – a real gap, not noise. Rather than committing to one “fixed” density assumption, this applies the same <code>res_acres</code>/<code>nonres_acres</code> x density formula across a fixed grid of alternative densities, so the capacity estimate can be shown as a range instead of a single number.</p>
+<p>Applied to all three centers, including The Point – even though its own “current” capacity estimate uses REMM’s full-buildout simulation directly rather than a density assumption (<code>median_dua</code> isn’t even defined for it; none of its parcels carry a <code>max_dua</code> entitlement yet), the constant dua/far scenarios below still apply the same acreage-based formula to it using its own <code>res_acres</code>/<code>nonres_acres</code>/<code>sqft_per_job</code> (computed earlier only as an exploratory cross-check), so it can be compared on the same scenario grid as the other two centers.</p>
+<ul>
+<li><strong>Residential</strong>: <code>dua</code> = each center’s own zoning median (current method, undefined for The Point) or a fixed 50/100/150 du/acre.</li>
+<li><strong>Nonresidential</strong>: <code>far</code> = each center’s own zoning median (current method) or a fixed 0.75/4.0 FAR.</li>
+</ul>
+<p>For Daybreak/Saratoga Springs Downtown, the “current” row reproduces <code>capacity.loc[center]</code>/<code>housing_capacity</code>/<code>jobs_capacity</code> from above exactly (same formula, same inputs) – included here as a consistency check as much as a scenario. For The Point, “current” instead pulls <code>point_capacity</code> directly, so <code>capacity_added</code> is left blank there: REMM’s full-buildout simulation is a direct absolute total, not decomposed into a 2025-baseline- plus-added-development estimate the way the formula-based scenarios are.</p>
+<div id="c1aaf856" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Full REMM capacity, as an absolute total comparable to metrics 1/2:</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Daybreak/Saratoga Springs Downtown = current year + additional capacity</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (task 2's density-assumption estimate); The Point = its own full-buildout</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sum directly (task 3), NOT the exploratory `capacity.loc["The Point"]` row.</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>housing_capacity <span class="op">=</span> pd.Series(index<span class="op">=</span>CENTERS_OF_INTEREST, dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>jobs_capacity <span class="op">=</span> pd.Series(index<span class="op">=</span>CENTERS_OF_INTEREST, dtype<span class="op">=</span><span class="bu">float</span>)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> center <span class="kw">in</span> [<span class="st">"Daybreak"</span>, <span class="st">"Saratoga Springs Downtown"</span>]:</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    housing_capacity[center] <span class="op">=</span> current_year.loc[center, <span class="st">"homes"</span>] <span class="op">+</span> capacity.loc[center, <span class="st">"housing_units"</span>]</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    jobs_capacity[center] <span class="op">=</span> current_year.loc[center, <span class="st">"jobs"</span>] <span class="op">+</span> capacity.loc[center, <span class="st">"jobs"</span>]</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>housing_capacity[<span class="st">"The Point"</span>] <span class="op">=</span> point_capacity[<span class="st">"housing_units"</span>]</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>jobs_capacity[<span class="st">"The Point"</span>] <span class="op">=</span> point_capacity[<span class="st">"jobs"</span>]</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_acres"</span>: parcels_per_center[<span class="st">"total_acres"</span>],</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2025"</span>: current_year[<span class="st">"homes"</span>],</span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2025"</span>: current_year[<span class="st">"jobs"</span>],</span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2055"</span>: forecast_2055[<span class="st">"homes"</span>],</span>
-<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2055"</span>: forecast_2055[<span class="st">"jobs"</span>],</span>
-<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_capacity"</span>: housing_capacity,</span>
-<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_capacity"</span>: jobs_capacity,</span>
-<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>}).loc[CENTERS_OF_INTEREST]</span>
-<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>summary.index.name <span class="op">=</span> <span class="st">"CenterName"</span></span>
-<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>DUA_SCENARIOS <span class="op">=</span> {<span class="st">"current (zoning median)"</span>: <span class="va">None</span>, <span class="st">"dua_50"</span>: <span class="dv">50</span>, <span class="st">"dua_100"</span>: <span class="dv">100</span>, <span class="st">"dua_150"</span>: <span class="dv">150</span>}</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>FAR_SCENARIOS <span class="op">=</span> {<span class="st">"current (zoning median)"</span>: <span class="va">None</span>, <span class="st">"far_0.75"</span>: <span class="fl">0.75</span>, <span class="st">"far_4.0"</span>: <span class="fl">4.0</span>}</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> residential_scenario(center, label, dua):</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> label <span class="op">==</span> <span class="st">"current (zoning median)"</span> <span class="kw">and</span> center <span class="op">==</span> <span class="st">"The Point"</span>:</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"assumption_value"</span>: <span class="bu">float</span>(<span class="st">"nan"</span>), <span class="st">"capacity_added"</span>: <span class="bu">float</span>(<span class="st">"nan"</span>),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>                <span class="st">"capacity_total"</span>: point_capacity[<span class="st">"housing_units"</span>]}</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    dua <span class="op">=</span> capacities.loc[center, <span class="st">"median_dua"</span>] <span class="cf">if</span> dua <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> dua</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    added <span class="op">=</span> acreage_allocation.loc[center, <span class="st">"res_acres"</span>] <span class="op">*</span> dua</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"assumption_value"</span>: dua, <span class="st">"capacity_added"</span>: added, <span class="st">"capacity_total"</span>: added <span class="op">+</span> current_year.loc[center, <span class="st">"homes"</span>]}</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> nonres_scenario(center, label, far):</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> label <span class="op">==</span> <span class="st">"current (zoning median)"</span> <span class="kw">and</span> center <span class="op">==</span> <span class="st">"The Point"</span>:</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> {<span class="st">"assumption_value"</span>: <span class="bu">float</span>(<span class="st">"nan"</span>), <span class="st">"capacity_added"</span>: <span class="bu">float</span>(<span class="st">"nan"</span>),</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">"capacity_total"</span>: point_capacity[<span class="st">"jobs"</span>]}</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    far <span class="op">=</span> capacities.loc[center, <span class="st">"median_far"</span>] <span class="cf">if</span> far <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> far</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    added <span class="op">=</span> acreage_allocation.loc[center, <span class="st">"nonres_acres"</span>] <span class="op">*</span> far <span class="op">*</span> SQFT_PER_ACRE <span class="op">/</span> sqft_per_job.loc[center]</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {<span class="st">"assumption_value"</span>: far, <span class="st">"capacity_added"</span>: added, <span class="st">"capacity_total"</span>: added <span class="op">+</span> current_year.loc[center, <span class="st">"jobs"</span>]}</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> center <span class="kw">in</span> CENTERS_OF_INTEREST:</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> label, dua <span class="kw">in</span> DUA_SCENARIOS.items():</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>        row <span class="op">=</span> {<span class="st">"CenterName"</span>: center, <span class="st">"domain"</span>: <span class="st">"residential"</span>, <span class="st">"scenario_label"</span>: label,</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>               <span class="st">"is_current_method"</span>: label.startswith(<span class="st">"current"</span>), <span class="st">"assumption_unit"</span>: <span class="st">"du/acre"</span>,</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>               <span class="st">"capacity_unit"</span>: <span class="st">"housing units"</span>}</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>        row.update(residential_scenario(center, label, dua))</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>        rows.append(row)</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> label, far <span class="kw">in</span> FAR_SCENARIOS.items():</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>        row <span class="op">=</span> {<span class="st">"CenterName"</span>: center, <span class="st">"domain"</span>: <span class="st">"nonres"</span>, <span class="st">"scenario_label"</span>: label,</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>               <span class="st">"is_current_method"</span>: label.startswith(<span class="st">"current"</span>), <span class="st">"assumption_unit"</span>: <span class="st">"FAR"</span>,</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>               <span class="st">"capacity_unit"</span>: <span class="st">"jobs"</span>}</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>        row.update(nonres_scenario(center, label, far))</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>        rows.append(row)</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>sensitivity <span class="op">=</span> pd.DataFrame(rows)[[</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">"CenterName"</span>, <span class="st">"domain"</span>, <span class="st">"scenario_label"</span>, <span class="st">"is_current_method"</span>,</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">"assumption_value"</span>, <span class="st">"assumption_unit"</span>, <span class="st">"capacity_added"</span>, <span class="st">"capacity_unit"</span>, <span class="st">"capacity_total"</span>,</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>]]</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>sensitivity</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">CenterName</th>
+<th data-quarto-table-cell-role="th">domain</th>
+<th data-quarto-table-cell-role="th">scenario_label</th>
+<th data-quarto-table-cell-role="th">is_current_method</th>
+<th data-quarto-table-cell-role="th">assumption_value</th>
+<th data-quarto-table-cell-role="th">assumption_unit</th>
+<th data-quarto-table-cell-role="th">capacity_added</th>
+<th data-quarto-table-cell-role="th">capacity_unit</th>
+<th data-quarto-table-cell-role="th">capacity_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>Daybreak</td>
+<td>residential</td>
+<td>current (zoning median)</td>
+<td>True</td>
+<td>30.00</td>
+<td>du/acre</td>
+<td>1168.869363</td>
+<td>housing units</td>
+<td>2213.869363</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>Daybreak</td>
+<td>residential</td>
+<td>dua_50</td>
+<td>False</td>
+<td>50.00</td>
+<td>du/acre</td>
+<td>1948.115605</td>
+<td>housing units</td>
+<td>2993.115605</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>Daybreak</td>
+<td>residential</td>
+<td>dua_100</td>
+<td>False</td>
+<td>100.00</td>
+<td>du/acre</td>
+<td>3896.231210</td>
+<td>housing units</td>
+<td>4941.231210</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>Daybreak</td>
+<td>residential</td>
+<td>dua_150</td>
+<td>False</td>
+<td>150.00</td>
+<td>du/acre</td>
+<td>5844.346815</td>
+<td>housing units</td>
+<td>6889.346815</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>Daybreak</td>
+<td>nonres</td>
+<td>current (zoning median)</td>
+<td>True</td>
+<td>7.00</td>
+<td>FAR</td>
+<td>78840.343399</td>
+<td>jobs</td>
+<td>81979.343399</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">5</th>
+<td>Daybreak</td>
+<td>nonres</td>
+<td>far_0.75</td>
+<td>False</td>
+<td>0.75</td>
+<td>FAR</td>
+<td>8447.179650</td>
+<td>jobs</td>
+<td>11586.179650</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">6</th>
+<td>Daybreak</td>
+<td>nonres</td>
+<td>far_4.0</td>
+<td>False</td>
+<td>4.00</td>
+<td>FAR</td>
+<td>45051.624799</td>
+<td>jobs</td>
+<td>48190.624799</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">7</th>
+<td>Saratoga Springs Downtown</td>
+<td>residential</td>
+<td>current (zoning median)</td>
+<td>True</td>
+<td>10.00</td>
+<td>du/acre</td>
+<td>402.354550</td>
+<td>housing units</td>
+<td>625.354550</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">8</th>
+<td>Saratoga Springs Downtown</td>
+<td>residential</td>
+<td>dua_50</td>
+<td>False</td>
+<td>50.00</td>
+<td>du/acre</td>
+<td>2011.772748</td>
+<td>housing units</td>
+<td>2234.772748</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">9</th>
+<td>Saratoga Springs Downtown</td>
+<td>residential</td>
+<td>dua_100</td>
+<td>False</td>
+<td>100.00</td>
+<td>du/acre</td>
+<td>4023.545495</td>
+<td>housing units</td>
+<td>4246.545495</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">10</th>
+<td>Saratoga Springs Downtown</td>
+<td>residential</td>
+<td>dua_150</td>
+<td>False</td>
+<td>150.00</td>
+<td>du/acre</td>
+<td>6035.318243</td>
+<td>housing units</td>
+<td>6258.318243</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">11</th>
+<td>Saratoga Springs Downtown</td>
+<td>nonres</td>
+<td>current (zoning median)</td>
+<td>True</td>
+<td>0.50</td>
+<td>FAR</td>
+<td>6883.023789</td>
+<td>jobs</td>
+<td>6883.023789</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">12</th>
+<td>Saratoga Springs Downtown</td>
+<td>nonres</td>
+<td>far_0.75</td>
+<td>False</td>
+<td>0.75</td>
+<td>FAR</td>
+<td>10324.535683</td>
+<td>jobs</td>
+<td>10324.535683</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">13</th>
+<td>Saratoga Springs Downtown</td>
+<td>nonres</td>
+<td>far_4.0</td>
+<td>False</td>
+<td>4.00</td>
+<td>FAR</td>
+<td>55064.190310</td>
+<td>jobs</td>
+<td>55064.190310</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">14</th>
+<td>The Point</td>
+<td>residential</td>
+<td>current (zoning median)</td>
+<td>True</td>
+<td>NaN</td>
+<td>du/acre</td>
+<td>NaN</td>
+<td>housing units</td>
+<td>6660.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">15</th>
+<td>The Point</td>
+<td>residential</td>
+<td>dua_50</td>
+<td>False</td>
+<td>50.00</td>
+<td>du/acre</td>
+<td>5874.132205</td>
+<td>housing units</td>
+<td>5874.132205</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">16</th>
+<td>The Point</td>
+<td>residential</td>
+<td>dua_100</td>
+<td>False</td>
+<td>100.00</td>
+<td>du/acre</td>
+<td>11748.264411</td>
+<td>housing units</td>
+<td>11748.264411</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">17</th>
+<td>The Point</td>
+<td>residential</td>
+<td>dua_150</td>
+<td>False</td>
+<td>150.00</td>
+<td>du/acre</td>
+<td>17622.396616</td>
+<td>housing units</td>
+<td>17622.396616</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">18</th>
+<td>The Point</td>
+<td>nonres</td>
+<td>current (zoning median)</td>
+<td>True</td>
+<td>NaN</td>
+<td>FAR</td>
+<td>NaN</td>
+<td>jobs</td>
+<td>28382.000000</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">19</th>
+<td>The Point</td>
+<td>nonres</td>
+<td>far_0.75</td>
+<td>False</td>
+<td>0.75</td>
+<td>FAR</td>
+<td>24949.328800</td>
+<td>jobs</td>
+<td>25927.328800</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">20</th>
+<td>The Point</td>
+<td>nonres</td>
+<td>far_4.0</td>
+<td>False</td>
+<td>4.00</td>
+<td>FAR</td>
+<td>133063.086932</td>
+<td>jobs</td>
+<td>134041.086932</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<div id="c3a5c1ef" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Full REMM capacity, as an absolute total comparable to metrics 1/2:</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Daybreak/Saratoga Springs Downtown = current year + additional capacity</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co"># (task 2's density-assumption estimate); The Point = its own full-buildout</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co"># sum directly (task 3), NOT the exploratory `capacity.loc["The Point"]` row.</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>housing_capacity <span class="op">=</span> pd.Series(index<span class="op">=</span>CENTERS_OF_INTEREST, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>jobs_capacity <span class="op">=</span> pd.Series(index<span class="op">=</span>CENTERS_OF_INTEREST, dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> center <span class="kw">in</span> [<span class="st">"Daybreak"</span>, <span class="st">"Saratoga Springs Downtown"</span>]:</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    housing_capacity[center] <span class="op">=</span> current_year.loc[center, <span class="st">"homes"</span>] <span class="op">+</span> capacity.loc[center, <span class="st">"housing_units"</span>]</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    jobs_capacity[center] <span class="op">=</span> current_year.loc[center, <span class="st">"jobs"</span>] <span class="op">+</span> capacity.loc[center, <span class="st">"jobs"</span>]</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>housing_capacity[<span class="st">"The Point"</span>] <span class="op">=</span> point_capacity[<span class="st">"housing_units"</span>]</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>jobs_capacity[<span class="st">"The Point"</span>] <span class="op">=</span> point_capacity[<span class="st">"jobs"</span>]</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>summary <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_acres"</span>: parcels_per_center[<span class="st">"total_acres"</span>],</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2025"</span>: current_year[<span class="st">"homes"</span>],</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2025"</span>: current_year[<span class="st">"jobs"</span>],</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2055"</span>: forecast_2055[<span class="st">"homes"</span>],</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2055"</span>: forecast_2055[<span class="st">"jobs"</span>],</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_capacity"</span>: housing_capacity,</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_capacity"</span>: jobs_capacity,</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>}).loc[CENTERS_OF_INTEREST]</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>summary.index.name <span class="op">=</span> <span class="st">"CenterName"</span></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
 
@@ -1254,44 +1589,44 @@ dtype: float64</code></pre>
 <p><strong>Note:</strong> both Daybreak’s <code>housing_capacity</code> (2,214 vs.&nbsp;<code>housing_2055</code> 7,077) and Saratoga Springs Downtown’s (625 vs.&nbsp;1,712) come in <em>below</em> their own 2055 forecast – see the “known limitation” callout above. The density-assumption method understates real achievable density for both; REMM’s own 2055 simulation is itself evidence of what’s actually achievable. Decided to implement the <code>## Plots</code> housing chart as-is despite this (no flooring at <code>max(capacity, housing_2055)</code>), accepting that the nested bar encoding renders oddly for these two centers until the density assumption itself is revisited.</p>
 <section id="csv-exports" class="level3">
 <h3 class="anchored" data-anchor-id="csv-exports">CSV exports</h3>
-<div id="9ce85758" class="cell" data-execution_count="17">
+<div id="4ee13d32" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> Path(<span class="st">"output"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>output_dir.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>summary.to_csv(output_dir <span class="op">/</span> <span class="st">"center_buildout_summary.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>output_dir <span class="op">=</span> Path(<span class="st">"output"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>output_dir.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>summary.to_csv(output_dir <span class="op">/</span> <span class="st">"center_buildout_summary.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="d4280c18" class="cell" data-execution_count="18">
+<div id="40c8cc76" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># every intermediate number computed along the way, one row per center, so</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># follow-up questions can be answered without re-running the notebook.</span></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>detail <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_acres"</span>: parcels_per_center[<span class="st">"total_acres"</span>],</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dev_acres"</span>: developable_land.set_index(<span class="st">"CenterName"</span>)[<span class="st">"dev_acres"</span>],</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"unit_job_ratio"</span>: dev_mix[<span class="st">"unit_job_ratio"</span>],</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"res_share"</span>: dev_mix[<span class="st">"res_share"</span>],</span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"res_acres"</span>: acreage_allocation[<span class="st">"res_acres"</span>],</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2025"</span>: current_year[<span class="st">"homes"</span>],</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2055"</span>: forecast_2055[<span class="st">"homes"</span>],</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"median_dua"</span>: capacities[<span class="st">"median_dua"</span>],</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_capacity"</span>: housing_capacity,</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nonres_share"</span>: dev_mix[<span class="st">"nonres_share"</span>],</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nonres_acres"</span>: acreage_allocation[<span class="st">"nonres_acres"</span>],</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2025"</span>: current_year[<span class="st">"jobs"</span>],</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2055"</span>: forecast_2055[<span class="st">"jobs"</span>],</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"median_far"</span>: capacities[<span class="st">"median_far"</span>],</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sqft_per_job"</span>: sqft_per_job,</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_capacity"</span>: jobs_capacity,</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>}).reindex(CENTERS_OF_INTEREST)</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>detail.index.name <span class="op">=</span> <span class="st">"CenterName"</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>detail.to_csv(output_dir <span class="op">/</span> <span class="st">"center_buildout_detail.csv"</span>)</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>detail</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># every intermediate number computed along the way, one row per center, so</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># follow-up questions can be answered without re-running the notebook.</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>detail <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"total_acres"</span>: parcels_per_center[<span class="st">"total_acres"</span>],</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"dev_acres"</span>: developable_land.set_index(<span class="st">"CenterName"</span>)[<span class="st">"dev_acres"</span>],</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"unit_job_ratio"</span>: dev_mix[<span class="st">"unit_job_ratio"</span>],</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"res_share"</span>: dev_mix[<span class="st">"res_share"</span>],</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"res_acres"</span>: acreage_allocation[<span class="st">"res_acres"</span>],</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2025"</span>: current_year[<span class="st">"homes"</span>],</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_2055"</span>: forecast_2055[<span class="st">"homes"</span>],</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"median_dua"</span>: capacities[<span class="st">"median_dua"</span>],</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing_capacity"</span>: housing_capacity,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nonres_share"</span>: dev_mix[<span class="st">"nonres_share"</span>],</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nonres_acres"</span>: acreage_allocation[<span class="st">"nonres_acres"</span>],</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2025"</span>: current_year[<span class="st">"jobs"</span>],</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_2055"</span>: forecast_2055[<span class="st">"jobs"</span>],</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"median_far"</span>: capacities[<span class="st">"median_far"</span>],</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sqft_per_job"</span>: sqft_per_job,</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs_capacity"</span>: jobs_capacity,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>}).reindex(CENTERS_OF_INTEREST)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>detail.index.name <span class="op">=</span> <span class="st">"CenterName"</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>detail.to_csv(output_dir <span class="op">/</span> <span class="st">"center_buildout_detail.csv"</span>)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>detail</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell-output cell-output-display" data-execution_count="18">
 <div>
 
 
@@ -1400,166 +1735,234 @@ dtype: float64</code></pre>
 </div>
 </div>
 </div>
+<div id="3a0d9867" class="cell" data-execution_count="20">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>sensitivity.to_csv(output_dir <span class="op">/</span> <span class="st">"center_buildout_sensitivity.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
 </section>
 <section id="plots" class="level3">
 <h3 class="anchored" data-anchor-id="plots">Plots</h3>
-<p>Employment only for now – jobs is monotonic (current &lt;= 2055 forecast &lt;= capacity) for all three centers, so the nested bullet-chart encoding below works cleanly. Housing isn’t yet, pending the Daybreak capacity-nesting question above; the same chart will extend to housing once that’s resolved.</p>
-<p>Horizontal bars, editorial styling inspired by Tanya Shapiro’s ggplot work: left-aligned bold title/subtitle, bars sorted largest-to-smallest, direct value labels instead of relying on axis ticks, minimal chart junk (no spines, no gridlines), and the WFRC brand’s own typeface (Poppins) instead of matplotlib’s default font – <code>Inter</code> (the brand’s heading font) turned out to only be installed as a variable font at weight 400, so <code>Poppins SemiBold</code> (a proper static weight) carries the title/value labels instead, keeping one cohesive typeface throughout rather than mixing families.</p>
+<p>Both employment and housing render below, each extended with the sensitivity scenarios from <code>## Sensitivity: DUA/FAR scenarios</code> as an overlay on top of the original chart – not a separate chart – so the density-assumption uncertainty shows up right on the same bars analysts already read.</p>
+<p>Horizontal bars, editorial styling inspired by Tanya Shapiro’s ggplot work: left-aligned bold title/subtitle, direct value labels instead of relying on axis ticks, minimal chart junk (no spines, no gridlines), and the WFRC brand’s own typeface (Poppins) instead of matplotlib’s default font – <code>Inter</code> (the brand’s heading font) turned out to only be installed as a variable font at weight 400, so <code>Poppins SemiBold</code> (a proper static weight) carries the title/value labels instead, keeping one cohesive typeface throughout rather than mixing families. Centers are fixed to <code>index.qmd</code>’s own canonical <code>CENTERS_OF_INTEREST</code> order (Daybreak, Saratoga Springs Downtown, The Point) in both charts – rather than each chart sorting by its own capacity column – so a center sits in the same row in both.</p>
 <p>Each bar is a <strong>Meter</strong>-style nested encoding (see the <code>dataviz</code> skill: fill = value, track = a lighter step of the same hue), extended from 2 tiers to 3, with all three values labeled (not just capacity):</p>
 <ul>
 <li><strong>Track</strong> (full bar length): full REMM capacity – lightest tint of the center’s hue.</li>
-<li><strong>Hatch overlay</strong> (0 to the 2055 figure): tone-on-tone diagonal texture – how much of that capacity REMM’s own simulation reaches by 2055. Skipped for The Point, where 2055 forecast == capacity exactly (nothing left developable), to avoid labeling the same value twice.</li>
-<li><strong>Solid fill</strong> (0 to the 2025 figure): full-saturation hue – where things stand today.</li>
+<li><strong>Hatch overlay</strong> (0 to the 2055 figure): tone-on-tone diagonal texture – how much of that capacity REMM’s own simulation reaches by 2055. Skipped for The Point, where 2055 forecast == capacity exactly (nothing left developable), to avoid labeling the same value twice. For Daybreak and Saratoga Springs Downtown’s <em>housing</em> chart specifically, <code>housing_2055</code> is actually <em>above</em> <code>housing_capacity</code> (the density-assumption method’s known limitation, discussed above) – an honest reflection of that, not a rendering bug, so the hatch overlay extends past the light-shade track there instead of nesting inside it.</li>
 </ul>
 <p>Colors are 3 categorical hues from the WFRC brand’s Core Palette (<code>blue #036fa8</code>, <code>orange #ea7b00</code>, <code>green #007426</code>), chosen over the “Wasatch Choice Center” colors since all three centers share the same <code>CenterType</code> and would collide under that scheme. Validated with the <code>dataviz</code> skill’s <code>validate_palette.js</code> six-checks script: all pass except a contrast WARN on orange (2.79, below 3:1) – satisfied by the visible value labels here and the table above, per the skill’s relief rule.</p>
-<div id="1d5810ac" class="cell" data-execution_count="19">
+<p><strong>Sensitivity overlay</strong>, drawn directly on top of each existing bar:</p>
+<ul>
+<li>A small vertical <strong>tick</strong> at each alternate scenario’s <code>capacity_total</code>, plus a thin neutral <strong>bracket</strong> connecting the tested range into one span. Ticks (and their value labels) get their own fixed color <em>per scenario</em> – not per center, since centers are already distinguished by row + the tier hues – from a light-to-dark purple <strong>ordinal ramp</strong> (50 &lt; 100 &lt; 150 du/ac; 0.75 &lt; 4.0 FAR is an ordered category, not an arbitrary categorical palette), with a second legend row mapping each color to its scenario.</li>
+<li><strong>The Point’s</strong> <code>dua_100</code>/<code>dua_150</code>/<code>far_4.0</code> scenarios are genuine order-of-magnitude outliers (its land area dwarfs Daybreak/SSD’s, so a flat per-acre assumption blows past everything else) – stretching the shared axis to fit them would compress every other bar into a sliver, so the axis instead caps at 1.3x the existing capacity-tier max, and anything past that renders as an off-scale <code>&gt;</code> marker with an asterisked value instead of distorting the whole plot.</li>
+<li>Every label – the pre-existing 2025/2055/capacity labels and the new scenario labels – draws at a higher <code>zorder</code> than the bracket/tick lines, and the bold capacity label additionally gets a surface-colored <code>path_effects</code> halo: the tested range regularly extends past capacity, so without this the bracket line would render <em>through</em> that number instead of behind it.</li>
+</ul>
+<div id="6dbfd859" class="cell" data-execution_count="21">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Patch</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">"hatch.linewidth"</span>] <span class="op">=</span> <span class="fl">2.2</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">"font.family"</span>] <span class="op">=</span> <span class="st">"Poppins"</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>CENTER_COLORS <span class="op">=</span> {</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Daybreak"</span>: <span class="st">"#036fa8"</span>,</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Saratoga Springs Downtown"</span>: <span class="st">"#ea7b00"</span>,</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The Point"</span>: <span class="st">"#007426"</span>,</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>CENTER_LABELS <span class="op">=</span> {</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Daybreak"</span>: <span class="st">"Daybreak"</span>,</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Saratoga Springs Downtown"</span>: <span class="st">"Saratoga Springs</span><span class="ch">\n</span><span class="st">Downtown"</span>,</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The Point"</span>: <span class="st">"The Point"</span>,</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>SURFACE <span class="op">=</span> <span class="st">"#fcfcfb"</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>TEXT_PRIMARY <span class="op">=</span> <span class="st">"#151515"</span></span>
-<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>TEXT_MUTED <span class="op">=</span> <span class="st">"#7f7a76"</span></span>
-<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>LEFT, RIGHT <span class="op">=</span> <span class="fl">0.205</span>, <span class="fl">0.92</span></span>
-<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lighten(hex_color, amount):</span>
-<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Blend hex_color toward white by `amount` (0=no change, 1=white)."""</span></span>
-<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>    hex_color <span class="op">=</span> hex_color.lstrip(<span class="st">"#"</span>)</span>
-<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    r, g, b <span class="op">=</span> (<span class="bu">int</span>(hex_color[i:i <span class="op">+</span> <span class="dv">2</span>], <span class="dv">16</span>) <span class="cf">for</span> i <span class="kw">in</span> (<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>))</span>
-<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    r, g, b <span class="op">=</span> (<span class="bu">int</span>(c <span class="op">+</span> (<span class="dv">255</span> <span class="op">-</span> c) <span class="op">*</span> amount) <span class="cf">for</span> c <span class="kw">in</span> (r, g, b))</span>
-<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"#</span><span class="sc">{</span>r<span class="sc">:02x}{</span>g<span class="sc">:02x}{</span>b<span class="sc">:02x}</span><span class="ss">"</span></span>
-<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>order <span class="op">=</span> summary[<span class="st">"jobs_capacity"</span>].sort_values(ascending<span class="op">=</span><span class="va">True</span>).index.tolist()</span>
-<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">5.9</span>), dpi<span class="op">=</span><span class="dv">140</span>)</span>
-<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(SURFACE)</span>
-<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>ax.set_facecolor(SURFACE)</span>
-<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>bar_height <span class="op">=</span> <span class="fl">0.5</span></span>
-<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>xmax <span class="op">=</span> summary[<span class="st">"jobs_capacity"</span>].<span class="bu">max</span>()</span>
-<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, center <span class="kw">in</span> <span class="bu">enumerate</span>(order):</span>
-<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>    hue <span class="op">=</span> CENTER_COLORS[center]</span>
-<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> summary.loc[center, <span class="st">"jobs_capacity"</span>]</span>
-<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>    forecast <span class="op">=</span> summary.loc[center, <span class="st">"jobs_2055"</span>]</span>
-<span id="cb23-45"><a href="#cb23-45" aria-hidden="true" tabindex="-1"></a>    current <span class="op">=</span> summary.loc[center, <span class="st">"jobs_2025"</span>]</span>
-<span id="cb23-46"><a href="#cb23-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-47"><a href="#cb23-47" aria-hidden="true" tabindex="-1"></a>    ax.barh(i, cap, height<span class="op">=</span>bar_height, color<span class="op">=</span>lighten(hue, <span class="fl">0.8</span>), zorder<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb23-48"><a href="#cb23-48" aria-hidden="true" tabindex="-1"></a>    ax.barh(i, forecast, height<span class="op">=</span>bar_height, facecolor<span class="op">=</span><span class="st">"none"</span>, hatch<span class="op">=</span><span class="st">"///"</span>, edgecolor<span class="op">=</span>lighten(hue, <span class="fl">0.25</span>), linewidth<span class="op">=</span><span class="dv">0</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb23-49"><a href="#cb23-49" aria-hidden="true" tabindex="-1"></a>    ax.barh(i, current, height<span class="op">=</span>bar_height, color<span class="op">=</span>hue, zorder<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb23-50"><a href="#cb23-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-51"><a href="#cb23-51" aria-hidden="true" tabindex="-1"></a>    top_y <span class="op">=</span> i <span class="op">+</span> bar_height <span class="op">/</span> <span class="dv">2</span></span>
-<span id="cb23-52"><a href="#cb23-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> current <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb23-53"><a href="#cb23-53" aria-hidden="true" tabindex="-1"></a>        ax.text(current, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="ss">f"</span><span class="sc">{</span>current<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED)</span>
-<span id="cb23-54"><a href="#cb23-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb23-55"><a href="#cb23-55" aria-hidden="true" tabindex="-1"></a>        ax.text(current, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="st">"0"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED)</span>
-<span id="cb23-56"><a href="#cb23-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> forecast <span class="op">&lt;</span> cap <span class="op">*</span> <span class="fl">0.999</span>:  <span class="co"># skip if 2055 == capacity (The Point) -- would duplicate the bold label</span></span>
-<span id="cb23-57"><a href="#cb23-57" aria-hidden="true" tabindex="-1"></a>        ax.text(forecast, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="ss">f"</span><span class="sc">{</span>forecast<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED)</span>
-<span id="cb23-58"><a href="#cb23-58" aria-hidden="true" tabindex="-1"></a>    ax.text(cap <span class="op">+</span> xmax <span class="op">*</span> <span class="fl">0.015</span>, i, <span class="ss">f"</span><span class="sc">{</span>cap<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_PRIMARY, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>)</span>
-<span id="cb23-59"><a href="#cb23-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-60"><a href="#cb23-60" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(order)))</span>
-<span id="cb23-61"><a href="#cb23-61" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([CENTER_LABELS[c] <span class="cf">for</span> c <span class="kw">in</span> order], fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_PRIMARY)</span>
-<span id="cb23-62"><a href="#cb23-62" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, xmax <span class="op">*</span> <span class="fl">1.18</span>)</span>
-<span id="cb23-63"><a href="#cb23-63" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="fl">0.6</span>, <span class="bu">len</span>(order) <span class="op">-</span> <span class="dv">1</span> <span class="op">+</span> <span class="fl">0.75</span>)</span>
-<span id="cb23-64"><a href="#cb23-64" aria-hidden="true" tabindex="-1"></a>ax.get_xaxis().set_visible(<span class="va">False</span>)</span>
-<span id="cb23-65"><a href="#cb23-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-66"><a href="#cb23-66" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> spine <span class="kw">in</span> ax.spines.values():</span>
-<span id="cb23-67"><a href="#cb23-67" aria-hidden="true" tabindex="-1"></a>    spine.set_visible(<span class="va">False</span>)</span>
-<span id="cb23-68"><a href="#cb23-68" aria-hidden="true" tabindex="-1"></a>ax.tick_params(left<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb23-69"><a href="#cb23-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-70"><a href="#cb23-70" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Employment capacity across three WCV centers"</span>, x<span class="op">=</span><span class="fl">0.03</span>, y<span class="op">=</span><span class="fl">0.975</span>, fontsize<span class="op">=</span><span class="dv">17</span>, color<span class="op">=</span>TEXT_PRIMARY, ha<span class="op">=</span><span class="st">"left"</span>, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>)</span>
-<span id="cb23-71"><a href="#cb23-71" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.03</span>, <span class="fl">0.875</span>, <span class="st">"Current jobs (2025), REMM's 2055 forecast, and full buildout capacity"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_MUTED, ha<span class="op">=</span><span class="st">"left"</span>)</span>
-<span id="cb23-72"><a href="#cb23-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-73"><a href="#cb23-73" aria-hidden="true" tabindex="-1"></a>tier_legend <span class="op">=</span> [</span>
-<span id="cb23-74"><a href="#cb23-74" aria-hidden="true" tabindex="-1"></a>    Patch(facecolor<span class="op">=</span>TEXT_MUTED, label<span class="op">=</span><span class="st">"2025 (current)"</span>),</span>
-<span id="cb23-75"><a href="#cb23-75" aria-hidden="true" tabindex="-1"></a>    Patch(facecolor<span class="op">=</span><span class="st">"none"</span>, edgecolor<span class="op">=</span>TEXT_MUTED, hatch<span class="op">=</span><span class="st">"///"</span>, label<span class="op">=</span><span class="st">"2055 (forecast)"</span>),</span>
-<span id="cb23-76"><a href="#cb23-76" aria-hidden="true" tabindex="-1"></a>    Patch(facecolor<span class="op">=</span>lighten(TEXT_MUTED, <span class="fl">0.7</span>), label<span class="op">=</span><span class="st">"Full REMM capacity"</span>),</span>
-<span id="cb23-77"><a href="#cb23-77" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb23-78"><a href="#cb23-78" aria-hidden="true" tabindex="-1"></a>fig.legend(handles<span class="op">=</span>tier_legend, loc<span class="op">=</span><span class="st">"upper center"</span>, bbox_to_anchor<span class="op">=</span>((LEFT <span class="op">+</span> RIGHT) <span class="op">/</span> <span class="dv">2</span>, <span class="fl">0.82</span>), ncol<span class="op">=</span><span class="dv">3</span>, frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, labelcolor<span class="op">=</span>TEXT_MUTED, handlelength<span class="op">=</span><span class="fl">1.5</span>, columnspacing<span class="op">=</span><span class="fl">1.2</span>)</span>
-<span id="cb23-79"><a href="#cb23-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-80"><a href="#cb23-80" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.97</span>, <span class="fl">0.02</span>, <span class="st">"Source: REMM 2055 run (WFRC)"</span>, fontsize<span class="op">=</span><span class="dv">8</span>, color<span class="op">=</span>TEXT_MUTED, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
-<span id="cb23-81"><a href="#cb23-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-82"><a href="#cb23-82" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(top<span class="op">=</span><span class="fl">0.76</span>, bottom<span class="op">=</span><span class="fl">0.08</span>, left<span class="op">=</span>LEFT, right<span class="op">=</span>RIGHT)</span>
-<span id="cb23-83"><a href="#cb23-83" aria-hidden="true" tabindex="-1"></a>plt.savefig(output_dir <span class="op">/</span> <span class="st">"employment_buildout.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor())</span>
-<span id="cb23-84"><a href="#cb23-84" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.patheffects <span class="im">as</span> pe</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.lines <span class="im">import</span> Line2D</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.patches <span class="im">import</span> Patch</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">"hatch.linewidth"</span>] <span class="op">=</span> <span class="fl">2.2</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">"font.family"</span>] <span class="op">=</span> <span class="st">"Poppins"</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>CENTER_COLORS <span class="op">=</span> {</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Daybreak"</span>: <span class="st">"#036fa8"</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Saratoga Springs Downtown"</span>: <span class="st">"#ea7b00"</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The Point"</span>: <span class="st">"#007426"</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>CENTER_LABELS <span class="op">=</span> {</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Daybreak"</span>: <span class="st">"Daybreak"</span>,</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Saratoga Springs Downtown"</span>: <span class="st">"Saratoga Springs</span><span class="ch">\n</span><span class="st">Downtown"</span>,</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The Point"</span>: <span class="st">"The Point"</span>,</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>SURFACE <span class="op">=</span> <span class="st">"#fcfcfb"</span></span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>TEXT_PRIMARY <span class="op">=</span> <span class="st">"#151515"</span></span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>TEXT_MUTED <span class="op">=</span> <span class="st">"#7f7a76"</span></span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>BRACKET_INK <span class="op">=</span> <span class="st">"#a19b94"</span>  <span class="co"># neutral connecting line -- just context, not identity</span></span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>LEFT, RIGHT <span class="op">=</span> <span class="fl">0.205</span>, <span class="fl">0.92</span></span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Scenarios get their own fixed hue, one shared ramp reused across both</span></span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a><span class="co"># domains and all three centers. Purple family: distinct from every</span></span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a><span class="co"># CENTER_COLORS hue and from the neutral bracket ink.</span></span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>SCENARIO_LOW, SCENARIO_MID, SCENARIO_HIGH <span class="op">=</span> <span class="st">"#b088d9"</span>, <span class="st">"#8347c2"</span>, <span class="st">"#5b2c86"</span></span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>DOMAIN_CFG <span class="op">=</span> {</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"jobs"</span>: {</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">"col"</span>: <span class="st">"nonres"</span>, <span class="st">"summary_cap"</span>: <span class="st">"jobs_capacity"</span>, <span class="st">"summary_2055"</span>: <span class="st">"jobs_2055"</span>, <span class="st">"summary_2025"</span>: <span class="st">"jobs_2025"</span>,</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">"alt_scenarios"</span>: [<span class="st">"far_0.75"</span>, <span class="st">"far_4.0"</span>], <span class="st">"alt_ticks"</span>: [<span class="st">"0.75 FAR"</span>, <span class="st">"4.0 FAR"</span>],</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">"scenario_colors"</span>: {<span class="st">"0.75 FAR"</span>: SCENARIO_LOW, <span class="st">"4.0 FAR"</span>: SCENARIO_HIGH},</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>        <span class="st">"title"</span>: <span class="st">"Employment capacity across three WCV centers"</span>,</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>        <span class="st">"subtitle"</span>: <span class="st">"Current jobs (2025), REMM's 2055 forecast, full buildout capacity, and alternate FAR scenarios"</span>,</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>        <span class="st">"out"</span>: <span class="st">"employment_buildout.png"</span>,</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"housing"</span>: {</span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>        <span class="st">"col"</span>: <span class="st">"residential"</span>, <span class="st">"summary_cap"</span>: <span class="st">"housing_capacity"</span>, <span class="st">"summary_2055"</span>: <span class="st">"housing_2055"</span>, <span class="st">"summary_2025"</span>: <span class="st">"housing_2025"</span>,</span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>        <span class="st">"alt_scenarios"</span>: [<span class="st">"dua_50"</span>, <span class="st">"dua_100"</span>, <span class="st">"dua_150"</span>], <span class="st">"alt_ticks"</span>: [<span class="st">"50 du/ac"</span>, <span class="st">"100 du/ac"</span>, <span class="st">"150 du/ac"</span>],</span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>        <span class="st">"scenario_colors"</span>: {<span class="st">"50 du/ac"</span>: SCENARIO_LOW, <span class="st">"100 du/ac"</span>: SCENARIO_MID, <span class="st">"150 du/ac"</span>: SCENARIO_HIGH},</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">"title"</span>: <span class="st">"Housing capacity across three WCV centers"</span>,</span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>        <span class="st">"subtitle"</span>: <span class="st">"Current homes (2025), REMM's 2055 forecast, full buildout capacity, and alternate DUA scenarios"</span>,</span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>        <span class="st">"out"</span>: <span class="st">"housing_buildout.png"</span>,</span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lighten(hex_color, amount):</span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Blend hex_color toward white by `amount` (0=no change, 1=white)."""</span></span>
+<span id="cb25-54"><a href="#cb25-54" aria-hidden="true" tabindex="-1"></a>    hex_color <span class="op">=</span> hex_color.lstrip(<span class="st">"#"</span>)</span>
+<span id="cb25-55"><a href="#cb25-55" aria-hidden="true" tabindex="-1"></a>    r, g, b <span class="op">=</span> (<span class="bu">int</span>(hex_color[i:i <span class="op">+</span> <span class="dv">2</span>], <span class="dv">16</span>) <span class="cf">for</span> i <span class="kw">in</span> (<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>))</span>
+<span id="cb25-56"><a href="#cb25-56" aria-hidden="true" tabindex="-1"></a>    r, g, b <span class="op">=</span> (<span class="bu">int</span>(c <span class="op">+</span> (<span class="dv">255</span> <span class="op">-</span> c) <span class="op">*</span> amount) <span class="cf">for</span> c <span class="kw">in</span> (r, g, b))</span>
+<span id="cb25-57"><a href="#cb25-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"#</span><span class="sc">{</span>r<span class="sc">:02x}{</span>g<span class="sc">:02x}{</span>b<span class="sc">:02x}</span><span class="ss">"</span></span>
+<span id="cb25-58"><a href="#cb25-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-59"><a href="#cb25-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-60"><a href="#cb25-60" aria-hidden="true" tabindex="-1"></a><span class="co"># fixed to CENTERS_OF_INTEREST, reversed since barh renders list[0] at the</span></span>
+<span id="cb25-61"><a href="#cb25-61" aria-hidden="true" tabindex="-1"></a><span class="co"># bottom row and list[-1] at the top -- this reads top-to-bottom as</span></span>
+<span id="cb25-62"><a href="#cb25-62" aria-hidden="true" tabindex="-1"></a><span class="co"># Daybreak, Saratoga Springs Downtown, The Point in both charts.</span></span>
+<span id="cb25-63"><a href="#cb25-63" aria-hidden="true" tabindex="-1"></a>CENTER_ORDER <span class="op">=</span> <span class="bu">list</span>(<span class="bu">reversed</span>(CENTERS_OF_INTEREST))</span>
+<span id="cb25-64"><a href="#cb25-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-65"><a href="#cb25-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-66"><a href="#cb25-66" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_chart(domain_key):</span>
+<span id="cb25-67"><a href="#cb25-67" aria-hidden="true" tabindex="-1"></a>    cfg <span class="op">=</span> DOMAIN_CFG[domain_key]</span>
+<span id="cb25-68"><a href="#cb25-68" aria-hidden="true" tabindex="-1"></a>    alt <span class="op">=</span> sensitivity[sensitivity[<span class="st">"domain"</span>] <span class="op">==</span> cfg[<span class="st">"col"</span>]].set_index([<span class="st">"CenterName"</span>, <span class="st">"scenario_label"</span>])[<span class="st">"capacity_total"</span>]</span>
+<span id="cb25-69"><a href="#cb25-69" aria-hidden="true" tabindex="-1"></a>    order <span class="op">=</span> CENTER_ORDER</span>
+<span id="cb25-70"><a href="#cb25-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-71"><a href="#cb25-71" aria-hidden="true" tabindex="-1"></a>    <span class="co"># modest extra row spacing (vs. a plain unit-spaced chart) so the</span></span>
+<span id="cb25-72"><a href="#cb25-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># per-scenario tick labels below each bar have room to breathe</span></span>
+<span id="cb25-73"><a href="#cb25-73" aria-hidden="true" tabindex="-1"></a>    row_gap <span class="op">=</span> <span class="fl">1.2</span></span>
+<span id="cb25-74"><a href="#cb25-74" aria-hidden="true" tabindex="-1"></a>    fig_height <span class="op">=</span> <span class="fl">5.9</span> <span class="op">+</span> (row_gap <span class="op">-</span> <span class="dv">1</span>) <span class="op">*</span> <span class="fl">1.6</span></span>
+<span id="cb25-75"><a href="#cb25-75" aria-hidden="true" tabindex="-1"></a>    ys <span class="op">=</span> [i <span class="op">*</span> row_gap <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(order))]</span>
+<span id="cb25-76"><a href="#cb25-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-77"><a href="#cb25-77" aria-hidden="true" tabindex="-1"></a>    fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">9.5</span>, fig_height), dpi<span class="op">=</span><span class="dv">140</span>)</span>
+<span id="cb25-78"><a href="#cb25-78" aria-hidden="true" tabindex="-1"></a>    fig.patch.set_facecolor(SURFACE)</span>
+<span id="cb25-79"><a href="#cb25-79" aria-hidden="true" tabindex="-1"></a>    ax.set_facecolor(SURFACE)</span>
+<span id="cb25-80"><a href="#cb25-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-81"><a href="#cb25-81" aria-hidden="true" tabindex="-1"></a>    bar_height <span class="op">=</span> <span class="fl">0.5</span></span>
+<span id="cb25-82"><a href="#cb25-82" aria-hidden="true" tabindex="-1"></a>    base_max <span class="op">=</span> summary[cfg[<span class="st">"summary_cap"</span>]].<span class="bu">max</span>()</span>
+<span id="cb25-83"><a href="#cb25-83" aria-hidden="true" tabindex="-1"></a>    clip_limit <span class="op">=</span> base_max <span class="op">*</span> <span class="fl">1.3</span></span>
+<span id="cb25-84"><a href="#cb25-84" aria-hidden="true" tabindex="-1"></a>    in_range_alts <span class="op">=</span> [alt[(c, s)] <span class="cf">for</span> c <span class="kw">in</span> order <span class="cf">for</span> s <span class="kw">in</span> cfg[<span class="st">"alt_scenarios"</span>] <span class="cf">if</span> alt[(c, s)] <span class="op">&lt;=</span> clip_limit]</span>
+<span id="cb25-85"><a href="#cb25-85" aria-hidden="true" tabindex="-1"></a>    xmax <span class="op">=</span> <span class="bu">max</span>([base_max, <span class="op">*</span>in_range_alts])</span>
+<span id="cb25-86"><a href="#cb25-86" aria-hidden="true" tabindex="-1"></a>    any_clipped <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb25-87"><a href="#cb25-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-88"><a href="#cb25-88" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, center <span class="kw">in</span> <span class="bu">enumerate</span>(order):</span>
+<span id="cb25-89"><a href="#cb25-89" aria-hidden="true" tabindex="-1"></a>        y <span class="op">=</span> ys[i]</span>
+<span id="cb25-90"><a href="#cb25-90" aria-hidden="true" tabindex="-1"></a>        hue <span class="op">=</span> CENTER_COLORS[center]</span>
+<span id="cb25-91"><a href="#cb25-91" aria-hidden="true" tabindex="-1"></a>        cap <span class="op">=</span> summary.loc[center, cfg[<span class="st">"summary_cap"</span>]]</span>
+<span id="cb25-92"><a href="#cb25-92" aria-hidden="true" tabindex="-1"></a>        forecast <span class="op">=</span> summary.loc[center, cfg[<span class="st">"summary_2055"</span>]]</span>
+<span id="cb25-93"><a href="#cb25-93" aria-hidden="true" tabindex="-1"></a>        current <span class="op">=</span> summary.loc[center, cfg[<span class="st">"summary_2025"</span>]]</span>
+<span id="cb25-94"><a href="#cb25-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-95"><a href="#cb25-95" aria-hidden="true" tabindex="-1"></a>        ax.barh(y, cap, height<span class="op">=</span>bar_height, color<span class="op">=</span>lighten(hue, <span class="fl">0.8</span>), zorder<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb25-96"><a href="#cb25-96" aria-hidden="true" tabindex="-1"></a>        ax.barh(y, forecast, height<span class="op">=</span>bar_height, facecolor<span class="op">=</span><span class="st">"none"</span>, hatch<span class="op">=</span><span class="st">"///"</span>, edgecolor<span class="op">=</span>lighten(hue, <span class="fl">0.25</span>), linewidth<span class="op">=</span><span class="dv">0</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb25-97"><a href="#cb25-97" aria-hidden="true" tabindex="-1"></a>        ax.barh(y, current, height<span class="op">=</span>bar_height, color<span class="op">=</span>hue, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb25-98"><a href="#cb25-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-99"><a href="#cb25-99" aria-hidden="true" tabindex="-1"></a>        top_y <span class="op">=</span> y <span class="op">+</span> bar_height <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb25-100"><a href="#cb25-100" aria-hidden="true" tabindex="-1"></a>        LABEL_Z <span class="op">=</span> <span class="dv">6</span>  <span class="co"># every label out-ranks the bracket (4) and tick (5) lines</span></span>
+<span id="cb25-101"><a href="#cb25-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> current <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb25-102"><a href="#cb25-102" aria-hidden="true" tabindex="-1"></a>            ax.text(current, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="ss">f"</span><span class="sc">{</span>current<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED, zorder<span class="op">=</span>LABEL_Z)</span>
+<span id="cb25-103"><a href="#cb25-103" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb25-104"><a href="#cb25-104" aria-hidden="true" tabindex="-1"></a>            ax.text(current, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="st">"0"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED, zorder<span class="op">=</span>LABEL_Z)</span>
+<span id="cb25-105"><a href="#cb25-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> np.isclose(forecast, cap, rtol<span class="op">=</span><span class="fl">0.001</span>):  <span class="co"># skip only when 2055 == capacity (The Point) -- avoids a duplicate label</span></span>
+<span id="cb25-106"><a href="#cb25-106" aria-hidden="true" tabindex="-1"></a>            ax.text(forecast, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="ss">f"</span><span class="sc">{</span>forecast<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED, zorder<span class="op">=</span>LABEL_Z)</span>
+<span id="cb25-107"><a href="#cb25-107" aria-hidden="true" tabindex="-1"></a>        ax.text(cap <span class="op">+</span> xmax <span class="op">*</span> <span class="fl">0.015</span>, y, <span class="ss">f"</span><span class="sc">{</span>cap<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_PRIMARY,</span>
+<span id="cb25-108"><a href="#cb25-108" aria-hidden="true" tabindex="-1"></a>                fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, zorder<span class="op">=</span>LABEL_Z,</span>
+<span id="cb25-109"><a href="#cb25-109" aria-hidden="true" tabindex="-1"></a>                path_effects<span class="op">=</span>[pe.withStroke(linewidth<span class="op">=</span><span class="dv">3</span>, foreground<span class="op">=</span>SURFACE)])</span>
+<span id="cb25-110"><a href="#cb25-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-111"><a href="#cb25-111" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- sensitivity overlay ---</span></span>
+<span id="cb25-112"><a href="#cb25-112" aria-hidden="true" tabindex="-1"></a>        alt_pairs <span class="op">=</span> <span class="bu">list</span>(<span class="bu">zip</span>(cfg[<span class="st">"alt_ticks"</span>], (alt[(center, s)] <span class="cf">for</span> s <span class="kw">in</span> cfg[<span class="st">"alt_scenarios"</span>])))</span>
+<span id="cb25-113"><a href="#cb25-113" aria-hidden="true" tabindex="-1"></a>        in_range <span class="op">=</span> [(lab, v) <span class="cf">for</span> lab, v <span class="kw">in</span> alt_pairs <span class="cf">if</span> v <span class="op">&lt;=</span> clip_limit]</span>
+<span id="cb25-114"><a href="#cb25-114" aria-hidden="true" tabindex="-1"></a>        clipped <span class="op">=</span> [(lab, v) <span class="cf">for</span> lab, v <span class="kw">in</span> alt_pairs <span class="cf">if</span> v <span class="op">&gt;</span> clip_limit]</span>
+<span id="cb25-115"><a href="#cb25-115" aria-hidden="true" tabindex="-1"></a>        tick_top, tick_bot <span class="op">=</span> y <span class="op">+</span> bar_height <span class="op">/</span> <span class="dv">2</span> <span class="op">+</span> <span class="fl">0.09</span>, y <span class="op">-</span> bar_height <span class="op">/</span> <span class="dv">2</span> <span class="op">-</span> <span class="fl">0.09</span></span>
+<span id="cb25-116"><a href="#cb25-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-117"><a href="#cb25-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> in_range:</span>
+<span id="cb25-118"><a href="#cb25-118" aria-hidden="true" tabindex="-1"></a>            vals <span class="op">=</span> [v <span class="cf">for</span> _, v <span class="kw">in</span> in_range]</span>
+<span id="cb25-119"><a href="#cb25-119" aria-hidden="true" tabindex="-1"></a>            ax.plot([<span class="bu">min</span>(vals), <span class="bu">max</span>(vals)], [y, y], color<span class="op">=</span>BRACKET_INK, linewidth<span class="op">=</span><span class="fl">1.4</span>, zorder<span class="op">=</span><span class="dv">4</span>, solid_capstyle<span class="op">=</span><span class="st">"round"</span>)</span>
+<span id="cb25-120"><a href="#cb25-120" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> lab, v <span class="kw">in</span> in_range:</span>
+<span id="cb25-121"><a href="#cb25-121" aria-hidden="true" tabindex="-1"></a>                sc_color <span class="op">=</span> cfg[<span class="st">"scenario_colors"</span>][lab]</span>
+<span id="cb25-122"><a href="#cb25-122" aria-hidden="true" tabindex="-1"></a>                ax.plot([v, v], [tick_bot, tick_top], color<span class="op">=</span>sc_color, linewidth<span class="op">=</span><span class="dv">2</span>, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb25-123"><a href="#cb25-123" aria-hidden="true" tabindex="-1"></a>                ax.text(v, tick_bot <span class="op">-</span> <span class="fl">0.03</span>, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">7.6</span>,</span>
+<span id="cb25-124"><a href="#cb25-124" aria-hidden="true" tabindex="-1"></a>                        color<span class="op">=</span>sc_color, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, zorder<span class="op">=</span>LABEL_Z)</span>
+<span id="cb25-125"><a href="#cb25-125" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> clipped:</span>
+<span id="cb25-126"><a href="#cb25-126" aria-hidden="true" tabindex="-1"></a>            any_clipped <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb25-127"><a href="#cb25-127" aria-hidden="true" tabindex="-1"></a>            edge_x <span class="op">=</span> xmax <span class="op">*</span> <span class="fl">0.955</span></span>
+<span id="cb25-128"><a href="#cb25-128" aria-hidden="true" tabindex="-1"></a>            ax.plot([edge_x], [y], marker<span class="op">=</span><span class="st">"&gt;"</span>, markersize<span class="op">=</span><span class="dv">6</span>, color<span class="op">=</span>BRACKET_INK, zorder<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb25-129"><a href="#cb25-129" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> idx, (lab, v) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">sorted</span>(clipped, key<span class="op">=</span><span class="kw">lambda</span> t: t[<span class="dv">1</span>])):</span>
+<span id="cb25-130"><a href="#cb25-130" aria-hidden="true" tabindex="-1"></a>                sc_color <span class="op">=</span> cfg[<span class="st">"scenario_colors"</span>][lab]</span>
+<span id="cb25-131"><a href="#cb25-131" aria-hidden="true" tabindex="-1"></a>                ax.text(edge_x <span class="op">+</span> xmax <span class="op">*</span> <span class="fl">0.01</span>, tick_bot <span class="op">-</span> <span class="fl">0.03</span> <span class="op">-</span> idx <span class="op">*</span> <span class="fl">0.15</span>, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:,.0f}</span><span class="ss">*"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb25-132"><a href="#cb25-132" aria-hidden="true" tabindex="-1"></a>                        fontsize<span class="op">=</span><span class="fl">7.6</span>, color<span class="op">=</span>sc_color, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, zorder<span class="op">=</span>LABEL_Z)</span>
+<span id="cb25-133"><a href="#cb25-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-134"><a href="#cb25-134" aria-hidden="true" tabindex="-1"></a>    ax.set_yticks(ys)</span>
+<span id="cb25-135"><a href="#cb25-135" aria-hidden="true" tabindex="-1"></a>    ax.set_yticklabels([CENTER_LABELS[c] <span class="cf">for</span> c <span class="kw">in</span> order], fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_PRIMARY)</span>
+<span id="cb25-136"><a href="#cb25-136" aria-hidden="true" tabindex="-1"></a>    ax.set_xlim(<span class="dv">0</span>, xmax <span class="op">*</span> <span class="fl">1.2</span>)</span>
+<span id="cb25-137"><a href="#cb25-137" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="op">-</span><span class="fl">0.75</span>, ys[<span class="op">-</span><span class="dv">1</span>] <span class="op">+</span> <span class="fl">0.95</span>)</span>
+<span id="cb25-138"><a href="#cb25-138" aria-hidden="true" tabindex="-1"></a>    ax.get_xaxis().set_visible(<span class="va">False</span>)</span>
+<span id="cb25-139"><a href="#cb25-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-140"><a href="#cb25-140" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> spine <span class="kw">in</span> ax.spines.values():</span>
+<span id="cb25-141"><a href="#cb25-141" aria-hidden="true" tabindex="-1"></a>        spine.set_visible(<span class="va">False</span>)</span>
+<span id="cb25-142"><a href="#cb25-142" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(left<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb25-143"><a href="#cb25-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-144"><a href="#cb25-144" aria-hidden="true" tabindex="-1"></a>    fig.suptitle(cfg[<span class="st">"title"</span>], x<span class="op">=</span><span class="fl">0.03</span>, y<span class="op">=</span><span class="fl">0.975</span>, fontsize<span class="op">=</span><span class="dv">17</span>, color<span class="op">=</span>TEXT_PRIMARY, ha<span class="op">=</span><span class="st">"left"</span>, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>)</span>
+<span id="cb25-145"><a href="#cb25-145" aria-hidden="true" tabindex="-1"></a>    fig.text(<span class="fl">0.03</span>, <span class="fl">0.875</span>, cfg[<span class="st">"subtitle"</span>], fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>TEXT_MUTED, ha<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb25-146"><a href="#cb25-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-147"><a href="#cb25-147" aria-hidden="true" tabindex="-1"></a>    tier_legend <span class="op">=</span> [</span>
+<span id="cb25-148"><a href="#cb25-148" aria-hidden="true" tabindex="-1"></a>        Patch(facecolor<span class="op">=</span>TEXT_MUTED, label<span class="op">=</span><span class="st">"2025 (current)"</span>),</span>
+<span id="cb25-149"><a href="#cb25-149" aria-hidden="true" tabindex="-1"></a>        Patch(facecolor<span class="op">=</span><span class="st">"none"</span>, edgecolor<span class="op">=</span>TEXT_MUTED, hatch<span class="op">=</span><span class="st">"///"</span>, label<span class="op">=</span><span class="st">"2055 (forecast)"</span>),</span>
+<span id="cb25-150"><a href="#cb25-150" aria-hidden="true" tabindex="-1"></a>        Patch(facecolor<span class="op">=</span>lighten(TEXT_MUTED, <span class="fl">0.7</span>), label<span class="op">=</span><span class="st">"Full REMM capacity"</span>),</span>
+<span id="cb25-151"><a href="#cb25-151" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb25-152"><a href="#cb25-152" aria-hidden="true" tabindex="-1"></a>    scenario_legend <span class="op">=</span> [</span>
+<span id="cb25-153"><a href="#cb25-153" aria-hidden="true" tabindex="-1"></a>        Line2D([<span class="dv">0</span>], [<span class="dv">0</span>], color<span class="op">=</span>color, marker<span class="op">=</span><span class="st">"|"</span>, markersize<span class="op">=</span><span class="dv">10</span>, markeredgewidth<span class="op">=</span><span class="fl">2.2</span>, linestyle<span class="op">=</span><span class="st">"-"</span>, linewidth<span class="op">=</span><span class="fl">1.6</span>, label<span class="op">=</span>lab)</span>
+<span id="cb25-154"><a href="#cb25-154" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> lab, color <span class="kw">in</span> cfg[<span class="st">"scenario_colors"</span>].items()</span>
+<span id="cb25-155"><a href="#cb25-155" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb25-156"><a href="#cb25-156" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Two independently self-centered legend rows (not one grid -- forcing</span></span>
+<span id="cb25-157"><a href="#cb25-157" aria-hidden="true" tabindex="-1"></a>    <span class="co"># jobs's 2 scenario items into a 3-wide grid to match the 3 tier items</span></span>
+<span id="cb25-158"><a href="#cb25-158" aria-hidden="true" tabindex="-1"></a>    <span class="co"># packs them left instead of centering them). Anchor x is 0.5 (true</span></span>
+<span id="cb25-159"><a href="#cb25-159" aria-hidden="true" tabindex="-1"></a>    <span class="co"># figure center), not the axes' own geometric center: the axes reserves</span></span>
+<span id="cb25-160"><a href="#cb25-160" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ~20% of extra width on its right for value labels beyond the bars</span></span>
+<span id="cb25-161"><a href="#cb25-161" aria-hidden="true" tabindex="-1"></a>    <span class="co"># (xlim goes to xmax*1.2) with nothing mirrored on the left, so the bars</span></span>
+<span id="cb25-162"><a href="#cb25-162" aria-hidden="true" tabindex="-1"></a>    <span class="co"># themselves visually center close to figure fraction 0.5.</span></span>
+<span id="cb25-163"><a href="#cb25-163" aria-hidden="true" tabindex="-1"></a>    legend_kwargs <span class="op">=</span> <span class="bu">dict</span>(loc<span class="op">=</span><span class="st">"upper center"</span>, frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="dv">9</span>, handlelength<span class="op">=</span><span class="fl">1.4</span>,</span>
+<span id="cb25-164"><a href="#cb25-164" aria-hidden="true" tabindex="-1"></a>                          columnspacing<span class="op">=</span><span class="fl">1.3</span>, bbox_transform<span class="op">=</span>fig.transFigure)</span>
+<span id="cb25-165"><a href="#cb25-165" aria-hidden="true" tabindex="-1"></a>    legend1 <span class="op">=</span> fig.legend(handles<span class="op">=</span>tier_legend, bbox_to_anchor<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">0.82</span>), ncol<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb25-166"><a href="#cb25-166" aria-hidden="true" tabindex="-1"></a>                          labelcolor<span class="op">=</span>TEXT_MUTED, <span class="op">**</span>legend_kwargs)</span>
+<span id="cb25-167"><a href="#cb25-167" aria-hidden="true" tabindex="-1"></a>    fig.add_artist(legend1)</span>
+<span id="cb25-168"><a href="#cb25-168" aria-hidden="true" tabindex="-1"></a>    fig.legend(handles<span class="op">=</span>scenario_legend, bbox_to_anchor<span class="op">=</span>(<span class="fl">0.5</span>, <span class="fl">0.775</span>),</span>
+<span id="cb25-169"><a href="#cb25-169" aria-hidden="true" tabindex="-1"></a>               ncol<span class="op">=</span><span class="bu">len</span>(scenario_legend), <span class="op">**</span>legend_kwargs)</span>
+<span id="cb25-170"><a href="#cb25-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-171"><a href="#cb25-171" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> any_clipped:</span>
+<span id="cb25-172"><a href="#cb25-172" aria-hidden="true" tabindex="-1"></a>        fig.text(<span class="fl">0.03</span>, <span class="fl">0.02</span>, <span class="st">"* beyond this chart's scale -- marked &gt; on its row"</span>, fontsize<span class="op">=</span><span class="dv">8</span>, color<span class="op">=</span>TEXT_MUTED,</span>
+<span id="cb25-173"><a href="#cb25-173" aria-hidden="true" tabindex="-1"></a>                  ha<span class="op">=</span><span class="st">"left"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb25-174"><a href="#cb25-174" aria-hidden="true" tabindex="-1"></a>    fig.text(<span class="fl">0.97</span>, <span class="fl">0.02</span>, <span class="st">"Source: REMM 2055 run (WFRC)"</span>, fontsize<span class="op">=</span><span class="dv">8</span>, color<span class="op">=</span>TEXT_MUTED, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb25-175"><a href="#cb25-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-176"><a href="#cb25-176" aria-hidden="true" tabindex="-1"></a>    plt.subplots_adjust(top<span class="op">=</span><span class="fl">0.68</span>, bottom<span class="op">=</span><span class="fl">0.08</span>, left<span class="op">=</span>LEFT, right<span class="op">=</span>RIGHT)</span>
+<span id="cb25-177"><a href="#cb25-177" aria-hidden="true" tabindex="-1"></a>    plt.savefig(output_dir <span class="op">/</span> cfg[<span class="st">"out"</span>], facecolor<span class="op">=</span>fig.get_facecolor())</span>
+<span id="cb25-178"><a href="#cb25-178" aria-hidden="true" tabindex="-1"></a>    plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="0a509087" class="cell" data-execution_count="22">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>make_chart(<span class="st">"jobs"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-20-output-1.png" width="1278" height="822" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-23-output-1.png" width="1278" height="865" class="figure-img"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Same chart, for housing. Implemented as-is despite the known limitation above: for Daybreak and Saratoga Springs Downtown, <code>housing_capacity</code> is <em>less than</em> <code>housing_2055</code>, so the hatch overlay (2055) extends past the light-shade track (capacity) instead of nesting inside it – an honest reflection of the density-assumption method understating real achievable density there, not a rendering bug. <code>xmax</code> is taken as the max of both <code>housing_capacity</code> and <code>housing_2055</code> (rather than just capacity, as in the employment chart) so nothing gets clipped by this. Centers stay in the same <code>order</code> as the employment chart (sorted by <code>jobs_capacity</code>) rather than re-sorting by <code>housing_capacity</code>, so a center sits in the same row in both.</p>
-<div id="92896a0c" class="cell" data-execution_count="20">
+<div id="962bc864" class="cell" data-execution_count="23">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>xmax <span class="op">=</span> <span class="bu">max</span>(summary[<span class="st">"housing_capacity"</span>].<span class="bu">max</span>(), summary[<span class="st">"housing_2055"</span>].<span class="bu">max</span>())</span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">9.5</span>, <span class="fl">5.9</span>), dpi<span class="op">=</span><span class="dv">140</span>)</span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(SURFACE)</span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>ax.set_facecolor(SURFACE)</span>
-<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, center <span class="kw">in</span> <span class="bu">enumerate</span>(order):</span>
-<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    hue <span class="op">=</span> CENTER_COLORS[center]</span>
-<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    cap <span class="op">=</span> summary.loc[center, <span class="st">"housing_capacity"</span>]</span>
-<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    forecast <span class="op">=</span> summary.loc[center, <span class="st">"housing_2055"</span>]</span>
-<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    current <span class="op">=</span> summary.loc[center, <span class="st">"housing_2025"</span>]</span>
-<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    ax.barh(i, cap, height<span class="op">=</span>bar_height, color<span class="op">=</span>lighten(hue, <span class="fl">0.8</span>), zorder<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    ax.barh(i, forecast, height<span class="op">=</span>bar_height, facecolor<span class="op">=</span><span class="st">"none"</span>, hatch<span class="op">=</span><span class="st">"///"</span>, edgecolor<span class="op">=</span>lighten(hue, <span class="fl">0.25</span>), linewidth<span class="op">=</span><span class="dv">0</span>, zorder<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    ax.barh(i, current, height<span class="op">=</span>bar_height, color<span class="op">=</span>hue, zorder<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    top_y <span class="op">=</span> i <span class="op">+</span> bar_height <span class="op">/</span> <span class="dv">2</span></span>
-<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> current <span class="op">&gt;</span> <span class="dv">0</span>:</span>
-<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>        ax.text(current, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="ss">f"</span><span class="sc">{</span>current<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED)</span>
-<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>        ax.text(current, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="st">"0"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED)</span>
-<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> np.isclose(forecast, cap, rtol<span class="op">=</span><span class="fl">0.001</span>):  <span class="co"># skip only when 2055 == capacity (The Point) -- avoids a duplicate label</span></span>
-<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>        ax.text(forecast, top_y <span class="op">+</span> <span class="fl">0.07</span>, <span class="ss">f"</span><span class="sc">{</span>forecast<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span>TEXT_MUTED)</span>
-<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>    ax.text(cap <span class="op">+</span> xmax <span class="op">*</span> <span class="fl">0.015</span>, i, <span class="ss">f"</span><span class="sc">{</span>cap<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_PRIMARY, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>)</span>
-<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(order)))</span>
-<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([CENTER_LABELS[c] <span class="cf">for</span> c <span class="kw">in</span> order], fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_PRIMARY)</span>
-<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, xmax <span class="op">*</span> <span class="fl">1.18</span>)</span>
-<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="fl">0.6</span>, <span class="bu">len</span>(order) <span class="op">-</span> <span class="dv">1</span> <span class="op">+</span> <span class="fl">0.75</span>)</span>
-<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>ax.get_xaxis().set_visible(<span class="va">False</span>)</span>
-<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> spine <span class="kw">in</span> ax.spines.values():</span>
-<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a>    spine.set_visible(<span class="va">False</span>)</span>
-<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a>ax.tick_params(left<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb24-35"><a href="#cb24-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-36"><a href="#cb24-36" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"Housing capacity across three WCV centers"</span>, x<span class="op">=</span><span class="fl">0.03</span>, y<span class="op">=</span><span class="fl">0.975</span>, fontsize<span class="op">=</span><span class="dv">17</span>, color<span class="op">=</span>TEXT_PRIMARY, ha<span class="op">=</span><span class="st">"left"</span>, fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>)</span>
-<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.03</span>, <span class="fl">0.875</span>, <span class="st">"Current homes (2025), REMM's 2055 forecast, and full buildout capacity"</span>, fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>TEXT_MUTED, ha<span class="op">=</span><span class="st">"left"</span>)</span>
-<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a>fig.legend(handles<span class="op">=</span>tier_legend, loc<span class="op">=</span><span class="st">"upper center"</span>, bbox_to_anchor<span class="op">=</span>((LEFT <span class="op">+</span> RIGHT) <span class="op">/</span> <span class="dv">2</span>, <span class="fl">0.82</span>), ncol<span class="op">=</span><span class="dv">3</span>, frameon<span class="op">=</span><span class="va">False</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, labelcolor<span class="op">=</span>TEXT_MUTED, handlelength<span class="op">=</span><span class="fl">1.5</span>, columnspacing<span class="op">=</span><span class="fl">1.2</span>)</span>
-<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.97</span>, <span class="fl">0.02</span>, <span class="st">"Source: REMM 2055 run (WFRC)"</span>, fontsize<span class="op">=</span><span class="dv">8</span>, color<span class="op">=</span>TEXT_MUTED, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
-<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a>plt.subplots_adjust(top<span class="op">=</span><span class="fl">0.76</span>, bottom<span class="op">=</span><span class="fl">0.08</span>, left<span class="op">=</span>LEFT, right<span class="op">=</span>RIGHT)</span>
-<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>plt.savefig(output_dir <span class="op">/</span> <span class="st">"housing_buildout.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor())</span>
-<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>make_chart(<span class="st">"housing"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-21-output-1.png" width="1278" height="822" class="figure-img"></p>
+<p><img src="index_files/figure-html/cell-24-output-1.png" width="1278" height="865" class="figure-img"></p>
 </figure>
 </div>
 </div>
