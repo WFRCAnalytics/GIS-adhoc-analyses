@@ -20,3 +20,24 @@ The Point,residential,dua_150,False,150.0,du/acre,17622.396616378323,housing uni
 The Point,nonres,current (zoning median),True,,FAR,,jobs,28382.0
 The Point,nonres,far_0.75,False,0.75,FAR,24949.32879975365,jobs,25927.32879975365
 The Point,nonres,far_4.0,False,4.0,FAR,133063.08693201945,jobs,134041.08693201945
+Ogden Downtown,residential,current (zoning median),True,50.0,du/acre,1990.4597103012272,housing units,6819.4597103012275
+Ogden Downtown,residential,dua_50,False,50.0,du/acre,1990.4597103012272,housing units,6819.4597103012275
+Ogden Downtown,residential,dua_100,False,100.0,du/acre,3980.9194206024545,housing units,8809.919420602455
+Ogden Downtown,residential,dua_150,False,150.0,du/acre,5971.3791309036815,housing units,10800.379130903682
+Ogden Downtown,nonres,current (zoning median),True,10.0,FAR,15460.477427226082,jobs,43286.477427226084
+Ogden Downtown,nonres,far_0.75,False,0.75,FAR,1159.535807041956,jobs,28985.535807041957
+Ogden Downtown,nonres,far_4.0,False,4.0,FAR,6184.190970890433,jobs,34010.190970890435
+Clearfield,residential,current (zoning median),True,30.0,du/acre,5194.537623730289,housing units,7907.537623730289
+Clearfield,residential,dua_50,False,50.0,du/acre,8657.562706217148,housing units,11370.562706217148
+Clearfield,residential,dua_100,False,100.0,du/acre,17315.125412434296,housing units,20028.125412434296
+Clearfield,residential,dua_150,False,150.0,du/acre,25972.688118651444,housing units,28685.688118651444
+Clearfield,nonres,current (zoning median),True,0.5,FAR,887.4865412834772,jobs,2738.486541283477
+Clearfield,nonres,far_0.75,False,0.75,FAR,1331.229811925216,jobs,3182.229811925216
+Clearfield,nonres,far_4.0,False,4.0,FAR,7099.892330267818,jobs,8950.892330267818
+Farmington Station Park,residential,current (zoning median),True,27.0,du/acre,3971.4702078524774,housing units,6610.470207852477
+Farmington Station Park,residential,dua_50,False,50.0,du/acre,7354.574458986069,housing units,9993.57445898607
+Farmington Station Park,residential,dua_100,False,100.0,du/acre,14709.148917972137,housing units,17348.14891797214
+Farmington Station Park,residential,dua_150,False,150.0,du/acre,22063.723376958205,housing units,24702.723376958205
+Farmington Station Park,nonres,current (zoning median),True,7.0,FAR,0.0,jobs,5666.0
+Farmington Station Park,nonres,far_0.75,False,0.75,FAR,0.0,jobs,5666.0
+Farmington Station Park,nonres,far_4.0,False,4.0,FAR,0.0,jobs,5666.0

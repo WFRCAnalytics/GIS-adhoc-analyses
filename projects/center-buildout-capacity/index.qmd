@@ -1,22 +1,23 @@
 ---
 title: "Center Buildout Capacity"
-subtitle: "Daybreak, Saratoga Springs Downtown, and The Point"
+subtitle: "Daybreak, Saratoga Springs Downtown, The Point, Ogden Downtown, Clearfield, and Farmington Station Park"
 ---
 
 ## Purpose
 
-For three WCV centers -- Daybreak, Saratoga Springs Downtown, and The Point
--- this answers three questions per center:
+For six WCV centers -- Daybreak, Saratoga Springs Downtown, The Point, Ogden
+Downtown, Clearfield, and Farmington Station Park -- this answers three
+questions per center:
 
 1. **Current year (2025)** homes and jobs -- where things stand today.
 2. **2055 forecast** homes and jobs -- REMM's own simulated outcome by 2055.
 3. **Full REMM capacity** homes and jobs -- see `## Full REMM capacity`
    below; the method differs by center, since The Point's is already fully
-   built out by 2055 per REMM (nothing developable left), while Daybreak and
-   Saratoga Springs Downtown still have land redeveloping past 2025 whose
-   *additional* capacity has to be estimated from density assumptions.
+   built out by 2055 per REMM (nothing developable left), while every other
+   center still has land redeveloping past 2025 whose *additional* capacity
+   has to be estimated from density assumptions.
 
-Metrics 1 and 2 use one shared calculation for all three centers. See
+Metrics 1 and 2 use one shared calculation for every center. See
 `## Summary` for the combined results and CSV exports (chart pending).
 
 Spatial joins, filtering, and aggregation below run in geopandas/pandas.
@@ -32,13 +33,50 @@ server-side `where`), so adding a center here doesn't require touching
 `sources.yml` or re-fetching -- just delete `_data/processed/centers.parquet`
 to force it to rebuild with the updated list.
 
-Every `gpd.read_file()` call below passes an OGR SQL `where` built straight
-from that list, restricted to "Urban Center" polygons (drops The Point's
-separate "Employment District" polygon, since every center in scope for
-this analysis is its Urban Center polygon).
+Not every raw `center_boundaries` row we need is a `CenterType = 'Urban
+Center'` polygon the way the original three were -- checked directly
+against the source's attribute table:
+
+- **Ogden Downtown** is `CenterType = 'Metropolitan Center'`.
+- **Clearfield** isn't a single polygon at all -- it's the combination of
+  three separate raw `CenterName` rows: `Downtown Clearfield` (Urban
+  Center), `Clearfield Station` (Urban Center), and `Downtown Gateway
+  (South)` (**City Center**).
+- **Farmington Station Park** is the raw row named just `Station Park`
+  (`City = 'Farmington'`, Urban Center) -- `center_boundaries` doesn't
+  prefix it with the city name the way the analysis name does.
+
+So the where-filter below can no longer blanket-restrict to `CenterType =
+'Urban Center'` (that would silently drop Ogden Downtown and Clearfield's
+City Center piece). It instead fetches by exact raw `CenterName`, excluding
+only `CenterType = 'Employment District'` -- the one type that would
+otherwise pull in The Point's redundant second polygon (its only raw-name
+collision; every other raw name below is unique in the source). A
+`RAW_TO_ANALYSIS` mapping then folds Clearfield's three raw rows down to
+one analysis center -- applied once, right after the fetch, so every
+downstream `groupby("CenterName")` naturally aggregates across all three of
+Clearfield's polygons without further changes.
 
 ```{python}
-CENTERS_OF_INTEREST = ["Daybreak", "Saratoga Springs Downtown", "The Point"]
+CENTERS_OF_INTEREST = [
+    "Daybreak", "Saratoga Springs Downtown", "The Point",
+    "Ogden Downtown", "Clearfield", "Farmington Station Park",
+]
+
+# raw center_boundaries CenterName -> analysis center name. Centers with a
+# 1:1 raw-to-analysis mapping still get an entry so RAW_CENTER_NAMES (the
+# where-filter's IN-list) and the remap step both come from this one dict.
+RAW_TO_ANALYSIS = {
+    "Daybreak": "Daybreak",
+    "Saratoga Springs Downtown": "Saratoga Springs Downtown",
+    "The Point": "The Point",
+    "Ogden Downtown": "Ogden Downtown",
+    "Downtown Clearfield": "Clearfield",
+    "Clearfield Station": "Clearfield",
+    "Downtown Gateway (South)": "Clearfield",
+    "Station Park": "Farmington Station Park",
+}
+RAW_CENTER_NAMES = list(RAW_TO_ANALYSIS.keys())
 ```
 
 ## Load center boundaries
@@ -50,9 +88,10 @@ import geopandas as gpd
 L = ensure_layers(["center_boundaries"])
 centers_preview = gpd.read_file(
     L["center_boundaries"],
-    where=f"CenterName IN ({', '.join(map(repr, CENTERS_OF_INTEREST))}) AND CenterType = 'Urban Center'",
+    where=f"CenterName IN ({', '.join(map(repr, RAW_CENTER_NAMES))}) AND CenterType <> 'Employment District'",
 )
-centers_preview[["CenterName", "CenterType", "City", "DwellingPerAcre", "NonResFAR"]]
+centers_preview["AnalysisCenter"] = centers_preview["CenterName"].map(RAW_TO_ANALYSIS)
+centers_preview[["AnalysisCenter", "CenterName", "CenterType", "City", "DwellingPerAcre", "NonResFAR"]]
 ```
 
 ```{python}
@@ -103,8 +142,13 @@ if not paths["parcels_geoparquet"].exists():
 if not paths["centers_geoparquet"].exists():
     centers_gdf = gpd.read_file(
         L["center_boundaries"],
-        where=f"CenterName IN ({', '.join(map(repr, CENTERS_OF_INTEREST))}) AND CenterType = 'Urban Center'",
+        where=f"CenterName IN ({', '.join(map(repr, RAW_CENTER_NAMES))}) AND CenterType <> 'Employment District'",
     )
+    # fold Clearfield's three raw polygons (and every other 1:1 raw name)
+    # down to their analysis center name here, once, so every downstream
+    # groupby("CenterName") aggregates across all of a center's raw rows
+    # without needing to know Clearfield is special.
+    centers_gdf["CenterName"] = centers_gdf["CenterName"].map(RAW_TO_ANALYSIS)
     centers_gdf.to_parquet(paths["centers_geoparquet"])
 
 if not paths["buildings_2055_parquet"].exists():
@@ -153,11 +197,11 @@ parcels_per_center
 ```
 
 ```{python}
-# parcels within our 3 centers of interest, reused by every metric below.
-# parcels_in_centers already only contains parcels inside Daybreak, Saratoga
-# Springs Downtown, and The Point (centers.parquet was itself built from the
-# 3-row where-filtered fetch) -- this isin() is a defensive, explicit filter
-# so downstream cells don't silently depend on that upstream scoping.
+# parcels within our centers of interest, reused by every metric below.
+# parcels_in_centers already only contains parcels inside those centers
+# (centers.parquet was itself built from the where-filtered fetch, then
+# remapped to analysis center names) -- this isin() is a defensive, explicit
+# filter so downstream cells don't silently depend on that upstream scoping.
 our_parcels = parcels_in_centers[parcels_in_centers["CenterName"].isin(CENTERS_OF_INTEREST)]
 ```
 
@@ -167,7 +211,7 @@ No dedicated 2025 REMM run exists (only "2023" and "2055" pickles), so this
 derives 2025 by filtering the 2055 run's buildings table
 (`run1842year2055allbuildings.pkl`, one row per *building*) to
 `year_built <= 2025` and summing `residential_units`/`job_spaces` per
-center. One shared calculation for all three centers.
+center. One shared calculation for every center.
 
 **Data quality note:** filtering to `year_built <= 2023` instead reproduces
 the dedicated `run1842year2023allbuildings.pkl` exactly for Daybreak (905
@@ -178,7 +222,11 @@ uniform `year_built <= 2025` method regardless: The Point was a state
 prison site until recently, so a real drop from ~2,474 jobs (2023,
 pre-closure) to ~978 (2025, post-closure/pre-redevelopment) is a plausible
 read, not necessarily a data error -- consistent with satellite imagery
-showing The Point still mostly undeveloped today.
+showing The Point still mostly undeveloped today. This same 2025-derivation
+method applies uniformly to Ogden Downtown, Clearfield, and Farmington
+Station Park too -- no dedicated 2023/2025 pickle exists for any center
+beyond the original three, so there's no equivalent cross-check available
+for them.
 
 ```{python}
 buildings_2055 = pd.read_parquet(
@@ -202,8 +250,8 @@ REMM's own simulated outcome by 2055 -- sum `parcel_progression_metrics`'s
 `residential_units`/`job_spaces` (verified reliable per-parcel sums across
 all of a parcel's buildings, unlike `year_built`, which only reflects one
 representative building) across **all** parcels in each center, not just
-the ones that redevelop after 2025. Same shared calculation for all three
-centers -- this is exactly what The Point's full-buildout figure below
+the ones that redevelop after 2025. Same shared calculation for every
+center -- this is exactly what The Point's full-buildout figure below
 already is, since REMM shows nothing left developable there by 2055.
 
 ```{python}
@@ -224,11 +272,11 @@ forecast_2055
 
 Method differs by center:
 
-- **Daybreak & Saratoga Springs Downtown**: developable acreage (parcels
-  with a building `year_built > 2025`) x forecast res/nonres mix ratio x
-  median density assumptions = **additional** housing units/jobs on top of
-  today's baseline (metric 1) -- not an absolute total by itself. Combined
-  with metric 1 in `## Summary` to get a comparable absolute figure.
+- **Every center except The Point**: developable acreage (parcels with a
+  building `year_built > 2025`) x forecast res/nonres mix ratio x median
+  density assumptions = **additional** housing units/jobs on top of today's
+  baseline (metric 1) -- not an absolute total by itself. Combined with
+  metric 1 in `## Summary` to get a comparable absolute figure.
 - **The Point**: no separate development schedule document was ever
   provided, and The Point is already REMM-modeled, so "the development
   schedule" here means REMM's own full-buildout simulation directly (no
@@ -236,13 +284,13 @@ Method differs by center:
   developable there as of 2055, so this figure already **is** an absolute
   total, identical to its metric 2 (2055 forecast).
 
-### Daybreak & Saratoga Springs Downtown: developable land
+### Developable land
 
 Follows the original pseudocode directly: filter the 2055 buildings table
 to parcels within our centers of interest, keep buildings with
 `year_built > 2025`, take the unique parcel ids from that, then sum
-`parcel_acres` for those parcels. Computed for all three centers here too
-(The Point's result is an exploratory cross-check only -- see above).
+`parcel_acres` for those parcels. Computed for every center here too (The
+Point's result is an exploratory cross-check only -- see above).
 
 An earlier version of this shortcut off the parcel-level
 `parcel_progression_metrics` table instead, since it already carries a
@@ -452,21 +500,21 @@ applies the same `res_acres`/`nonres_acres` x density formula across a
 fixed grid of alternative densities, so the capacity estimate can be shown
 as a range instead of a single number.
 
-Applied to all three centers, including The Point -- even though its own
+Applied to every center, including The Point -- even though its own
 "current" capacity estimate uses REMM's full-buildout simulation directly
 rather than a density assumption (`median_dua` isn't even defined for it;
 none of its parcels carry a `max_dua` entitlement yet), the constant
 dua/far scenarios below still apply the same acreage-based formula to it
 using its own `res_acres`/`nonres_acres`/`sqft_per_job` (computed earlier
 only as an exploratory cross-check), so it can be compared on the same
-scenario grid as the other two centers.
+scenario grid as every other center.
 
 - **Residential**: `dua` = each center's own zoning median (current
   method, undefined for The Point) or a fixed 50/100/150 du/acre.
 - **Nonresidential**: `far` = each center's own zoning median (current
   method) or a fixed 0.75/4.0 FAR.
 
-For Daybreak/Saratoga Springs Downtown, the "current" row reproduces
+For every center except The Point, the "current" row reproduces
 `capacity.loc[center]`/`housing_capacity`/`jobs_capacity` from above exactly
 (same formula, same inputs) -- included here as a consistency check as much
 as a scenario. For The Point, "current" instead pulls `point_capacity`
@@ -524,13 +572,15 @@ sensitivity
 ```{python}
 import numpy as np
 
-# Full REMM capacity, as an absolute total comparable to metrics 1/2:
-# Daybreak/Saratoga Springs Downtown = current year + additional capacity
-# (task 2's density-assumption estimate); The Point = its own full-buildout
-# sum directly (task 3), NOT the exploratory `capacity.loc["The Point"]` row.
+# Full REMM capacity, as an absolute total comparable to metrics 1/2: every
+# center except The Point = current year + additional capacity (task 2's
+# density-assumption estimate); The Point = its own full-buildout sum
+# directly (task 3), NOT the exploratory `capacity.loc["The Point"]` row.
 housing_capacity = pd.Series(index=CENTERS_OF_INTEREST, dtype=float)
 jobs_capacity = pd.Series(index=CENTERS_OF_INTEREST, dtype=float)
-for center in ["Daybreak", "Saratoga Springs Downtown"]:
+for center in CENTERS_OF_INTEREST:
+    if center == "The Point":
+        continue
     housing_capacity[center] = current_year.loc[center, "homes"] + capacity.loc[center, "housing_units"]
     jobs_capacity[center] = current_year.loc[center, "jobs"] + capacity.loc[center, "jobs"]
 housing_capacity["The Point"] = point_capacity["housing_units"]
@@ -615,9 +665,9 @@ brand's own typeface (Poppins) instead of matplotlib's default font --
 variable font at weight 400, so `Poppins SemiBold` (a proper static weight)
 carries the title/value labels instead, keeping one cohesive typeface
 throughout rather than mixing families. Centers are fixed to `index.qmd`'s
-own canonical `CENTERS_OF_INTEREST` order (Daybreak, Saratoga Springs
-Downtown, The Point) in both charts -- rather than each chart sorting by
-its own capacity column -- so a center sits in the same row in both.
+own canonical `CENTERS_OF_INTEREST` order in both charts -- rather than each
+chart sorting by its own capacity column -- so a center sits in the same
+row in both.
 
 Each bar is a **Meter**-style nested encoding (see the `dataviz` skill:
 fill = value, track = a lighter step of the same hue), extended from 2
@@ -628,20 +678,26 @@ tiers to 3, with all three values labeled (not just capacity):
 - **Hatch overlay** (0 to the 2055 figure): tone-on-tone diagonal texture --
   how much of that capacity REMM's own simulation reaches by 2055. Skipped
   for The Point, where 2055 forecast == capacity exactly (nothing left
-  developable), to avoid labeling the same value twice. For Daybreak and
-  Saratoga Springs Downtown's *housing* chart specifically, `housing_2055`
-  is actually *above* `housing_capacity` (the density-assumption method's
-  known limitation, discussed above) -- an honest reflection of that, not a
-  rendering bug, so the hatch overlay extends past the light-shade track
+  developable), to avoid labeling the same value twice. For every other
+  center's *housing* chart, if `housing_2055` ends up *above*
+  `housing_capacity` (the density-assumption method's known limitation,
+  first observed on Daybreak/SSD and discussed above), that's an honest
+  reflection of the method understating real achievable density, not a
+  rendering bug -- the hatch overlay extends past the light-shade track
   there instead of nesting inside it.
 
-Colors are 3 categorical hues from the WFRC brand's Core Palette (`blue
-#036fa8`, `orange #ea7b00`, `green #007426`), chosen over the "Wasatch
-Choice Center" colors since all three centers share the same `CenterType`
-and would collide under that scheme. Validated with the `dataviz` skill's
-`validate_palette.js` six-checks script: all pass except a contrast WARN on
-orange (2.79, below 3:1) -- satisfied by the visible value labels here and
-the table above, per the skill's relief rule.
+Colors are 6 categorical hues -- one per center -- drawn from the WFRC
+brand's Core Palette (blue, orange, green, purple, gold, red), chosen over
+the "Wasatch Choice Center" colors since centers span multiple `CenterType`s
+and would collide under that scheme. The original three centers keep their
+exact original hues (`blue #036fa8`, `orange #ea7b00`, `green #007426`);
+purple and gold are nudged slightly off their literal brand hex (`#553c8f`
+-> `#5f4494`, `#eab500` -> `#c9a000`) to clear the `dataviz` skill's
+lightness-band check, and the 6-color set is both reordered and re-nudged
+until `validate_palette.js` passes clean in this exact row order -- worst
+adjacent pair (green/orange) clears CVD at 11.7, with only the usual
+contrast WARN on orange and gold (both satisfied by the always-visible bold
+value labels, per the skill's relief rule).
 
 **Sensitivity overlay**, drawn directly on top of each existing bar:
 
@@ -649,13 +705,16 @@ the table above, per the skill's relief rule.
   plus a thin neutral **bracket** connecting the tested range into one
   span. Ticks (and their value labels) get their own fixed color *per
   scenario* -- not per center, since centers are already distinguished by
-  row + the tier hues -- from a light-to-dark purple **ordinal ramp** (50 <
+  row + the tier hues -- from a light-to-dark **teal ordinal ramp** (50 <
   100 < 150 du/ac; 0.75 < 4.0 FAR is an ordered category, not an arbitrary
   categorical palette), with a second legend row mapping each color to its
-  scenario.
+  scenario. Teal specifically because it's the one hue-family gap left once
+  all 6 centers claim blue/orange/green/purple/gold/red -- validated
+  separately with `--ordinal` (monotone lightness, adjacent steps, light-end
+  contrast), since a sequential ramp fails the categorical six by design.
 - **The Point's** `dua_100`/`dua_150`/`far_4.0` scenarios are genuine
-  order-of-magnitude outliers (its land area dwarfs Daybreak/SSD's, so a
-  flat per-acre assumption blows past everything else) -- stretching the
+  order-of-magnitude outliers (its land area dwarfs every other center's, so
+  a flat per-acre assumption blows past everything else) -- stretching the
   shared axis to fit them would compress every other bar into a sliver, so
   the axis instead caps at 1.3x the existing capacity-tier max, and
   anything past that renders as an off-scale `>` marker with an asterisked
@@ -666,6 +725,11 @@ the table above, per the skill's relief rule.
   `path_effects` halo: the tested range regularly extends past capacity, so
   without this the bracket line would render *through* that number instead
   of behind it.
+- Figure height and the title/subtitle/legend margins scale with the
+  number of centers (an absolute-inches header/footer budget, not a fixed
+  figure-fraction) -- a fixed-fraction header sized for 3 rows would either
+  crush 6 rows' worth of bars into no vertical room, or leave a
+  disproportionate blank margin above 3.
 
 ```{python}
 import matplotlib
@@ -682,11 +746,17 @@ CENTER_COLORS = {
     "Daybreak": "#036fa8",
     "Saratoga Springs Downtown": "#ea7b00",
     "The Point": "#007426",
+    "Ogden Downtown": "#5f4494",
+    "Clearfield": "#c9a000",
+    "Farmington Station Park": "#d32f00",
 }
 CENTER_LABELS = {
     "Daybreak": "Daybreak",
     "Saratoga Springs Downtown": "Saratoga Springs\nDowntown",
     "The Point": "The Point",
+    "Ogden Downtown": "Ogden Downtown",
+    "Clearfield": "Clearfield",
+    "Farmington Station Park": "Farmington\nStation Park",
 }
 SURFACE = "#fcfcfb"
 TEXT_PRIMARY = "#151515"
@@ -695,16 +765,17 @@ BRACKET_INK = "#a19b94"  # neutral connecting line -- just context, not identity
 LEFT, RIGHT = 0.205, 0.92
 
 # Scenarios get their own fixed hue, one shared ramp reused across both
-# domains and all three centers. Purple family: distinct from every
-# CENTER_COLORS hue and from the neutral bracket ink.
-SCENARIO_LOW, SCENARIO_MID, SCENARIO_HIGH = "#b088d9", "#8347c2", "#5b2c86"
+# domains and every center. Teal: the one hue-family gap left once all 6
+# centers claim blue/orange/green/purple/gold/red (see CENTER_COLORS) --
+# distinct from every one of them and from the neutral bracket ink.
+SCENARIO_LOW, SCENARIO_MID, SCENARIO_HIGH = "#5cbdb0", "#2f9c8f", "#155c53"
 
 DOMAIN_CFG = {
     "jobs": {
         "col": "nonres", "summary_cap": "jobs_capacity", "summary_2055": "jobs_2055", "summary_2025": "jobs_2025",
         "alt_scenarios": ["far_0.75", "far_4.0"], "alt_ticks": ["0.75 FAR", "4.0 FAR"],
         "scenario_colors": {"0.75 FAR": SCENARIO_LOW, "4.0 FAR": SCENARIO_HIGH},
-        "title": "Employment capacity across three WCV centers",
+        "title": "Employment capacity across six WCV centers",
         "subtitle": "Current jobs (2025), REMM's 2055 forecast, full buildout capacity, and alternate FAR scenarios",
         "out": "employment_buildout.png",
     },
@@ -712,7 +783,7 @@ DOMAIN_CFG = {
         "col": "residential", "summary_cap": "housing_capacity", "summary_2055": "housing_2055", "summary_2025": "housing_2025",
         "alt_scenarios": ["dua_50", "dua_100", "dua_150"], "alt_ticks": ["50 du/ac", "100 du/ac", "150 du/ac"],
         "scenario_colors": {"50 du/ac": SCENARIO_LOW, "100 du/ac": SCENARIO_MID, "150 du/ac": SCENARIO_HIGH},
-        "title": "Housing capacity across three WCV centers",
+        "title": "Housing capacity across six WCV centers",
         "subtitle": "Current homes (2025), REMM's 2055 forecast, full buildout capacity, and alternate DUA scenarios",
         "out": "housing_buildout.png",
     },
@@ -727,10 +798,53 @@ def lighten(hex_color, amount):
     return f"#{r:02x}{g:02x}{b:02x}"
 
 
+def declutter_depths(xs, min_gap):
+    """Given x-positions (any order), return a same-length list of stack
+    depths (0, 1, 2, ...) so any two positions closer than min_gap land at
+    different depths -- greedy, walked in x order. Used to keep same-row
+    labels from overlapping when their underlying values happen to sit close
+    together (e.g. Ogden Downtown's 2025/2055/FAR-scenario jobs figures all
+    landing within ~1-2% of each other) -- a collision the original 3-center
+    data never triggered, but real numbers for the added centers did."""
+    order_idx = sorted(range(len(xs)), key=lambda i: xs[i])
+    depths = [0] * len(xs)
+    last_x, depth = None, 0
+    for i in order_idx:
+        x = xs[i]
+        depth = depth + 1 if last_x is not None and (x - last_x) < min_gap else 0
+        depths[i] = depth
+        last_x = x
+    return depths
+
+
 # fixed to CENTERS_OF_INTEREST, reversed since barh renders list[0] at the
-# bottom row and list[-1] at the top -- this reads top-to-bottom as
-# Daybreak, Saratoga Springs Downtown, The Point in both charts.
+# bottom row and list[-1] at the top -- this reads top-to-bottom in
+# CENTERS_OF_INTEREST's own order in both charts.
 CENTER_ORDER = list(reversed(CENTERS_OF_INTEREST))
+
+
+# Absolute-inches header/footer/title/legend budget, calibrated once from
+# the chart's original 3-center, fig_height=6.22in layout (row_gap=1.2, top
+# margin fraction 0.68, bottom 0.08, title/subtitle/legend y=0.975/0.875/
+# 0.82/0.775) -- then reapplied to ANY row count by holding these absolute
+# inches constant and letting only the axes (bars) portion grow with
+# len(order). A fixed *fraction* (the original code) scales the header/
+# footer/title area right along with the figure as centers are added,
+# which either crushes 6 rows of bars into the same axes height a 3-row
+# chart had, or (going the other way) leaves 3 rows swimming in a
+# disproportionately tall header margin -- neither is "the chart just got
+# taller to fit more bars," which is the only thing that should change.
+ROW_GAP = 1.2
+_CALIBRATION_FIG_HEIGHT_IN = 5.9 + (ROW_GAP - 1) * 1.6  # 6.22, the original 3-row figure height
+_CALIBRATION_N = 3
+_CALIBRATION_AXES_DATA_RANGE = (_CALIBRATION_N - 1) * ROW_GAP + 1.7
+IN_PER_DATA_UNIT = (0.60 * _CALIBRATION_FIG_HEIGHT_IN) / _CALIBRATION_AXES_DATA_RANGE
+HEADER_HEIGHT_IN = 0.32 * _CALIBRATION_FIG_HEIGHT_IN
+FOOTER_HEIGHT_IN = 0.08 * _CALIBRATION_FIG_HEIGHT_IN
+TITLE_TOP_IN = 0.025 * _CALIBRATION_FIG_HEIGHT_IN
+SUBTITLE_TOP_IN = 0.125 * _CALIBRATION_FIG_HEIGHT_IN
+LEGEND1_TOP_IN = 0.18 * _CALIBRATION_FIG_HEIGHT_IN
+LEGEND2_TOP_IN = 0.225 * _CALIBRATION_FIG_HEIGHT_IN
 
 
 def make_chart(domain_key):
@@ -740,9 +854,10 @@ def make_chart(domain_key):
 
     # modest extra row spacing (vs. a plain unit-spaced chart) so the
     # per-scenario tick labels below each bar have room to breathe
-    row_gap = 1.2
-    fig_height = 5.9 + (row_gap - 1) * 1.6
+    row_gap = ROW_GAP
     ys = [i * row_gap for i in range(len(order))]
+    axes_data_range = (len(order) - 1) * row_gap + 1.7
+    fig_height = HEADER_HEIGHT_IN + IN_PER_DATA_UNIT * axes_data_range + FOOTER_HEIGHT_IN
 
     fig, ax = plt.subplots(figsize=(9.5, fig_height), dpi=140)
     fig.patch.set_facecolor(SURFACE)
@@ -753,6 +868,14 @@ def make_chart(domain_key):
     clip_limit = base_max * 1.3
     in_range_alts = [alt[(c, s)] for c in order for s in cfg["alt_scenarios"] if alt[(c, s)] <= clip_limit]
     xmax = max([base_max, *in_range_alts])
+    # off-scale markers/labels anchor a fixed distance PAST xmax (not a
+    # fraction below it) -- with 6 centers, one center's own borderline
+    # in-range scenario can land close enough to xmax itself (e.g.
+    # Farmington's dua_50 at 9,994 against an xmax of 9,994) that an
+    # edge_x defined as a fraction *below* xmax would collide with that
+    # legitimate in-range tick's label. Anchoring past xmax instead keeps
+    # off-scale content clear of every in-range tick, always.
+    EDGE_X = xmax * 1.05
     any_clipped = False
 
     for i, center in enumerate(order):
@@ -768,12 +891,17 @@ def make_chart(domain_key):
 
         top_y = y + bar_height / 2
         LABEL_Z = 6  # every label out-ranks the bracket (4) and tick (5) lines
+        show_forecast = not np.isclose(forecast, cap, rtol=0.001)  # skip only when 2055 == capacity (The Point) -- avoids a duplicate label
+        # bump the forecast label above the current label (rather than
+        # side by side at the same height) when the two values sit close
+        # enough that their text would otherwise overlap horizontally.
+        forecast_bump = 0.16 if show_forecast and abs(forecast - current) < xmax * 0.08 else 0.0
         if current > 0:
             ax.text(current, top_y + 0.07, f"{current:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
         else:
             ax.text(current, top_y + 0.07, "0", ha="left", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
-        if not np.isclose(forecast, cap, rtol=0.001):  # skip only when 2055 == capacity (The Point) -- avoids a duplicate label
-            ax.text(forecast, top_y + 0.07, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
+        if show_forecast:
+            ax.text(forecast, top_y + 0.07 + forecast_bump, f"{forecast:,.0f}", ha="center", va="bottom", fontsize=8.5, color=TEXT_MUTED, zorder=LABEL_Z)
         ax.text(cap + xmax * 0.015, y, f"{cap:,.0f}", ha="left", va="center", fontsize=11, color=TEXT_PRIMARY,
                 fontfamily="Poppins SemiBold", zorder=LABEL_Z,
                 path_effects=[pe.withStroke(linewidth=3, foreground=SURFACE)])
@@ -787,23 +915,25 @@ def make_chart(domain_key):
         if in_range:
             vals = [v for _, v in in_range]
             ax.plot([min(vals), max(vals)], [y, y], color=BRACKET_INK, linewidth=1.4, zorder=4, solid_capstyle="round")
-            for lab, v in in_range:
+            # ticks draw at their true value regardless; only the text label
+            # stacks deeper when two scenario values sit close together.
+            depths = declutter_depths(vals, min_gap=xmax * 0.08)
+            for (lab, v), depth in zip(in_range, depths):
                 sc_color = cfg["scenario_colors"][lab]
                 ax.plot([v, v], [tick_bot, tick_top], color=sc_color, linewidth=2, zorder=5)
-                ax.text(v, tick_bot - 0.03, f"{v:,.0f}", ha="center", va="top", fontsize=7.6,
+                ax.text(v, tick_bot - 0.03 - depth * 0.14, f"{v:,.0f}", ha="center", va="top", fontsize=7.6,
                         color=sc_color, fontfamily="Poppins SemiBold", zorder=LABEL_Z)
         if clipped:
             any_clipped = True
-            edge_x = xmax * 0.955
-            ax.plot([edge_x], [y], marker=">", markersize=6, color=BRACKET_INK, zorder=5)
+            ax.plot([EDGE_X], [y], marker=">", markersize=6, color=BRACKET_INK, zorder=5)
             for idx, (lab, v) in enumerate(sorted(clipped, key=lambda t: t[1])):
                 sc_color = cfg["scenario_colors"][lab]
-                ax.text(edge_x + xmax * 0.01, tick_bot - 0.03 - idx * 0.15, f"{v:,.0f}*", ha="left", va="top",
+                ax.text(EDGE_X + xmax * 0.01, tick_bot - 0.03 - idx * 0.15, f"{v:,.0f}*", ha="left", va="top",
                         fontsize=7.6, color=sc_color, fontfamily="Poppins SemiBold", zorder=LABEL_Z)
 
     ax.set_yticks(ys)
     ax.set_yticklabels([CENTER_LABELS[c] for c in order], fontsize=11, color=TEXT_PRIMARY)
-    ax.set_xlim(0, xmax * 1.2)
+    ax.set_xlim(0, xmax * 1.32)
     ax.set_ylim(-0.75, ys[-1] + 0.95)
     ax.get_xaxis().set_visible(False)
 
@@ -811,8 +941,9 @@ def make_chart(domain_key):
         spine.set_visible(False)
     ax.tick_params(left=False)
 
-    fig.suptitle(cfg["title"], x=0.03, y=0.975, fontsize=17, color=TEXT_PRIMARY, ha="left", fontfamily="Poppins SemiBold")
-    fig.text(0.03, 0.875, cfg["subtitle"], fontsize=10.5, color=TEXT_MUTED, ha="left")
+    fig.suptitle(cfg["title"], x=0.03, y=1 - TITLE_TOP_IN / fig_height, fontsize=17, color=TEXT_PRIMARY,
+                 ha="left", fontfamily="Poppins SemiBold")
+    fig.text(0.03, 1 - SUBTITLE_TOP_IN / fig_height, cfg["subtitle"], fontsize=10.5, color=TEXT_MUTED, ha="left")
 
     tier_legend = [
         Patch(facecolor=TEXT_MUTED, label="2025 (current)"),
@@ -832,10 +963,10 @@ def make_chart(domain_key):
     # themselves visually center close to figure fraction 0.5.
     legend_kwargs = dict(loc="upper center", frameon=False, fontsize=9, handlelength=1.4,
                           columnspacing=1.3, bbox_transform=fig.transFigure)
-    legend1 = fig.legend(handles=tier_legend, bbox_to_anchor=(0.5, 0.82), ncol=3,
+    legend1 = fig.legend(handles=tier_legend, bbox_to_anchor=(0.5, 1 - LEGEND1_TOP_IN / fig_height), ncol=3,
                           labelcolor=TEXT_MUTED, **legend_kwargs)
     fig.add_artist(legend1)
-    fig.legend(handles=scenario_legend, bbox_to_anchor=(0.5, 0.775),
+    fig.legend(handles=scenario_legend, bbox_to_anchor=(0.5, 1 - LEGEND2_TOP_IN / fig_height),
                ncol=len(scenario_legend), **legend_kwargs)
 
     if any_clipped:
@@ -843,7 +974,9 @@ def make_chart(domain_key):
                   ha="left", style="italic")
     fig.text(0.97, 0.02, "Source: REMM 2055 run (WFRC)", fontsize=8, color=TEXT_MUTED, ha="right", style="italic")
 
-    plt.subplots_adjust(top=0.68, bottom=0.08, left=LEFT, right=RIGHT)
+    top_fraction = 1 - HEADER_HEIGHT_IN / fig_height
+    bottom_fraction = FOOTER_HEIGHT_IN / fig_height
+    plt.subplots_adjust(top=top_fraction, bottom=bottom_fraction, left=LEFT, right=RIGHT)
     plt.savefig(output_dir / cfg["out"], facecolor=fig.get_facecolor())
     plt.show()
 ```
