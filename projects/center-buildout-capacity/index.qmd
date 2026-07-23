@@ -8,12 +8,13 @@ subtitle: "Daybreak, Saratoga Springs Downtown, and The Point"
 Estimate additional housing units and jobs at full buildout for three WCV
 centers:
 
-- **Daybreak** and **Saratoga Springs Downtown**: from REMM-forecast
-  post-2025 development, applying each center's median dwelling-unit-per-acre
-  and employment-density (FAR + job-space) assumptions to the forecast
-  residential / commercial-employment development mix.
-- **The Point**: from the development schedule the Point team has provided
-  directly, rather than from REMM.
+- **All three centers**: from REMM-forecast post-2025 development, applying
+  each center's median dwelling-unit-per-acre and employment-density (FAR +
+  job-space) assumptions to the forecast residential / commercial-employment
+  development mix.
+- **The Point**: additionally, from the development schedule the Point team
+  has provided directly -- that schedule-based figure is the one that
+  matters for The Point; the REMM-based estimate above is a cross-check.
 
 Spatial joins, filtering, and aggregation below run in geopandas/pandas.
 The base-year parcels come from `remm_base_year_data.gdb`, which is cached
@@ -26,9 +27,7 @@ Single ordered list to extend if more centers are added later.
 `center_boundaries` is fetched in full from the REST service (no
 server-side `where`), so adding a center here doesn't require touching
 `sources.yml` or re-fetching -- just delete `_data/processed/centers.parquet`
-to force it to rebuild with the updated list. Subsets below are index
-slices into this same list: `[0:2]` for the two REMM-method centers
-(Daybreak, Saratoga Springs Downtown), `[2:3]` for The Point.
+to force it to rebuild with the updated list.
 
 Every `gpd.read_file()` call below passes an OGR SQL `where` built straight
 from that list, restricted to "Urban Center" polygons (drops The Point's
@@ -54,7 +53,10 @@ centers_preview[["CenterName", "CenterType", "City", "DwellingPerAcre", "NonResF
 ```
 
 ```{python}
-centers_preview.explore(column="CenterName", tooltip=["CenterName", "CenterType", "City"], legend=False)
+#| eval: false
+centers_preview.explore(
+    column="CenterName", tooltip=["CenterName", "CenterType", "City"], legend=False
+)
 ```
 
 ## REMM parcels: load and cache as parquet
@@ -82,32 +84,45 @@ paths.update({
 })
 
 # one-time read of the two vector sources, cached as GeoParquet so later runs
-# don't re-parse the FileGDB or re-fetch the REST layer.
+# don't re-parse the FileGDB or re-fetch the REST layer. Each cache is a full
+# replica of every source column -- selecting only the columns actually
+# needed for a given step happens later, at read time (via `columns=`), not
+# by trimming what gets cached here.
 if not paths["parcels_geoparquet"].exists():
-    parcels_gdf = gpd.read_file(paths["gdb"], layer="parcels", columns=["parcel_id", "parcel_acres"])
+    parcels_gdf = gpd.read_file(paths["gdb"], layer="parcels")
+    # Split_Factor/MAG_parcel_id mix strings with a couple of real NaNs, which
+    # pyarrow can't write as a single column type -- nullable string dtype
+    # keeps those as actual nulls (not the literal string "nan").
+    parcels_gdf["Split_Factor"] = parcels_gdf["Split_Factor"].astype("string")
+    parcels_gdf["MAG_parcel_id"] = parcels_gdf["MAG_parcel_id"].astype("string")
     parcels_gdf.to_parquet(paths["parcels_geoparquet"])
 
 if not paths["centers_geoparquet"].exists():
     centers_gdf = gpd.read_file(
         L["center_boundaries"],
-        columns=["CenterName", "CenterType"],
         where=f"CenterName IN ({', '.join(map(repr, CENTERS_OF_INTEREST))}) AND CenterType = 'Urban Center'",
     )
     centers_gdf.to_parquet(paths["centers_geoparquet"])
 
 if not paths["buildings_2055_parquet"].exists():
     buildings_full = pd.read_pickle(paths["buildings_2055_pkl"]).reset_index()
-    # 'note' mixes strings with an int 0 sentinel (no dedicated null), which pyarrow
-    # can't write as a single column type -- cast to string so every row survives
-    # as-is (0 -> "0") rather than dropping columns to sidestep the type error.
-    buildings_full["note"] = buildings_full["note"].astype(str)
+    # 'note' mixes real strings with an int 0 sentinel (no dedicated null),
+    # which pyarrow can't write as a single column type. 0 means "no note", so
+    # it's replaced with an actual null rather than becoming the string "0".
+    buildings_full["note"] = buildings_full["note"].replace(0, pd.NA).astype("string")
     buildings_full.to_parquet(paths["buildings_2055_parquet"])
 
 if not paths["progression_2055_parquet"].exists():
+    # no mixed-type columns here, so a plain conversion is enough
     pd.read_pickle(paths["progression_2055_pkl"]).to_parquet(paths["progression_2055_parquet"])
 
-parcels = gpd.read_parquet(paths["parcels_geoparquet"])
-centers = gpd.read_parquet(paths["centers_geoparquet"]).to_crs(parcels.crs)
+# only the columns needed for the spatial join below (geometry + acreage/name) --
+# other columns (max_far, max_dua, DwellingPerAcre, ...) get pulled later, from
+# the same cached files, only where they're actually used.
+parcels = gpd.read_parquet(paths["parcels_geoparquet"], columns=["parcel_id", "parcel_acres", "geometry"])
+centers = gpd.read_parquet(
+    paths["centers_geoparquet"], columns=["CenterName", "CenterType", "geometry"]
+).to_crs(parcels.crs)  # centers ships in EPSG:4326 (WGS84) from the REST layer; parcels are in EPSG:26912 (UTM 12N)
 ```
 
 ## Parcels within each center
@@ -117,8 +132,13 @@ straddling a center boundary is assigned to exactly one center, not
 double-counted.
 
 ```{python}
+# swap each parcel's polygon for its centroid point -- a polygon can legitimately
+# intersect two centers along a shared edge, but its centroid falls in exactly one.
 parcel_centroids = parcels.set_geometry(parcels.geometry.centroid)
 
+# predicate="within": keep a parcel only if its centroid point falls inside a
+# center polygon. how="inner" drops parcels whose centroid falls in no center
+# at all (most of the region -- centers are a tiny fraction of all parcels).
 parcels_in_centers = gpd.sjoin(
     parcel_centroids, centers[["CenterName", "geometry"]], predicate="within", how="inner"
 )[["parcel_id", "parcel_acres", "CenterName"]]
@@ -128,38 +148,64 @@ parcels_in_centers.groupby("CenterName").agg(
 )
 ```
 
-## Daybreak & Saratoga Springs: REMM developable land
+## REMM developable land
 
 Follows the original pseudocode directly: filter the 2055 buildings table
 (`run1842year2055allbuildings.pkl`, one row per *building*) to parcels
-within our two centers, keep buildings with `year_built > 2025`, take the
-unique parcel ids from that, then sum `parcel_acres` for those parcels.
+within our centers of interest, keep buildings with `year_built > 2025`,
+take the unique parcel ids from that, then sum `parcel_acres` for those
+parcels. Computed for all three centers -- The Point's result here is a
+cross-check alongside its own development-schedule-based buildout, not a
+replacement for it.
 
 An earlier version of this shortcut off the parcel-level
 `parcel_progression_metrics` table instead, since it already carries a
 single `year_built` per parcel. That's only valid if every building on a
 parcel always shares the same year/type -- checked directly: 162 parcels
-regionwide have more than one building, 2 of them are in our two centers,
-and in both cases the buildings on that parcel happened to share the same
-`year_built`. That was a coincidence of this dataset, not something the
-data guarantees in general, so this now filters at the building level as
-originally specified rather than relying on it holding elsewhere.
+regionwide have more than one building, 2 of them are in our centers of
+interest, and in both cases the buildings on that parcel happened to share
+the same `year_built`. That was a coincidence of this dataset, not
+something the data guarantees in general, so this now filters at the
+building level as originally specified rather than relying on it holding
+elsewhere.
+
+#### (1) Restrict to parcels within our centers of interest
 
 ```{python}
+# parcels_in_centers already only contains parcels inside Daybreak, Saratoga
+# Springs Downtown, and The Point (centers.parquet was itself built from the
+# 3-row where-filtered fetch) -- this isin() is a defensive, explicit filter
+# so this cell doesn't silently depend on that upstream scoping.
+our_parcels = parcels_in_centers[parcels_in_centers["CenterName"].isin(CENTERS_OF_INTEREST)]
+```
+
+#### (2) Filter the 2055 buildings table to post-2025 buildings on those parcels
+
+```{python}
+# only the columns this step needs -- year_built to filter, general_type/
+# residential_units/job_spaces are read later (task 2) from the same cache.
 buildings_2055 = pd.read_parquet(
     paths["buildings_2055_parquet"],
     columns=["parcel_id", "year_built", "general_type", "residential_units", "job_spaces"],
 )
 
-our_parcels = parcels_in_centers[parcels_in_centers["CenterName"].isin(CENTERS_OF_INTEREST)]
+# inner join: only buildings whose parcel_id is one of our centers' parcels survive.
 buildings_in_centers = buildings_2055.merge(
     our_parcels[["parcel_id", "CenterName"]], on="parcel_id"
 )
 
+# a parcel can have multiple buildings (see note above) -- .unique() collapses
+# "one row per building built after 2025" down to "one row per qualifying parcel".
 post_2025_parcel_ids = buildings_in_centers.loc[
     buildings_in_centers["year_built"] > 2025, "parcel_id"
 ].unique()
 
+post_2025_parcel_ids
+```
+
+#### (3) Sum developable acreage for those parcels, per center
+
+```{python}
 developable_land = (
     our_parcels[our_parcels["parcel_id"].isin(post_2025_parcel_ids)]
     .groupby("CenterName")
@@ -171,23 +217,33 @@ developable_land
 
 ### Forecast development mix and buildout capacity
 
-Daybreak and Saratoga Springs Downtown only -- The Point's buildout comes
-from its own development schedule, not this REMM-based estimate.
+All three centers -- The Point's REMM-based estimate here is a cross-check
+alongside its own development-schedule-based buildout (below), not a
+replacement for it.
 
 ```{python}
+# our_parcels/post_2025_parcel_ids are already scoped to all of
+# CENTERS_OF_INTEREST from task 1 -- kept explicit in case task 2's
+# center scope ever needs to differ from task 1's again.
 task2_parcel_ids = our_parcels.loc[
-    our_parcels["CenterName"].isin(CENTERS_OF_INTEREST[0:2])
+    our_parcels["CenterName"].isin(CENTERS_OF_INTEREST)
     & our_parcels["parcel_id"].isin(post_2025_parcel_ids),
     "parcel_id",
 ]
+
+task2_parcel_ids
 ```
 
-**Step 1 -- residential : jobs ratio.** Sum `residential_units` and
-`job_spaces` from `parcel_progression_metrics` for the same post-2025
-developable parcels identified above. These two fields were checked
-directly against the buildings table and are reliable per-parcel sums
-across all of a parcel's buildings (unlike `year_built`, which only
-reflects one representative building) -- see note above.
+#### (1) Forecast residential : commercial/employment development ratio
+
+Sum `residential_units` and `job_spaces` from `parcel_progression_metrics`
+for the post-2025 developable parcels identified above (2055 run). These
+two fields were checked directly against the buildings table and are
+reliable per-parcel sums across all of a parcel's buildings (unlike
+`year_built`, which only reflects one representative building) -- see note
+above. Full buildout of each center is assumed to follow this same mix, so
+each center's total developable acreage (from task 1) is allocated between
+residential and commercial/employment by this ratio.
 
 ```{python}
 progression_2055 = pd.read_parquet(
@@ -200,72 +256,93 @@ dev_mix = (
     .groupby("CenterName")[["residential_units", "job_spaces"]]
     .sum()
 )
+dev_mix["unit_job_ratio"] = dev_mix["residential_units"] / dev_mix["job_spaces"]
+
+# res_share/nonres_share are the same ratio re-expressed as shares of a whole
+# (res_share = unit_job_ratio / (unit_job_ratio + 1)) -- this is what actually
+# gets multiplied against acreage below.
 dev_mix["res_share"] = dev_mix["residential_units"] / (dev_mix["residential_units"] + dev_mix["job_spaces"])
 dev_mix["nonres_share"] = 1 - dev_mix["res_share"]
 dev_mix
 ```
 
-**Step 2 -- allocate each center's developable acreage by that ratio.**
-
 ```{python}
+# split each center's total developable acreage (task 1) into a residential
+# and a non-residential/employment share, using the res_share/nonres_share
+# computed above -- this is the "assume full buildout follows this same mix" step.
 acreage_allocation = developable_land.set_index("CenterName").loc[
-    CENTERS_OF_INTEREST[0:2], ["total_acres"]
+    CENTERS_OF_INTEREST, ["total_acres"]
 ].join(dev_mix[["res_share", "nonres_share"]])
 acreage_allocation["res_acres"] = acreage_allocation["total_acres"] * acreage_allocation["res_share"]
 acreage_allocation["nonres_acres"] = acreage_allocation["total_acres"] * acreage_allocation["nonres_share"]
 acreage_allocation
 ```
 
-**Step 3 -- median capacity assumptions.** Per Josh's guidance, "median"
-means the midpoint of the standard planning range for the center's type
-(all three of ours are "Urban Center": FAR 0.75-4.0, DUA 20-100) -- not a
-statistical median computed from the parcels table's own `max_far`/`max_dua`
-columns. The `DwellingPerAcre`/`NonResFAR` fields on the REST-cached center
-layer already carry each center's own range string, so this parses those
-directly.
+#### (2) Apply density assumptions to each acreage share
+
+**Median dwelling-units-per-acre and FAR.** `max_far`/`max_dua` live on the
+`parcels` table (per-parcel zoning capacity, not a text range), so this
+takes the statistical median across *all* parcels in each center -- not
+just the post-2025 developable ones, since the assumption is about the
+center's overall zoned capacity, not only what's forecast to redevelop.
+Josh noted REMM's own FAR/DUA-driven numbers assume a parcel develops
+wall-to-wall (no roads, parking, or common space carved out), so if that
+assumption changes later, override the values directly here (e.g.
+`capacities.loc["Daybreak", "median_far"] = 2.0`) and rerun from this cell
+down.
 
 ```{python}
-def range_midpoint(range_str):
-    lo, hi = range_str.split("-")
-    return (float(lo) + float(hi)) / 2
-
-
-capacities = centers_preview.set_index("CenterName").loc[
-    CENTERS_OF_INTEREST[0:2], ["DwellingPerAcre", "NonResFAR"]
-]
-capacities["median_dua"] = capacities["DwellingPerAcre"].apply(range_midpoint)
-capacities["median_far"] = capacities["NonResFAR"].apply(range_midpoint)
-capacities
+# our_parcels only has parcel_id/parcel_acres/CenterName -- pull max_far/max_dua
+# from the same parcels cache (already scoped to our_parcels via the merge).
+capacities = (
+    our_parcels.merge(
+        gpd.read_parquet(
+            paths["parcels_geoparquet"], columns=["parcel_id", "max_far", "max_dua", "geometry"]
+        ),
+        on="parcel_id",
+    )
+    .groupby("CenterName")[["max_far", "max_dua"]]
+    .median()
+    .rename(columns={"max_far": "median_far", "max_dua": "median_dua"})
+)
+capacities  # The Point's median_dua is NaN -- none of its parcels have a max_dua entitlement yet; left as-is
 ```
 
-**Step 4 -- sqft-per-job assumption**, from each center's own post-2025
-non-residential buildings. `sqft_per_job` turns out to be a fixed constant
-per building `general_type` region-wide (Office 633, Retail 374, Industrial
-975, ...), so taking the median here reflects each center's forecast
-non-res building mix rather than sampling noise.
+**Median employment density, from FAR and a job-space assumption.**
+`sqft_per_job` (needed to turn FAR-driven building sqft into a job count)
+comes from each center's own non-residential buildings (all of them, not
+just post-2025 -- there aren't many non-res buildings in Saratoga Springs
+Downtown yet, so restricting to post-2025 only left a very thin sample).
+It turns out to be a fixed constant per building `general_type` region-wide
+(Office 633, Retail 374, Industrial 975, ...), so the median here reflects
+each center's non-res building mix rather than sampling noise.
 
 ```{python}
 buildings_full = pd.read_parquet(
-    paths["buildings_2055_parquet"], columns=["parcel_id", "year_built", "general_type", "sqft_per_job"]
+    paths["buildings_2055_parquet"], columns=["parcel_id", "general_type", "sqft_per_job"]
 ).merge(our_parcels[["parcel_id", "CenterName"]], on="parcel_id")
 
-nonres_post_2025 = buildings_full[
-    (buildings_full["CenterName"].isin(CENTERS_OF_INTEREST[0:2]))
-    & (buildings_full["year_built"] > 2025)
+# residential building types excluded here -- sqft_per_job only makes sense
+# for the non-residential/employment share of buildout.
+nonres_buildings = buildings_full[
+    (buildings_full["CenterName"].isin(CENTERS_OF_INTEREST))
     & ~buildings_full["general_type"].isin(["SF Residential", "MF Residential"])
 ]
-sqft_per_job = nonres_post_2025.groupby("CenterName")["sqft_per_job"].median().rename("sqft_per_job")
+sqft_per_job = nonres_buildings.groupby("CenterName")["sqft_per_job"].median().rename("sqft_per_job")
 sqft_per_job
 ```
 
-**Step 5 -- combine into full-buildout capacity.**
+#### (3) Estimate additional housing units and jobs at full buildout
 
 ```{python}
 SQFT_PER_ACRE = 43_560
 
 capacity = acreage_allocation.join(capacities[["median_dua", "median_far"]]).join(sqft_per_job)
+# residential: acres x dwelling-units-per-acre = additional housing units
 capacity["housing_units"] = capacity["res_acres"] * capacity["median_dua"]
+# non-residential: acres x FAR x sqft/acre = total building sqft at full buildout
 capacity["nonres_sqft"] = capacity["nonres_acres"] * capacity["median_far"] * SQFT_PER_ACRE
+# building sqft / sqft-per-job = additional jobs
 capacity["jobs"] = capacity["nonres_sqft"] / capacity["sqft_per_job"]
 capacity[["total_acres", "res_acres", "nonres_acres", "housing_units", "jobs"]]
 ```
