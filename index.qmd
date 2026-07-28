@@ -14,10 +14,9 @@ published site by convention).
 
 ## [Center Buildout Capacity](projects/center-buildout-capacity/index.qmd)
 
-Current homes and jobs, REMM's 2055 forecast, and full buildout capacity
-for six Wasatch Choice Vision centers: Daybreak, Saratoga Springs
-Downtown, The Point, Ogden Downtown, Clearfield, and Farmington Station
-Park.
+REMM's 2025 estimate, its 2055 forecast, and full buildout capacity for
+six Wasatch Choice Vision centers: Daybreak, Saratoga Springs Downtown,
+The Point, Ogden Downtown, Clearfield, and Farmington Station Park.
 
 ::: {layout-ncol="2"}
 ![Housing capacity across six WCV centers. Click to enlarge.](projects/center-buildout-capacity/output/housing_buildout.png){.lightbox group="center-buildout-capacity"}
