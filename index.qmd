@@ -3,20 +3,13 @@ title: "Geospatial Analyses"
 subtitle: "Wasatch Front Regional Council"
 ---
 
-A working index of ad hoc geospatial analyses for WFRC. Each analysis
-lives in its own folder under `projects/`, with its own data sources,
-script/notebook, and outputs. See `README.md` and `CLAUDE.md` at the repo
-root for conventions.
+A working index of ad hoc geospatial analyses for WFRC. Each analysis lives in its own folder under `projects/`, with its own data sources, script/notebook, and outputs. See `README.md` and `CLAUDE.md` at the repo root for conventions.
 
-To start a new analysis, copy `projects/_template/` (its underscore prefix
-keeps it -- and any other in-progress scaffold folder -- out of this
-published site by convention).
+To start a new analysis, copy `projects/_template/` (its underscore prefix keeps it -- and any other in-progress scaffold folder -- out of this published site by convention).
 
 ## [Center Buildout Capacity](projects/center-buildout-capacity/index.qmd)
 
-REMM's 2025 estimate, its 2055 forecast, and full buildout capacity for
-six Wasatch Choice Vision centers: Daybreak, Saratoga Springs Downtown,
-The Point, Ogden Downtown, Clearfield, and Farmington Station Park.
+REMM's 2025 estimate, its 2055 forecast, and full buildout capacity for six Wasatch Choice Vision centers: Daybreak, Saratoga Springs Downtown, The Point, Ogden Downtown, Clearfield, and Farmington Station Park.
 
 ::: {layout-ncol="2"}
 ![Housing capacity across six WCV centers. Click to enlarge.](projects/center-buildout-capacity/output/housing_buildout.png){.lightbox group="center-buildout-capacity"}
