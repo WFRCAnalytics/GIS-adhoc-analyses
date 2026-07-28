@@ -31,7 +31,8 @@ each one:
    model (REMM) simulates how each center actually develops between now and
    2055.
 3. **How much room is left at full buildout?** Beyond the 2055 forecast,
-   how many additional homes and jobs current zoning would allow once a
+   how many additional homes and jobs the assumed capacity levels for
+   additional, plausible development opportunities would allow once a
    center is fully built out.
 
 Jump straight to the [map](#where-are-these-centers) or the
@@ -127,9 +128,10 @@ def show(df, rename=None):
 ## Where are these centers? {#where-are-these-centers}
 
 The map below shows the boundary used for each center in this analysis,
-along with each source record's current zoning caps -- dwelling units per
-acre for residential, floor-area-ratio (FAR) for non-residential -- used
-later in the [full buildout](#how-much-room-is-left-at-full-buildout)
+along with each source record's assumed capacity levels for additional,
+plausible development opportunities -- dwelling units per acre for
+residential, floor-area-ratio (FAR) for non-residential -- used later in
+the [full buildout](#how-much-room-is-left-at-full-buildout)
 estimate.
 
 ```{python}
@@ -363,9 +365,9 @@ developable there by 2055.
 ## How much room is left at full buildout
 
 Beyond what REMM's 2055 simulation forecasts, most centers still have land
-that current zoning would allow to develop further. This analysis
-estimates that additional room two different ways, depending on the
-center:
+that the assumed capacity levels for additional, plausible development
+opportunities would allow to develop further. This analysis estimates
+that additional room two different ways, depending on the center:
 
 - **The Point**: REMM's own 2055 simulation shows **no parcels left
   undeveloped** there -- the whole center is already at full buildout by
@@ -376,7 +378,8 @@ center:
   land redeveloping past 2025. For that land, this analysis estimates
   *additional* homes and jobs on top of the 2025 estimate above, using
   REMM's own forecast mix of residential vs. commercial/employment
-  development, applied at each center's median current zoning density.
+  development, applied at each center's median assumed capacity level for
+  additional, plausible development opportunities.
 
 ::: {.callout-note collapse="true"}
 ## Developable land
@@ -420,9 +423,10 @@ show(
 
 Each center's developable acreage is split between residential and
 commercial/employment uses using REMM's own forecast mix for that center's
-post-2025 parcels, then multiplied by that center's **median** current
-zoning density (dwelling-units-per-acre for residential, floor-area-ratio
-for commercial/employment) to estimate additional homes and jobs.
+post-2025 parcels, then multiplied by that center's **median** assumed
+capacity level for additional, plausible development opportunities
+(dwelling-units-per-acre for residential, floor-area-ratio for
+commercial/employment) to estimate additional homes and jobs.
 
 **Known limitation:** for Daybreak specifically, several of its post-2025
 parcels are large master-planned "super-parcels" whose actual REMM-
@@ -433,9 +437,7 @@ fully captured by the zoning fields this method relies on. That
 understates Daybreak's true buildout capacity. The same understatement
 pattern -- full-buildout capacity landing *below* the 2055 forecast, which
 shouldn't happen if capacity is a real ceiling -- also shows up for
-Saratoga Springs Downtown and, to a smaller degree, Ogden Downtown -- see
-the note under
-[the summary table](#the-bottom-line-all-six-centers-at-a-glance) below.
+Saratoga Springs Downtown and, to a smaller degree, Ogden Downtown.
 
 ```{python}
 #| output: false
@@ -537,6 +539,7 @@ show(
 ```
 
 ```{python}
+#| output: false
 #| code-summary: "Density assumptions used per center"
 show(
     capacities.join(sqft_per_job),
@@ -545,6 +548,7 @@ show(
 ```
 
 ```{python}
+#| output: false
 #| code-summary: "Estimated additional housing units and jobs at full buildout"
 show(
     capacity[["dev_acres", "res_acres", "nonres_acres", "housing_units", "jobs"]],
@@ -594,6 +598,7 @@ point_capacity = point_buildout[["residential_units", "job_spaces"]].sum().renam
 :::
 
 ```{python}
+#| output: false
 #| code-summary: "The Point's full buildout total"
 show(
     point_capacity.to_frame("The Point").T,
@@ -672,12 +677,9 @@ numbers behind the tick marks on the charts below:
 housing_scenarios = (
     sensitivity[sensitivity["domain"] == "residential"]
     .pivot(index="CenterName", columns="scenario_label", values="capacity_total")
-    .loc[CENTERS_OF_INTEREST, ["current (zoning median)", "dua_50", "dua_100", "dua_150"]]
+    .loc[CENTERS_OF_INTEREST, ["dua_50", "dua_100", "dua_150"]]
 )
-show(housing_scenarios, rename={
-    "current (zoning median)": "Current method (zoning median)",
-    "dua_50": "50 DU/acre", "dua_100": "100 DU/acre", "dua_150": "150 DU/acre",
-})
+show(housing_scenarios, rename={"dua_50": "50 DU/acre", "dua_100": "100 DU/acre", "dua_150": "150 DU/acre"})
 ```
 
 ```{python}
@@ -685,12 +687,9 @@ show(housing_scenarios, rename={
 jobs_scenarios = (
     sensitivity[sensitivity["domain"] == "nonres"]
     .pivot(index="CenterName", columns="scenario_label", values="capacity_total")
-    .loc[CENTERS_OF_INTEREST, ["current (zoning median)", "far_0.75", "far_4.0"]]
+    .loc[CENTERS_OF_INTEREST, ["far_0.75", "far_4.0"]]
 )
-show(jobs_scenarios, rename={
-    "current (zoning median)": "Current method (zoning median)",
-    "far_0.75": "0.75 FAR", "far_4.0": "4.0 FAR",
-})
+show(jobs_scenarios, rename={"far_0.75": "0.75 FAR", "far_4.0": "4.0 FAR"})
 ```
 
 ## Capacity at a glance {#capacity-at-a-glance}
@@ -700,9 +699,9 @@ Each chart below shows, for every center: REMM's modeled 2025 estimate
 tested under alternate density assumptions (small ticks). Full
 REMM-derived buildout capacity is computed for every center (and exported
 in the [downloads](#downloads) below) but hidden from these charts for
-now, since the underlying density assumption needs revisiting for Daybreak
-and Saratoga Springs Downtown first -- see the note under the summary
-table.
+now, since the underlying density assumption needs revisiting for
+Daybreak and Saratoga Springs Downtown first -- see the known limitation
+noted above.
 
 ::: {.callout-tip collapse="true"}
 ## How to read these charts
@@ -1113,31 +1112,29 @@ make_chart("jobs")
 show(
     summary[[
         "total_acres",
-        "housing_2025", "housing_2055", "housing_capacity",
-        "jobs_2025", "jobs_2055", "jobs_capacity",
+        "housing_2025", "housing_2055",
+        "jobs_2025", "jobs_2055",
     ]],
     rename={
         "total_acres": "Center size (acres)",
         "housing_2025": "Homes, 2025 est.",
         "housing_2055": "Homes by 2055 (forecast)",
-        "housing_capacity": "Homes at full buildout",
         "jobs_2025": "Jobs, 2025 est.",
         "jobs_2055": "Jobs by 2055 (forecast)",
-        "jobs_capacity": "Jobs at full buildout",
     },
 )
 ```
 
 ::: {.callout-important}
-For **Daybreak**, **Saratoga Springs Downtown**, and (to a smaller degree)
-**Ogden Downtown**, the full-buildout homes estimate above comes in
-*below* the 2055 forecast. That's not an error -- it means REMM's own
-simulation already achieves more housing density than this analysis's
-standard zoning-based estimate assumed was possible for these centers (see
-the note on development mix and density assumptions above for the
-details). In practice, treat their full-buildout figures as a conservative
-floor rather than a hard ceiling -- real achievable capacity for all three
-is at least as high as their 2055 forecast already shown above.
+For **Daybreak**, even the highest tested housing scenario (150 dwelling
+units/acre, 6,889 homes) comes in *below* REMM's own 2055 forecast (7,077
+homes) -- see the [scenario table](#testing-the-growth-assumptions-with-alternate-densities)
+above. That's not an error -- it's the same known limitation noted above:
+REMM's own simulation already achieves more density on this land (via a
+specific high-rise development agreement) than even our upper test
+scenario assumes. Treat Daybreak's tested range as a conservative floor
+rather than a hard ceiling -- real achievable capacity is at least as high
+as its 2055 forecast already shown above.
 :::
 
 ## Downloads {#downloads}
