@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>GIS Ad Hoc Analyses</title>
+<title>Geospatial Analyses</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -48,6 +48,9 @@ ul.task-list li input[type="checkbox"] {
 <link href="site_libs/bootstrap/bootstrap-938b977aa7afcaf0e5d1a678dfb25394.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/bootstrap/bootstrap-dark-7f601f039f3fd5ca42992913d2a5218d.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <link href="site_libs/bootstrap/bootstrap-938b977aa7afcaf0e5d1a678dfb25394.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -258,11 +261,11 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_white_transparent.png" alt="Wasatch Front Regional Council" class="navbar-logo light-content">
-    <img src="site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_white_transparent.png" alt="Wasatch Front Regional Council" class="navbar-logo dark-content">
+    <img src="site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_color_transparent.png" alt="" class="navbar-logo light-content">
+    <img src="site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_white_transparent.png" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="./index.html">
-    <span class="navbar-title">GIS Ad Hoc Analyses</span>
+    <span class="navbar-title">Geospatial Analyses</span>
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
@@ -280,6 +283,13 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Center Buildout Capacity</span></a>
   </li>  
 </ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/WFRCAnalytics/GIS-adhoc-analyses"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
           </div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
   <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
@@ -291,7 +301,8 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">GIS Ad Hoc Analyses</h1>
+      <h1 class="title">Geospatial Analyses</h1>
+            <p class="subtitle lead">Wasatch Front Regional Council</p>
                       </div>
   </div>
     
@@ -312,7 +323,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#analyses" id="toc-analyses" class="nav-link active" data-scroll-target="#analyses">Analyses</a></li>
+  <li><a href="#center-buildout-capacity" id="toc-center-buildout-capacity" class="nav-link active" data-scroll-target="#center-buildout-capacity">Center Buildout Capacity</a></li>
   </ul>
 </nav>
     </div>
@@ -324,11 +335,31 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<p>A working index of small, one-off GIS analyses for WFRC. Each analysis lives in its own folder under <code>projects/</code>, with its own data sources, script/notebook, and outputs. See <code>README.md</code> and <code>CLAUDE.md</code> at the repo root for conventions.</p>
+<p>A working index of ad hoc geospatial analyses for WFRC. Each analysis lives in its own folder under <code>projects/</code>, with its own data sources, script/notebook, and outputs. See <code>README.md</code> and <code>CLAUDE.md</code> at the repo root for conventions.</p>
 <p>To start a new analysis, copy <code>projects/_template/</code> (its underscore prefix keeps it – and any other in-progress scaffold folder – out of this published site by convention).</p>
-<section id="analyses" class="level2">
-<h2 class="anchored" data-anchor-id="analyses">Analyses</h2>
-<p>No analyses published yet.</p>
+<section id="center-buildout-capacity" class="level2">
+<h2 class="anchored" data-anchor-id="center-buildout-capacity"><a href="./projects/center-buildout-capacity/index.html">Center Buildout Capacity</a></h2>
+<p>Current homes and jobs, REMM’s 2055 forecast, and full buildout capacity for six Wasatch Choice Vision centers: Daybreak, Saratoga Springs Downtown, The Point, Ogden Downtown, Clearfield, and Farmington Station Park.</p>
+<div class="quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="projects/center-buildout-capacity/output/housing_buildout.png" class="lightbox" data-gallery="center-buildout-capacity" title="Housing capacity across six WCV centers. Click to enlarge."><img src="projects/center-buildout-capacity/output/housing_buildout.png" class="img-fluid figure-img" alt="Housing capacity across six WCV centers. Click to enlarge."></a></p>
+<figcaption>Housing capacity across six WCV centers. Click to enlarge.</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="projects/center-buildout-capacity/output/employment_buildout.png" class="lightbox" data-gallery="center-buildout-capacity" title="Employment capacity across six WCV centers. Click to enlarge."><img src="projects/center-buildout-capacity/output/employment_buildout.png" class="img-fluid figure-img" alt="Employment capacity across six WCV centers. Click to enlarge."></a></p>
+<figcaption>Employment capacity across six WCV centers. Click to enlarge.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
 
 
 </section>
@@ -761,6 +792,38 @@ ul.task-list li input[type="checkbox"] {
     </div>
   </div>
 </footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 

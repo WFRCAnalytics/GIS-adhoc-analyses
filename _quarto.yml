@@ -8,9 +8,9 @@ project:
 brand: _extensions/WFRCAnalytics/wfrc-brand/brand.yml
 
 website:
-  title: "GIS Ad Hoc Analyses"
+  title: "Geospatial Analyses"
   description: >
-    Wasatch Front Regional Council -- small, one-off GIS analyses, tracked
+    Wasatch Front Regional Council -- ad hoc geospatial analyses, tracked
     for code, process, and results.
   site-url: "https://wfrcanalytics.github.io/GIS-adhoc-analyses"
   favicon: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_color_transparent.png"
@@ -19,13 +19,19 @@ website:
   back-to-top-navigation: true
 
   navbar:
-    logo: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_white_transparent.png"
+    logo:
+      light: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_color_transparent.png"
+      dark: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_white_transparent.png"
     logo-alt: "Wasatch Front Regional Council"
     left:
       - text: "Home"
         href: index.qmd
       - text: "Center Buildout Capacity"
         href: projects/center-buildout-capacity/index.qmd
+    right:
+      - icon: github
+        href: https://github.com/WFRCAnalytics/GIS-adhoc-analyses
+        aria-label: "GitHub repository"
 
   page-footer:
     left: "© 2026 [Wasatch Front Regional Council](https://wfrc.utah.gov/)"
@@ -54,6 +60,7 @@ format:
     toc: true
     code-fold: true
     code-summary: "Show the code"
+    lightbox: auto
 
 title-block-banner: true
 citation: false
