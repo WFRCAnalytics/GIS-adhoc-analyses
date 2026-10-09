@@ -389,39 +389,286 @@ for scenario in SCENARIOS:
 
 ## Visualization
 
-@fig-region-pct compares all three scenarios at the region level. Reading
-left to right: the gap between Existing 2027 and No Build 2055 is pure
-population growth outpacing a frozen network; the gap between No Build 2055
-and RTP 2055 is what building the plan actually buys.
+No Build 2055 and RTP 2055 are **alternate futures**, not consecutive years
+-- both branch from the same Existing 2027 baseline, so each chart draws two
+separate lines per county forking from that shared starting point: dashed
+for No Build, solid for RTP. Pick one or more counties below; both charts
+update together, and the gray lines are always the WFRC region, so any
+county reads directly against the regional reference rather than in
+isolation. Hover any point for its exact value.
+
+```{python}
+#| label: to-ojs
+#| echo: false
+
+ojs_define(tc_data=tidy.to_dict(orient="records"))
+```
+
+```{ojs}
+//| label: ojs-setup
+//| echo: false
+
+// Existing 2027 is the single shared baseline; No Build 2055 and RTP 2055
+// are two ALTERNATE futures branching from it, not a sequence -- so the
+// x-axis is real years (2027, 2055), and each entity gets two line
+// segments both starting at the same 2027 point, styled by path (dashed =
+// No Build, solid = RTP) rather than laid out as one continuous timeline.
+PATH_STYLE = ({
+  "No Build": {dash: "5,4", label: "No Build 2055"},
+  "RTP": {dash: null, label: "RTP (Build) 2055"},
+})
+
+countyNames = [...new Set(
+  tc_data.filter((d) => d.geography_level === "CountyName").map((d) => d.geography_name)
+)].sort()
+
+// Pulled from the WFRC brand palette (_extensions/.../brand.yml) --
+// wc-light-rail, rtp-mustard, wc-roadways, wc-trails -- validated for
+// CVD-safe separation (scripts/validate_palette.js from the dataviz skill).
+countyPalette = ["#3762ad", "#c98b3a", "#a3423c", "#799f4c"]
+countyColor = new Map(countyNames.map((name, i) => [name, countyPalette[i % countyPalette.length]]))
+REGION_COLOR = "#7f7a76" // brand wfrc-gray -- dashed/solid reference lines, deliberately neutral
+INK = "#023c5b" // brand wfrc-blue
+
+// Reshape {scenario, pct_near_facility} rows into {entity, path, year, value}
+// fork segments: one "No Build" segment and one "RTP" segment per entity,
+// both anchored at the same 2027 value.
+function branchRows(modeKey, geoLevel, namesFilter) {
+  const rows = tc_data.filter(
+    (d) => d.mode === modeKey && d.geography_level === geoLevel && (!namesFilter || namesFilter.includes(d.geography_name))
+  )
+  const existing = new Map(rows.filter((d) => d.scenario === "existing_2027").map((d) => [d.geography_name, d.pct_near_facility]))
+  const out = []
+  for (const [scenarioKey, path] of [["no_build_2055", "No Build"], ["rtp_2055", "RTP"]]) {
+    for (const d of rows.filter((d) => d.scenario === scenarioKey)) {
+      const start = existing.get(d.geography_name)
+      if (start === undefined) continue
+      out.push({entity: d.geography_name, path, year: 2027, value: start})
+      out.push({entity: d.geography_name, path, year: 2055, value: d.pct_near_facility})
+    }
+  }
+  return out
+}
+```
+
+```{ojs}
+//| label: county-picker
+//| echo: false
+
+viewof selectedCounties = Inputs.checkbox(countyNames, {value: countyNames, label: "Counties"})
+```
+
+```{ojs}
+//| label: chart-fn
+//| echo: false
+
+function modeChart(modeKey, title, subtitle) {
+  const countyRows = branchRows(modeKey, "CountyName", selectedCounties)
+  const regionRows = branchRows(modeKey, "Region", null)
+  const regionNoBuild2055 = regionRows.find((d) => d.path === "No Build" && d.year === 2055)?.value
+  const regionRtp2055 = regionRows.find((d) => d.path === "RTP" && d.year === 2055)?.value
+  const deltaPp = regionNoBuild2055 !== undefined && regionRtp2055 !== undefined ? (regionRtp2055 - regionNoBuild2055) * 100 : null
+
+  return Plot.plot({
+    width,
+    height: 380,
+    marginRight: 130,
+    marginBottom: 46,
+    style: {background: "#fbf9f4", fontFamily: "Poppins, sans-serif", color: INK},
+    title,
+    subtitle,
+    caption: "Solid = RTP (Build) 2055 · Dashed = No Build 2055 · both branch from the same 2027 baseline. Source: WFRC Transportation Choices (v10).",
+    x: {domain: [2026, 2059], ticks: [2027, 2055], label: "Year", tickFormat: "d"},
+    y: {percent: true, grid: true, nice: true, label: "% within 1/4 mile ↑"},
+    color: {domain: countyNames, range: countyPalette, legend: true},
+    marks: [
+      Plot.ruleY([0], {stroke: "#00000022"}),
+      ...["No Build", "RTP"].flatMap((path) => [
+        Plot.line(countyRows.filter((d) => d.path === path), {
+          x: "year",
+          y: "value",
+          z: "entity",
+          stroke: "entity",
+          strokeWidth: path === "RTP" ? 2.5 : 2,
+          strokeDasharray: PATH_STYLE[path].dash,
+          strokeOpacity: path === "RTP" ? 1 : 0.8,
+        }),
+        Plot.line(regionRows.filter((d) => d.path === path), {
+          x: "year",
+          y: "value",
+          stroke: REGION_COLOR,
+          strokeWidth: path === "RTP" ? 3 : 2.5,
+          strokeDasharray: PATH_STYLE[path].dash,
+        }),
+      ]),
+      Plot.dot(countyRows, {
+        x: "year",
+        y: "value",
+        fill: "entity",
+        r: 3.5,
+        tip: true,
+        channels: {County: "entity", Scenario: (d) => (d.year === 2027 ? "Existing 2027" : PATH_STYLE[d.path].label)},
+      }),
+      Plot.dot(regionRows, {
+        x: "year",
+        y: "value",
+        fill: REGION_COLOR,
+        r: 4,
+        tip: true,
+        channels: {Geography: () => "WFRC region", Scenario: (d) => (d.year === 2027 ? "Existing 2027" : PATH_STYLE[d.path].label)},
+      }),
+      Plot.text(countyRows.filter((d) => d.path === "RTP" && d.year === 2055), {
+        x: "year",
+        y: "value",
+        text: (d) => d.entity,
+        dx: 10,
+        textAnchor: "start",
+        fontWeight: 600,
+        fill: (d) => countyColor.get(d.entity),
+      }),
+      Plot.text(regionRows.filter((d) => d.path === "RTP" && d.year === 2055), {
+        x: "year",
+        y: "value",
+        text: () => "WFRC region",
+        dx: 10,
+        dy: 16,
+        textAnchor: "start",
+        fontStyle: "italic",
+        fill: REGION_COLOR,
+      }),
+      Plot.text(deltaPp === null ? [] : [{year: 2055, value: (regionNoBuild2055 + regionRtp2055) / 2}], {
+        x: "year",
+        y: "value",
+        dx: 10,
+        dy: -28,
+        text: () => `${deltaPp >= 0 ? "+" : ""}${deltaPp.toFixed(1)} pp, RTP vs No Build`,
+        fontWeight: 700,
+        fontSize: 12,
+        fill: INK,
+      }),
+    ],
+  })
+}
+```
+
+```{ojs}
+//| label: fig-bike-interactive
+//| echo: false
+
+modeChart("bike", "Bike", "Share of population within 1/4 mile of a dedicated bike facility")
+```
+
+```{ojs}
+//| label: fig-transit-interactive
+//| echo: false
+
+modeChart("transit", "Transit", "Share of population within 1/4 mile of a frequent bus stop, station, or line")
+```
+
+::: {.callout-note}
+## Known rough edges
+
+This is a first pass, not a final design: colors are tuned for light mode
+only (no separate dark-mode palette yet), the fork layout hardcodes
+`existing_2027`/`no_build_2055`/`rtp_2055` as the three scenario names
+(adding a fourth scenario -- e.g. a second "build" alternative -- needs
+`branchRows()` updated, not just `SCENARIOS`), and the "pp vs No Build"
+annotation quietly disappears rather than erroring if either 2055 scenario
+is renamed or removed.
+:::
+
+### At a Glance
+
+The region-level headline from the charts above, as a static summary --
+easier to screenshot, print, or drop into a slide than an interactive
+chart. Saved to `output/region_pct.png`, which the repo homepage also
+embeds directly, so it's the same image in both places, not a separate one.
 
 ```{python}
 #| label: fig-region-pct
-#| fig-cap: "Share of WFRC-region population within 1/4 mile of a bike or transit facility, by scenario."
-#| fig-alt: "Grouped bar chart comparing bike and transit percentages across three scenarios: Existing 2027, No Build 2055, and RTP 2055. Bike rises from about 88% to about 94%; transit rises only slightly from Existing to No Build before reaching about 21% under RTP 2055."
+#| fig-cap: "Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."
+#| fig-alt: "Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP."
 
 import matplotlib.pyplot as plt
 
 region = tidy[tidy["geography_level"] == "Region"].copy()
 scenario_order = [s["name"] for s in SCENARIOS]
+scenario_labels = {"existing_2027": "Existing\n2027", "no_build_2055": "No Build\n2055", "rtp_2055": "RTP\n2055"}
 region["scenario"] = pd.Categorical(region["scenario"], categories=scenario_order, ordered=True)
 region = region.sort_values("scenario")
 
-MODE_COLORS = {"bike": "#1B7F79", "transit": "#8A5BC2"}  # fixed categorical order, not cycled
+MODE_COLORS = {"bike": "#036fa8", "transit": "#9d4879"}  # brand blue / rtp-fuschia -- fixed order, not cycled
+INK = "#023c5b"  # brand wfrc-blue
+BG = "#fbf9f4"  # matches the interactive charts above
 
-fig, ax = plt.subplots(figsize=(8, 5))
-width = 0.35
-x = range(len(scenario_order))
+bike_existing = region.query("mode == 'bike' and scenario == 'existing_2027'")["pct_near_facility"].iloc[0]
+transit_existing = region.query("mode == 'transit' and scenario == 'existing_2027'")["pct_near_facility"].iloc[0]
+
+# Editorial bar-chart treatment: headline + deck above the chart, direct
+# value labels on each bar instead of a y-axis, an inline color key instead
+# of a boxed legend, and a small source caption -- no gridlines or borders
+# competing with the numbers themselves.
+fig, ax = plt.subplots(figsize=(8.5, 5.5))
+fig.patch.set_facecolor(BG)
+ax.set_facecolor(BG)
+fig.subplots_adjust(top=0.76, bottom=0.16, left=0.03, right=0.97)
+
+bar_width = 0.32
+# Existing 2027 sits apart on its own; No Build and RTP sit close together
+# as a pair -- uneven spacing (not evenly-spaced ticks) so the layout itself
+# signals "one baseline, two alternative 2055 outcomes" rather than a
+# three-step timeline.
+x_positions = {"existing_2027": 0.0, "no_build_2055": 1.6, "rtp_2055": 2.6}
+x = [x_positions[s] for s in scenario_order]
 for i, mode in enumerate(("bike", "transit")):
-    vals = region[region["mode"] == mode].set_index("scenario")["pct_near_facility"].reindex(scenario_order)
-    offset = (i - 0.5) * width
-    ax.bar([xi + offset for xi in x], vals * 100, width=width, label=mode, color=MODE_COLORS[mode])
+    vals = region[region["mode"] == mode].set_index("scenario")["pct_near_facility"].reindex(scenario_order) * 100
+    offset = (i - 0.5) * bar_width
+    ax.bar([xi + offset for xi in x], vals, width=bar_width, color=MODE_COLORS[mode], zorder=3)
+    for xi, v in zip(x, vals):
+        ax.text(xi + offset, v + 3, f"{v:.0f}%", ha="center", va="bottom", fontsize=10.5, fontweight="bold", color=MODE_COLORS[mode])
 
-ax.set_xticks(list(x))
-ax.set_xticklabels(scenario_order)
-ax.set_ylabel("% of population within 1/4 mile")
-ax.legend(title="Mode", frameon=False)
-ax.spines[["top", "right"]].set_visible(False)
-plt.tight_layout()
+# Divider + bracket reinforce the same point visually: a dotted line splits
+# the baseline from the 2055 pair, and a bracket spans only the pair it
+# actually groups.
+divider_x = (x_positions["existing_2027"] + x_positions["no_build_2055"]) / 2
+ax.axvline(divider_x, color=INK, alpha=0.15, linestyle=":", linewidth=1, zorder=1)
+bracket_left, bracket_right = x_positions["no_build_2055"] - bar_width, x_positions["rtp_2055"] + bar_width
+ax.plot(
+    [bracket_left, bracket_left, bracket_right, bracket_right],
+    [103, 106, 106, 103],
+    color=INK,
+    linewidth=1,
+    zorder=4,
+)
+ax.text((bracket_left + bracket_right) / 2, 108, "2055 — two alternative futures", ha="center", va="bottom", fontsize=9.5, style="italic", color=INK)
+
+ax.set_xticks(x)
+ax.set_xticklabels([scenario_labels[s] for s in scenario_order], fontsize=11, color=INK)
+ax.set_xlim(x_positions["existing_2027"] - 0.6, x_positions["rtp_2055"] + 0.6)
+ax.set_ylim(0, 118)
+ax.set_yticks([])
+for side in ("top", "right", "left"):
+    ax.spines[side].set_visible(False)
+ax.spines["bottom"].set_color(INK)
+ax.spines["bottom"].set_linewidth(1)
+ax.tick_params(length=0)
+
+fig.text(0.03, 0.95, "Bike access far outpaces transit, in every scenario", ha="left", va="top", fontsize=15, fontweight="bold", color=INK)
+fig.text(
+    0.03,
+    0.88,
+    f"Share of WFRC-region population within 1/4 mile of a facility — today, {bike_existing * 100:.0f}% for bike vs {transit_existing * 100:.0f}% for transit",
+    ha="left",
+    va="top",
+    fontsize=10.5,
+    color="#55595e",
+)
+fig.text(0.03, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["bike"])
+fig.text(0.05, 0.805, "Bike", ha="left", va="top", fontsize=10.5, color=INK)
+fig.text(0.115, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["transit"])
+fig.text(0.135, 0.805, "Transit", ha="left", va="top", fontsize=10.5, color=INK)
+fig.text(0.03, 0.03, "Source: WFRC Transportation Choices analysis (v10)", ha="left", fontsize=8.5, color="#8a8f98", style="italic")
+
 fig.savefig(PATHS["output"] / "region_pct.png", facecolor=fig.get_facecolor(), dpi=150)
 plt.show()
 ```

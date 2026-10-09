@@ -117,6 +117,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script type="module" src="../../site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="../../site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
@@ -384,7 +386,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#prepare-taz-geography" id="toc-prepare-taz-geography" class="nav-link" data-scroll-target="#prepare-taz-geography">Prepare TAZ Geography</a></li>
   <li><a href="#sec-compute" id="toc-sec-compute" class="nav-link" data-scroll-target="#sec-compute">Compute Compatible-Area % by Scenario</a></li>
   <li><a href="#outputs" id="toc-outputs" class="nav-link" data-scroll-target="#outputs">Outputs</a></li>
-  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a>
+  <ul class="collapse">
+  <li><a href="#at-a-glance" id="toc-at-a-glance" class="nav-link" data-scroll-target="#at-a-glance">At a Glance</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -926,44 +931,356 @@ Saved -&gt; output\transportation_choices_rtp_2055.csv</code></pre>
 </section>
 <section id="visualization" class="level2">
 <h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
-<p><a href="#fig-region-pct" class="quarto-xref">Figure&nbsp;1</a> compares all three scenarios at the region level. Reading left to right: the gap between Existing 2027 and No Build 2055 is pure population growth outpacing a frozen network; the gap between No Build 2055 and RTP 2055 is what building the plan actually buys.</p>
-<div id="cell-fig-region-pct" class="cell" data-execution_count="12">
-<details class="code-fold">
+<p>No Build 2055 and RTP 2055 are <strong>alternate futures</strong>, not consecutive years – both branch from the same Existing 2027 baseline, so each chart draws two separate lines per county forking from that shared starting point: dashed for No Build, solid for RTP. Pick one or more counties below; both charts update together, and the gray lines are always the WFRC region, so any county reads directly against the regional reference rather than in isolation. Hover any point for its exact value.</p>
+<div id="cell-to-ojs" class="cell" data-execution_count="12">
+<div id="to-ojs" class="cell-output cell-output-display">
+<script type="ojs-define">{"contents": [{"name": "tc_data", "value": [{"scenario": "existing_2027", "mode": "bike", "se_year": 2027, "gis_year": 2027, "geography_level": "Region", "geography_name": "WFRC", "pct_near_facility": 0.8758967388990739}, {"scenario": "existing_2027", "mode": "bike", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Box Elder", "pct_near_facility": 0.5963041863714129}, {"scenario": "existing_2027", "mode": "bike", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Davis", "pct_near_facility": 0.8464844778470819}, {"scenario": "existing_2027", "mode": "bike", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Salt Lake", "pct_near_facility": 0.9177369654517401}, {"scenario": "existing_2027", "mode": "bike", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Weber", "pct_near_facility": 0.7575910710581639}, {"scenario": "existing_2027", "mode": "transit", "se_year": 2027, "gis_year": 2027, "geography_level": "Region", "geography_name": "WFRC", "pct_near_facility": 0.18789699096905263}, {"scenario": "existing_2027", "mode": "transit", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Box Elder", "pct_near_facility": 0.0}, {"scenario": "existing_2027", "mode": "transit", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Davis", "pct_near_facility": 0.009269265728187571}, {"scenario": "existing_2027", "mode": "transit", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Salt Lake", "pct_near_facility": 0.25296192767774384}, {"scenario": "existing_2027", "mode": "transit", "se_year": 2027, "gis_year": 2027, "geography_level": "CountyName", "geography_name": "Weber", "pct_near_facility": 0.16622708444466022}, {"scenario": "no_build_2055", "mode": "bike", "se_year": 2055, "gis_year": 2032, "geography_level": "Region", "geography_name": "WFRC", "pct_near_facility": 0.8500711423541041}, {"scenario": "no_build_2055", "mode": "bike", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Box Elder", "pct_near_facility": 0.5963009469261668}, {"scenario": "no_build_2055", "mode": "bike", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Davis", "pct_near_facility": 0.8136020810255202}, {"scenario": "no_build_2055", "mode": "bike", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Salt Lake", "pct_near_facility": 0.9101390407419071}, {"scenario": "no_build_2055", "mode": "bike", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Weber", "pct_near_facility": 0.6727294567949149}, {"scenario": "no_build_2055", "mode": "transit", "se_year": 2055, "gis_year": 2032, "geography_level": "Region", "geography_name": "WFRC", "pct_near_facility": 0.18976491667498824}, {"scenario": "no_build_2055", "mode": "transit", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Box Elder", "pct_near_facility": 0.0}, {"scenario": "no_build_2055", "mode": "transit", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Davis", "pct_near_facility": 0.007871005386922796}, {"scenario": "no_build_2055", "mode": "transit", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Salt Lake", "pct_near_facility": 0.26794695884054026}, {"scenario": "no_build_2055", "mode": "transit", "se_year": 2055, "gis_year": 2032, "geography_level": "CountyName", "geography_name": "Weber", "pct_near_facility": 0.14482243207412926}, {"scenario": "rtp_2055", "mode": "bike", "se_year": 2055, "gis_year": 2055, "geography_level": "Region", "geography_name": "WFRC", "pct_near_facility": 0.9350313867002761}, {"scenario": "rtp_2055", "mode": "bike", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Box Elder", "pct_near_facility": 0.8583434244586594}, {"scenario": "rtp_2055", "mode": "bike", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Davis", "pct_near_facility": 0.8972282754707149}, {"scenario": "rtp_2055", "mode": "bike", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Salt Lake", "pct_near_facility": 0.957168668453864}, {"scenario": "rtp_2055", "mode": "bike", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Weber", "pct_near_facility": 0.9044789191209456}, {"scenario": "rtp_2055", "mode": "transit", "se_year": 2055, "gis_year": 2055, "geography_level": "Region", "geography_name": "WFRC", "pct_near_facility": 0.21240645638118968}, {"scenario": "rtp_2055", "mode": "transit", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Box Elder", "pct_near_facility": 0.005022358133557638}, {"scenario": "rtp_2055", "mode": "transit", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Davis", "pct_near_facility": 0.025329142828452392}, {"scenario": "rtp_2055", "mode": "transit", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Salt Lake", "pct_near_facility": 0.29620472337311765}, {"scenario": "rtp_2055", "mode": "transit", "se_year": 2055, "gis_year": 2055, "geography_level": "CountyName", "geography_name": "Weber", "pct_near_facility": 0.1527850420024589}]}]}</script>
+</div>
+</div>
+<div id="ojs-setup" class="cell">
+<details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> tidy[tidy[<span class="st">"geography_level"</span>] <span class="op">==</span> <span class="st">"Region"</span>].copy()</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>scenario_order <span class="op">=</span> [s[<span class="st">"name"</span>] <span class="cf">for</span> s <span class="kw">in</span> SCENARIOS]</span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>region[<span class="st">"scenario"</span>] <span class="op">=</span> pd.Categorical(region[<span class="st">"scenario"</span>], categories<span class="op">=</span>scenario_order, ordered<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> region.sort_values(<span class="st">"scenario"</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>MODE_COLORS <span class="op">=</span> {<span class="st">"bike"</span>: <span class="st">"#1B7F79"</span>, <span class="st">"transit"</span>: <span class="st">"#8A5BC2"</span>}  <span class="co"># fixed categorical order, not cycled</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.35</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(scenario_order))</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, mode <span class="kw">in</span> <span class="bu">enumerate</span>((<span class="st">"bike"</span>, <span class="st">"transit"</span>)):</span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> region[region[<span class="st">"mode"</span>] <span class="op">==</span> mode].set_index(<span class="st">"scenario"</span>)[<span class="st">"pct_near_facility"</span>].reindex(scenario_order)</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> (i <span class="op">-</span> <span class="fl">0.5</span>) <span class="op">*</span> width</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    ax.bar([xi <span class="op">+</span> offset <span class="cf">for</span> xi <span class="kw">in</span> x], vals <span class="op">*</span> <span class="dv">100</span>, width<span class="op">=</span>width, label<span class="op">=</span>mode, color<span class="op">=</span>MODE_COLORS[mode])</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">list</span>(x))</span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels(scenario_order)</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"</span><span class="sc">% o</span><span class="st">f population within 1/4 mile"</span>)</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>ax.legend(title<span class="op">=</span><span class="st">"Mode"</span>, frameon<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>fig.savefig(PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="st">"region_pct.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor(), dpi<span class="op">=</span><span class="dv">150</span>)</span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb22" data-startfrom="416" data-source-offset="-367"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 415;"><span id="cb22-416"><a href="#cb22-416" aria-hidden="true" tabindex="-1"></a>PATH_STYLE <span class="op">=</span> ({</span>
+<span id="cb22-417"><a href="#cb22-417" aria-hidden="true" tabindex="-1"></a>  <span class="st">"No Build"</span><span class="op">:</span> {<span class="dt">dash</span><span class="op">:</span> <span class="st">"5,4"</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"No Build 2055"</span>}<span class="op">,</span></span>
+<span id="cb22-418"><a href="#cb22-418" aria-hidden="true" tabindex="-1"></a>  <span class="st">"RTP"</span><span class="op">:</span> {<span class="dt">dash</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"RTP (Build) 2055"</span>}<span class="op">,</span></span>
+<span id="cb22-419"><a href="#cb22-419" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb22-420"><a href="#cb22-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-421"><a href="#cb22-421" aria-hidden="true" tabindex="-1"></a>countyNames <span class="op">=</span> [<span class="op">...</span><span class="kw">new</span> <span class="bu">Set</span>(</span>
+<span id="cb22-422"><a href="#cb22-422" aria-hidden="true" tabindex="-1"></a>  tc_data<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">geography_level</span> <span class="op">===</span> <span class="st">"CountyName"</span>)<span class="op">.</span><span class="fu">map</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">geography_name</span>)</span>
+<span id="cb22-423"><a href="#cb22-423" aria-hidden="true" tabindex="-1"></a>)]<span class="op">.</span><span class="fu">sort</span>()</span>
+<span id="cb22-424"><a href="#cb22-424" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-425"><a href="#cb22-425" aria-hidden="true" tabindex="-1"></a><span class="co">// Pulled from the WFRC brand palette (_extensions/.../brand.yml) --</span></span>
+<span id="cb22-426"><a href="#cb22-426" aria-hidden="true" tabindex="-1"></a><span class="co">// wc-light-rail, rtp-mustard, wc-roadways, wc-trails -- validated for</span></span>
+<span id="cb22-427"><a href="#cb22-427" aria-hidden="true" tabindex="-1"></a><span class="co">// CVD-safe separation (scripts/validate_palette.js from the dataviz skill).</span></span>
+<span id="cb22-428"><a href="#cb22-428" aria-hidden="true" tabindex="-1"></a>countyPalette <span class="op">=</span> [<span class="st">"#3762ad"</span><span class="op">,</span> <span class="st">"#c98b3a"</span><span class="op">,</span> <span class="st">"#a3423c"</span><span class="op">,</span> <span class="st">"#799f4c"</span>]</span>
+<span id="cb22-429"><a href="#cb22-429" aria-hidden="true" tabindex="-1"></a>countyColor <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>(countyNames<span class="op">.</span><span class="fu">map</span>((name<span class="op">,</span> i) <span class="kw">=&gt;</span> [name<span class="op">,</span> countyPalette[i <span class="op">%</span> countyPalette<span class="op">.</span><span class="at">length</span>]]))</span>
+<span id="cb22-430"><a href="#cb22-430" aria-hidden="true" tabindex="-1"></a>REGION_COLOR <span class="op">=</span> <span class="st">"#7f7a76"</span> <span class="co">// brand wfrc-gray -- dashed/solid reference lines, deliberately neutral</span></span>
+<span id="cb22-431"><a href="#cb22-431" aria-hidden="true" tabindex="-1"></a>INK <span class="op">=</span> <span class="st">"#023c5b"</span> <span class="co">// brand wfrc-blue</span></span>
+<span id="cb22-432"><a href="#cb22-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-433"><a href="#cb22-433" aria-hidden="true" tabindex="-1"></a><span class="co">// Reshape {scenario, pct_near_facility} rows into {entity, path, year, value}</span></span>
+<span id="cb22-434"><a href="#cb22-434" aria-hidden="true" tabindex="-1"></a><span class="co">// fork segments: one "No Build" segment and one "RTP" segment per entity,</span></span>
+<span id="cb22-435"><a href="#cb22-435" aria-hidden="true" tabindex="-1"></a><span class="co">// both anchored at the same 2027 value.</span></span>
+<span id="cb22-436"><a href="#cb22-436" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> geoLevel<span class="op">,</span> namesFilter) {</span>
+<span id="cb22-437"><a href="#cb22-437" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> tc_data<span class="op">.</span><span class="fu">filter</span>(</span>
+<span id="cb22-438"><a href="#cb22-438" aria-hidden="true" tabindex="-1"></a>    (d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">mode</span> <span class="op">===</span> modeKey <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">geography_level</span> <span class="op">===</span> geoLevel <span class="op">&amp;&amp;</span> (<span class="op">!</span>namesFilter <span class="op">||</span> namesFilter<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">geography_name</span>))</span>
+<span id="cb22-439"><a href="#cb22-439" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-440"><a href="#cb22-440" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> existing <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>(rows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">scenario</span> <span class="op">===</span> <span class="st">"existing_2027"</span>)<span class="op">.</span><span class="fu">map</span>((d) <span class="kw">=&gt;</span> [d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> d<span class="op">.</span><span class="at">pct_near_facility</span>]))</span>
+<span id="cb22-441"><a href="#cb22-441" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> out <span class="op">=</span> []</span>
+<span id="cb22-442"><a href="#cb22-442" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> [scenarioKey<span class="op">,</span> path] <span class="kw">of</span> [[<span class="st">"no_build_2055"</span><span class="op">,</span> <span class="st">"No Build"</span>]<span class="op">,</span> [<span class="st">"rtp_2055"</span><span class="op">,</span> <span class="st">"RTP"</span>]]) {</span>
+<span id="cb22-443"><a href="#cb22-443" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> d <span class="kw">of</span> rows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">scenario</span> <span class="op">===</span> scenarioKey)) {</span>
+<span id="cb22-444"><a href="#cb22-444" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> start <span class="op">=</span> existing<span class="op">.</span><span class="fu">get</span>(d<span class="op">.</span><span class="at">geography_name</span>)</span>
+<span id="cb22-445"><a href="#cb22-445" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (start <span class="op">===</span> <span class="kw">undefined</span>) <span class="cf">continue</span></span>
+<span id="cb22-446"><a href="#cb22-446" aria-hidden="true" tabindex="-1"></a>      out<span class="op">.</span><span class="fu">push</span>({<span class="dt">entity</span><span class="op">:</span> d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> path<span class="op">,</span> <span class="dt">year</span><span class="op">:</span> <span class="dv">2027</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> start})</span>
+<span id="cb22-447"><a href="#cb22-447" aria-hidden="true" tabindex="-1"></a>      out<span class="op">.</span><span class="fu">push</span>({<span class="dt">entity</span><span class="op">:</span> d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> path<span class="op">,</span> <span class="dt">year</span><span class="op">:</span> <span class="dv">2055</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> d<span class="op">.</span><span class="at">pct_near_facility</span>})</span>
+<span id="cb22-448"><a href="#cb22-448" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb22-449"><a href="#cb22-449" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb22-450"><a href="#cb22-450" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out</span>
+<span id="cb22-451"><a href="#cb22-451" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
-<div id="fig-region-pct" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Grouped bar chart comparing bike and transit percentages across three scenarios: Existing 2027, No Build 2055, and RTP 2055. Bike rises from about 88% to about 94%; transit rises only slightly from Existing to No Build before reaching about 21% under RTP 2055.">
+<div id="ojs-setup-1">
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="ojs-setup-2">
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="ojs-setup-3">
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="ojs-setup-4">
+<div id="ojs-cell-1-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="ojs-setup-5">
+<div id="ojs-cell-1-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="ojs-setup-6">
+<div id="ojs-cell-1-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div id="ojs-setup-7">
+<div id="ojs-cell-1-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold hidden">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb23" data-startfrom="456" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 455;"><span id="cb23-456"><a href="#cb23-456" aria-hidden="true" tabindex="-1"></a>viewof selectedCounties <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">checkbox</span>(countyNames<span class="op">,</span> {<span class="dt">value</span><span class="op">:</span> countyNames<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Counties"</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="county-picker" class="cell-output cell-output-display">
+<div id="ojs-cell-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold hidden">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb24" data-startfrom="463" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 462;"><span id="cb24-463"><a href="#cb24-463" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">modeChart</span>(modeKey<span class="op">,</span> title<span class="op">,</span> subtitle) {</span>
+<span id="cb24-464"><a href="#cb24-464" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> countyRows <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> <span class="st">"CountyName"</span><span class="op">,</span> selectedCounties)</span>
+<span id="cb24-465"><a href="#cb24-465" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionRows <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> <span class="st">"Region"</span><span class="op">,</span> <span class="kw">null</span>)</span>
+<span id="cb24-466"><a href="#cb24-466" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionNoBuild2055 <span class="op">=</span> regionRows<span class="op">.</span><span class="fu">find</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"No Build"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">?.</span><span class="at">value</span></span>
+<span id="cb24-467"><a href="#cb24-467" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionRtp2055 <span class="op">=</span> regionRows<span class="op">.</span><span class="fu">find</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">?.</span><span class="at">value</span></span>
+<span id="cb24-468"><a href="#cb24-468" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> deltaPp <span class="op">=</span> regionNoBuild2055 <span class="op">!==</span> <span class="kw">undefined</span> <span class="op">&amp;&amp;</span> regionRtp2055 <span class="op">!==</span> <span class="kw">undefined</span> <span class="op">?</span> (regionRtp2055 <span class="op">-</span> regionNoBuild2055) <span class="op">*</span> <span class="dv">100</span> <span class="op">:</span> <span class="kw">null</span></span>
+<span id="cb24-469"><a href="#cb24-469" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-470"><a href="#cb24-470" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb24-471"><a href="#cb24-471" aria-hidden="true" tabindex="-1"></a>    width<span class="op">,</span></span>
+<span id="cb24-472"><a href="#cb24-472" aria-hidden="true" tabindex="-1"></a>    <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span></span>
+<span id="cb24-473"><a href="#cb24-473" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marginRight</span><span class="op">:</span> <span class="dv">130</span><span class="op">,</span></span>
+<span id="cb24-474"><a href="#cb24-474" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">46</span><span class="op">,</span></span>
+<span id="cb24-475"><a href="#cb24-475" aria-hidden="true" tabindex="-1"></a>    <span class="dt">style</span><span class="op">:</span> {<span class="dt">background</span><span class="op">:</span> <span class="st">"#fbf9f4"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Poppins, sans-serif"</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> INK}<span class="op">,</span></span>
+<span id="cb24-476"><a href="#cb24-476" aria-hidden="true" tabindex="-1"></a>    title<span class="op">,</span></span>
+<span id="cb24-477"><a href="#cb24-477" aria-hidden="true" tabindex="-1"></a>    subtitle<span class="op">,</span></span>
+<span id="cb24-478"><a href="#cb24-478" aria-hidden="true" tabindex="-1"></a>    <span class="dt">caption</span><span class="op">:</span> <span class="st">"Solid = RTP (Build) 2055 · Dashed = No Build 2055 · both branch from the same 2027 baseline. Source: WFRC Transportation Choices (v10)."</span><span class="op">,</span></span>
+<span id="cb24-479"><a href="#cb24-479" aria-hidden="true" tabindex="-1"></a>    <span class="dt">x</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> [<span class="dv">2026</span><span class="op">,</span> <span class="dv">2059</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> [<span class="dv">2027</span><span class="op">,</span> <span class="dv">2055</span>]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Year"</span><span class="op">,</span> <span class="dt">tickFormat</span><span class="op">:</span> <span class="st">"d"</span>}<span class="op">,</span></span>
+<span id="cb24-480"><a href="#cb24-480" aria-hidden="true" tabindex="-1"></a>    <span class="dt">y</span><span class="op">:</span> {<span class="dt">percent</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">nice</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"% within 1/4 mile ↑"</span>}<span class="op">,</span></span>
+<span id="cb24-481"><a href="#cb24-481" aria-hidden="true" tabindex="-1"></a>    <span class="dt">color</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> countyNames<span class="op">,</span> <span class="dt">range</span><span class="op">:</span> countyPalette<span class="op">,</span> <span class="dt">legend</span><span class="op">:</span> <span class="kw">true</span>}<span class="op">,</span></span>
+<span id="cb24-482"><a href="#cb24-482" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb24-483"><a href="#cb24-483" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#00000022"</span>})<span class="op">,</span></span>
+<span id="cb24-484"><a href="#cb24-484" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>[<span class="st">"No Build"</span><span class="op">,</span> <span class="st">"RTP"</span>]<span class="op">.</span><span class="fu">flatMap</span>((path) <span class="kw">=&gt;</span> [</span>
+<span id="cb24-485"><a href="#cb24-485" aria-hidden="true" tabindex="-1"></a>        Plot<span class="op">.</span><span class="fu">line</span>(countyRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> path)<span class="op">,</span> {</span>
+<span id="cb24-486"><a href="#cb24-486" aria-hidden="true" tabindex="-1"></a>          <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-487"><a href="#cb24-487" aria-hidden="true" tabindex="-1"></a>          <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-488"><a href="#cb24-488" aria-hidden="true" tabindex="-1"></a>          <span class="dt">z</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
+<span id="cb24-489"><a href="#cb24-489" aria-hidden="true" tabindex="-1"></a>          <span class="dt">stroke</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
+<span id="cb24-490"><a href="#cb24-490" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeWidth</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="fl">2.5</span> <span class="op">:</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb24-491"><a href="#cb24-491" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeDasharray</span><span class="op">:</span> PATH_STYLE[path]<span class="op">.</span><span class="at">dash</span><span class="op">,</span></span>
+<span id="cb24-492"><a href="#cb24-492" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeOpacity</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="fl">0.8</span><span class="op">,</span></span>
+<span id="cb24-493"><a href="#cb24-493" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
+<span id="cb24-494"><a href="#cb24-494" aria-hidden="true" tabindex="-1"></a>        Plot<span class="op">.</span><span class="fu">line</span>(regionRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> path)<span class="op">,</span> {</span>
+<span id="cb24-495"><a href="#cb24-495" aria-hidden="true" tabindex="-1"></a>          <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-496"><a href="#cb24-496" aria-hidden="true" tabindex="-1"></a>          <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-497"><a href="#cb24-497" aria-hidden="true" tabindex="-1"></a>          <span class="dt">stroke</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
+<span id="cb24-498"><a href="#cb24-498" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeWidth</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="dv">3</span> <span class="op">:</span> <span class="fl">2.5</span><span class="op">,</span></span>
+<span id="cb24-499"><a href="#cb24-499" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeDasharray</span><span class="op">:</span> PATH_STYLE[path]<span class="op">.</span><span class="at">dash</span><span class="op">,</span></span>
+<span id="cb24-500"><a href="#cb24-500" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
+<span id="cb24-501"><a href="#cb24-501" aria-hidden="true" tabindex="-1"></a>      ])<span class="op">,</span></span>
+<span id="cb24-502"><a href="#cb24-502" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">dot</span>(countyRows<span class="op">,</span> {</span>
+<span id="cb24-503"><a href="#cb24-503" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-504"><a href="#cb24-504" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-505"><a href="#cb24-505" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
+<span id="cb24-506"><a href="#cb24-506" aria-hidden="true" tabindex="-1"></a>        <span class="dt">r</span><span class="op">:</span> <span class="fl">3.5</span><span class="op">,</span></span>
+<span id="cb24-507"><a href="#cb24-507" aria-hidden="true" tabindex="-1"></a>        <span class="dt">tip</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb24-508"><a href="#cb24-508" aria-hidden="true" tabindex="-1"></a>        <span class="dt">channels</span><span class="op">:</span> {<span class="dt">County</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span> <span class="dt">Scenario</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> (d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2027</span> <span class="op">?</span> <span class="st">"Existing 2027"</span> <span class="op">:</span> PATH_STYLE[d<span class="op">.</span><span class="at">path</span>]<span class="op">.</span><span class="at">label</span>)}<span class="op">,</span></span>
+<span id="cb24-509"><a href="#cb24-509" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb24-510"><a href="#cb24-510" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">dot</span>(regionRows<span class="op">,</span> {</span>
+<span id="cb24-511"><a href="#cb24-511" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-512"><a href="#cb24-512" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-513"><a href="#cb24-513" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
+<span id="cb24-514"><a href="#cb24-514" aria-hidden="true" tabindex="-1"></a>        <span class="dt">r</span><span class="op">:</span> <span class="dv">4</span><span class="op">,</span></span>
+<span id="cb24-515"><a href="#cb24-515" aria-hidden="true" tabindex="-1"></a>        <span class="dt">tip</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb24-516"><a href="#cb24-516" aria-hidden="true" tabindex="-1"></a>        <span class="dt">channels</span><span class="op">:</span> {<span class="dt">Geography</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="st">"WFRC region"</span><span class="op">,</span> <span class="dt">Scenario</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> (d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2027</span> <span class="op">?</span> <span class="st">"Existing 2027"</span> <span class="op">:</span> PATH_STYLE[d<span class="op">.</span><span class="at">path</span>]<span class="op">.</span><span class="at">label</span>)}<span class="op">,</span></span>
+<span id="cb24-517"><a href="#cb24-517" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb24-518"><a href="#cb24-518" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(countyRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">,</span> {</span>
+<span id="cb24-519"><a href="#cb24-519" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-520"><a href="#cb24-520" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-521"><a href="#cb24-521" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">entity</span><span class="op">,</span></span>
+<span id="cb24-522"><a href="#cb24-522" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
+<span id="cb24-523"><a href="#cb24-523" aria-hidden="true" tabindex="-1"></a>        <span class="dt">textAnchor</span><span class="op">:</span> <span class="st">"start"</span><span class="op">,</span></span>
+<span id="cb24-524"><a href="#cb24-524" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontWeight</span><span class="op">:</span> <span class="dv">600</span><span class="op">,</span></span>
+<span id="cb24-525"><a href="#cb24-525" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> countyColor<span class="op">.</span><span class="fu">get</span>(d<span class="op">.</span><span class="at">entity</span>)<span class="op">,</span></span>
+<span id="cb24-526"><a href="#cb24-526" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb24-527"><a href="#cb24-527" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(regionRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">,</span> {</span>
+<span id="cb24-528"><a href="#cb24-528" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-529"><a href="#cb24-529" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-530"><a href="#cb24-530" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="st">"WFRC region"</span><span class="op">,</span></span>
+<span id="cb24-531"><a href="#cb24-531" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
+<span id="cb24-532"><a href="#cb24-532" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dy</span><span class="op">:</span> <span class="dv">16</span><span class="op">,</span></span>
+<span id="cb24-533"><a href="#cb24-533" aria-hidden="true" tabindex="-1"></a>        <span class="dt">textAnchor</span><span class="op">:</span> <span class="st">"start"</span><span class="op">,</span></span>
+<span id="cb24-534"><a href="#cb24-534" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontStyle</span><span class="op">:</span> <span class="st">"italic"</span><span class="op">,</span></span>
+<span id="cb24-535"><a href="#cb24-535" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
+<span id="cb24-536"><a href="#cb24-536" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb24-537"><a href="#cb24-537" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(deltaPp <span class="op">===</span> <span class="kw">null</span> <span class="op">?</span> [] <span class="op">:</span> [{<span class="dt">year</span><span class="op">:</span> <span class="dv">2055</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> (regionNoBuild2055 <span class="op">+</span> regionRtp2055) <span class="op">/</span> <span class="dv">2</span>}]<span class="op">,</span> {</span>
+<span id="cb24-538"><a href="#cb24-538" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb24-539"><a href="#cb24-539" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb24-540"><a href="#cb24-540" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
+<span id="cb24-541"><a href="#cb24-541" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dy</span><span class="op">:</span> <span class="op">-</span><span class="dv">28</span><span class="op">,</span></span>
+<span id="cb24-542"><a href="#cb24-542" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="vs">`</span><span class="sc">${</span>deltaPp <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"+"</span> <span class="op">:</span> <span class="st">""</span><span class="sc">}${</span>deltaPp<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="sc">}</span><span class="vs"> pp, RTP vs No Build`</span><span class="op">,</span></span>
+<span id="cb24-543"><a href="#cb24-543" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontWeight</span><span class="op">:</span> <span class="dv">700</span><span class="op">,</span></span>
+<span id="cb24-544"><a href="#cb24-544" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">12</span><span class="op">,</span></span>
+<span id="cb24-545"><a href="#cb24-545" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> INK<span class="op">,</span></span>
+<span id="cb24-546"><a href="#cb24-546" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb24-547"><a href="#cb24-547" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
+<span id="cb24-548"><a href="#cb24-548" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb24-549"><a href="#cb24-549" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="chart-fn" class="cell-output cell-output-display">
+<div id="ojs-cell-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold hidden">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb25" data-startfrom="556" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 555;"><span id="cb25-556"><a href="#cb25-556" aria-hidden="true" tabindex="-1"></a><span class="fu">modeChart</span>(<span class="st">"bike"</span><span class="op">,</span> <span class="st">"Bike"</span><span class="op">,</span> <span class="st">"Share of population within 1/4 mile of a dedicated bike facility"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="fig-bike-interactive" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bike-interactive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="ojs-cell-4" data-nodetype="expression">
+
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-bike-interactive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold hidden">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb26" data-startfrom="563" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 562;"><span id="cb26-563"><a href="#cb26-563" aria-hidden="true" tabindex="-1"></a><span class="fu">modeChart</span>(<span class="st">"transit"</span><span class="op">,</span> <span class="st">"Transit"</span><span class="op">,</span> <span class="st">"Share of population within 1/4 mile of a frequent bus stop, station, or line"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="fig-transit-interactive" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-transit-interactive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div id="ojs-cell-5" data-nodetype="expression">
+
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-transit-interactive-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Known rough edges
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a first pass, not a final design: colors are tuned for light mode only (no separate dark-mode palette yet), the fork layout hardcodes <code>existing_2027</code>/<code>no_build_2055</code>/<code>rtp_2055</code> as the three scenario names (adding a fourth scenario – e.g.&nbsp;a second “build” alternative – needs <code>branchRows()</code> updated, not just <code>SCENARIOS</code>), and the “pp vs No Build” annotation quietly disappears rather than erroring if either 2055 scenario is renamed or removed.</p>
+</div>
+</div>
+<section id="at-a-glance" class="level3">
+<h3 class="anchored" data-anchor-id="at-a-glance">At a Glance</h3>
+<p>The region-level headline from the charts above, as a static summary – easier to screenshot, print, or drop into a slide than an interactive chart. Saved to <code>output/region_pct.png</code>, which the repo homepage also embeds directly, so it’s the same image in both places, not a separate one.</p>
+<div id="cell-fig-region-pct" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> tidy[tidy[<span class="st">"geography_level"</span>] <span class="op">==</span> <span class="st">"Region"</span>].copy()</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>scenario_order <span class="op">=</span> [s[<span class="st">"name"</span>] <span class="cf">for</span> s <span class="kw">in</span> SCENARIOS]</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>scenario_labels <span class="op">=</span> {<span class="st">"existing_2027"</span>: <span class="st">"Existing</span><span class="ch">\n</span><span class="st">2027"</span>, <span class="st">"no_build_2055"</span>: <span class="st">"No Build</span><span class="ch">\n</span><span class="st">2055"</span>, <span class="st">"rtp_2055"</span>: <span class="st">"RTP</span><span class="ch">\n</span><span class="st">2055"</span>}</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>region[<span class="st">"scenario"</span>] <span class="op">=</span> pd.Categorical(region[<span class="st">"scenario"</span>], categories<span class="op">=</span>scenario_order, ordered<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> region.sort_values(<span class="st">"scenario"</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>MODE_COLORS <span class="op">=</span> {<span class="st">"bike"</span>: <span class="st">"#036fa8"</span>, <span class="st">"transit"</span>: <span class="st">"#9d4879"</span>}  <span class="co"># brand blue / rtp-fuschia -- fixed order, not cycled</span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>INK <span class="op">=</span> <span class="st">"#023c5b"</span>  <span class="co"># brand wfrc-blue</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>BG <span class="op">=</span> <span class="st">"#fbf9f4"</span>  <span class="co"># matches the interactive charts above</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>bike_existing <span class="op">=</span> region.query(<span class="st">"mode == 'bike' and scenario == 'existing_2027'"</span>)[<span class="st">"pct_near_facility"</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>transit_existing <span class="op">=</span> region.query(<span class="st">"mode == 'transit' and scenario == 'existing_2027'"</span>)[<span class="st">"pct_near_facility"</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Editorial bar-chart treatment: headline + deck above the chart, direct</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co"># value labels on each bar instead of a y-axis, an inline color key instead</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="co"># of a boxed legend, and a small source caption -- no gridlines or borders</span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="co"># competing with the numbers themselves.</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">8.5</span>, <span class="fl">5.5</span>))</span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(BG)</span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>ax.set_facecolor(BG)</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(top<span class="op">=</span><span class="fl">0.76</span>, bottom<span class="op">=</span><span class="fl">0.16</span>, left<span class="op">=</span><span class="fl">0.03</span>, right<span class="op">=</span><span class="fl">0.97</span>)</span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>bar_width <span class="op">=</span> <span class="fl">0.32</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Existing 2027 sits apart on its own; No Build and RTP sit close together</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a><span class="co"># as a pair -- uneven spacing (not evenly-spaced ticks) so the layout itself</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="co"># signals "one baseline, two alternative 2055 outcomes" rather than a</span></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="co"># three-step timeline.</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>x_positions <span class="op">=</span> {<span class="st">"existing_2027"</span>: <span class="fl">0.0</span>, <span class="st">"no_build_2055"</span>: <span class="fl">1.6</span>, <span class="st">"rtp_2055"</span>: <span class="fl">2.6</span>}</span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [x_positions[s] <span class="cf">for</span> s <span class="kw">in</span> scenario_order]</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, mode <span class="kw">in</span> <span class="bu">enumerate</span>((<span class="st">"bike"</span>, <span class="st">"transit"</span>)):</span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> region[region[<span class="st">"mode"</span>] <span class="op">==</span> mode].set_index(<span class="st">"scenario"</span>)[<span class="st">"pct_near_facility"</span>].reindex(scenario_order) <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> (i <span class="op">-</span> <span class="fl">0.5</span>) <span class="op">*</span> bar_width</span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>    ax.bar([xi <span class="op">+</span> offset <span class="cf">for</span> xi <span class="kw">in</span> x], vals, width<span class="op">=</span>bar_width, color<span class="op">=</span>MODE_COLORS[mode], zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xi, v <span class="kw">in</span> <span class="bu">zip</span>(x, vals):</span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>        ax.text(xi <span class="op">+</span> offset, v <span class="op">+</span> <span class="dv">3</span>, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.0f}</span><span class="ss">%"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span>MODE_COLORS[mode])</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Divider + bracket reinforce the same point visually: a dotted line splits</span></span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="co"># the baseline from the 2055 pair, and a bracket spans only the pair it</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="co"># actually groups.</span></span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>divider_x <span class="op">=</span> (x_positions[<span class="st">"existing_2027"</span>] <span class="op">+</span> x_positions[<span class="st">"no_build_2055"</span>]) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>ax.axvline(divider_x, color<span class="op">=</span>INK, alpha<span class="op">=</span><span class="fl">0.15</span>, linestyle<span class="op">=</span><span class="st">":"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, zorder<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>bracket_left, bracket_right <span class="op">=</span> x_positions[<span class="st">"no_build_2055"</span>] <span class="op">-</span> bar_width, x_positions[<span class="st">"rtp_2055"</span>] <span class="op">+</span> bar_width</span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>    [bracket_left, bracket_left, bracket_right, bracket_right],</span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">103</span>, <span class="dv">106</span>, <span class="dv">106</span>, <span class="dv">103</span>],</span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>    zorder<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>ax.text((bracket_left <span class="op">+</span> bracket_right) <span class="op">/</span> <span class="dv">2</span>, <span class="dv">108</span>, <span class="st">"2055 — two alternative futures"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"bottom"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, style<span class="op">=</span><span class="st">"italic"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(x)</span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([scenario_labels[s] <span class="cf">for</span> s <span class="kw">in</span> scenario_order], fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(x_positions[<span class="st">"existing_2027"</span>] <span class="op">-</span> <span class="fl">0.6</span>, x_positions[<span class="st">"rtp_2055"</span>] <span class="op">+</span> <span class="fl">0.6</span>)</span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">118</span>)</span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a>ax.set_yticks([])</span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> side <span class="kw">in</span> (<span class="st">"top"</span>, <span class="st">"right"</span>, <span class="st">"left"</span>):</span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a>    ax.spines[side].set_visible(<span class="va">False</span>)</span>
+<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a>ax.spines[<span class="st">"bottom"</span>].set_color(INK)</span>
+<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a>ax.spines[<span class="st">"bottom"</span>].set_linewidth(<span class="dv">1</span>)</span>
+<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.03</span>, <span class="fl">0.95</span>, <span class="st">"Bike access far outpaces transit, in every scenario"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">15</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
+<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
+<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.88</span>,</span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Share of WFRC-region population within 1/4 mile of a facility — today, </span><span class="sc">{</span>bike_existing <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% for bike vs </span><span class="sc">{</span>transit_existing <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% for transit"</span>,</span>
+<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
+<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">10.5</span>,</span>
+<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"#55595e"</span>,</span>
+<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.03</span>, <span class="fl">0.80</span>, <span class="st">"●"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span>MODE_COLORS[<span class="st">"bike"</span>])</span>
+<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.05</span>, <span class="fl">0.805</span>, <span class="st">"Bike"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.115</span>, <span class="fl">0.80</span>, <span class="st">"●"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span>MODE_COLORS[<span class="st">"transit"</span>])</span>
+<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.135</span>, <span class="fl">0.805</span>, <span class="st">"Transit"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.03</span>, <span class="fl">0.03</span>, <span class="st">"Source: WFRC Transportation Choices analysis (v10)"</span>, ha<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="fl">8.5</span>, color<span class="op">=</span><span class="st">"#8a8f98"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a>fig.savefig(PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="st">"region_pct.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor(), dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-region-pct" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-region-pct-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Share of WFRC-region population within 1/4 mile of a bike or transit facility, by scenario."><img src="index_files/figure-html/fig-region-pct-output-1.png" alt="Grouped bar chart comparing bike and transit percentages across three scenarios: Existing 2027, No Build 2055, and RTP 2055. Bike rises from about 88% to about 94%; transit rises only slightly from Existing to No Build before reaching about 21% under RTP 2055." width="759" height="470" class="figure-img"></a>
+<a href="index_files/figure-html/fig-region-pct-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."><img src="index_files/figure-html/fig-region-pct-output-1.png" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP." width="786" height="508" class="figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Share of WFRC-region population within 1/4 mile of a bike or transit facility, by scenario.
+Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP.
 </figcaption>
 </figure>
 </div>
@@ -972,8 +1289,20 @@ Figure&nbsp;1: Share of WFRC-region population within 1/4 mile of a bike or tran
 
 
 </section>
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6IlxuLy8gRXhpc3RpbmcgMjAyNyBpcyB0aGUgc2luZ2xlIHNoYXJlZCBiYXNlbGluZTsgTm8gQnVpbGQgMjA1NSBhbmQgUlRQIDIwNTVcbi8vIGFyZSB0d28gQUxURVJOQVRFIGZ1dHVyZXMgYnJhbmNoaW5nIGZyb20gaXQsIG5vdCBhIHNlcXVlbmNlIC0tIHNvIHRoZVxuLy8geC1heGlzIGlzIHJlYWwgeWVhcnMgKDIwMjcsIDIwNTUpLCBhbmQgZWFjaCBlbnRpdHkgZ2V0cyB0d28gbGluZVxuLy8gc2VnbWVudHMgYm90aCBzdGFydGluZyBhdCB0aGUgc2FtZSAyMDI3IHBvaW50LCBzdHlsZWQgYnkgcGF0aCAoZGFzaGVkID1cbi8vIE5vIEJ1aWxkLCBzb2xpZCA9IFJUUCkgcmF0aGVyIHRoYW4gbGFpZCBvdXQgYXMgb25lIGNvbnRpbnVvdXMgdGltZWxpbmUuXG5QQVRIX1NUWUxFID0gKHtcbiAgXCJObyBCdWlsZFwiOiB7ZGFzaDogXCI1LDRcIiwgbGFiZWw6IFwiTm8gQnVpbGQgMjA1NVwifSxcbiAgXCJSVFBcIjoge2Rhc2g6IG51bGwsIGxhYmVsOiBcIlJUUCAoQnVpbGQpIDIwNTVcIn0sXG59KVxuXG5jb3VudHlOYW1lcyA9IFsuLi5uZXcgU2V0KFxuICB0Y19kYXRhLmZpbHRlcigoZCkgPT4gZC5nZW9ncmFwaHlfbGV2ZWwgPT09IFwiQ291bnR5TmFtZVwiKS5tYXAoKGQpID0+IGQuZ2VvZ3JhcGh5X25hbWUpXG4pXS5zb3J0KClcblxuLy8gUHVsbGVkIGZyb20gdGhlIFdGUkMgYnJhbmQgcGFsZXR0ZSAoX2V4dGVuc2lvbnMvLi4uL2JyYW5kLnltbCkgLS1cbi8vIHdjLWxpZ2h0LXJhaWwsIHJ0cC1tdXN0YXJkLCB3Yy1yb2Fkd2F5cywgd2MtdHJhaWxzIC0tIHZhbGlkYXRlZCBmb3Jcbi8vIENWRC1zYWZlIHNlcGFyYXRpb24gKHNjcmlwdHMvdmFsaWRhdGVfcGFsZXR0ZS5qcyBmcm9tIHRoZSBkYXRhdml6IHNraWxsKS5cbmNvdW50eVBhbGV0dGUgPSBbXCIjMzc2MmFkXCIsIFwiI2M5OGIzYVwiLCBcIiNhMzQyM2NcIiwgXCIjNzk5ZjRjXCJdXG5jb3VudHlDb2xvciA9IG5ldyBNYXAoY291bnR5TmFtZXMubWFwKChuYW1lLCBpKSA9PiBbbmFtZSwgY291bnR5UGFsZXR0ZVtpICUgY291bnR5UGFsZXR0ZS5sZW5ndGhdXSkpXG5SRUdJT05fQ09MT1IgPSBcIiM3ZjdhNzZcIiAvLyBicmFuZCB3ZnJjLWdyYXkgLS0gZGFzaGVkL3NvbGlkIHJlZmVyZW5jZSBsaW5lcywgZGVsaWJlcmF0ZWx5IG5ldXRyYWxcbklOSyA9IFwiIzAyM2M1YlwiIC8vIGJyYW5kIHdmcmMtYmx1ZVxuXG4vLyBSZXNoYXBlIHtzY2VuYXJpbywgcGN0X25lYXJfZmFjaWxpdHl9IHJvd3MgaW50byB7ZW50aXR5LCBwYXRoLCB5ZWFyLCB2YWx1ZX1cbi8vIGZvcmsgc2VnbWVudHM6IG9uZSBcIk5vIEJ1aWxkXCIgc2VnbWVudCBhbmQgb25lIFwiUlRQXCIgc2VnbWVudCBwZXIgZW50aXR5LFxuLy8gYm90aCBhbmNob3JlZCBhdCB0aGUgc2FtZSAyMDI3IHZhbHVlLlxuZnVuY3Rpb24gYnJhbmNoUm93cyhtb2RlS2V5LCBnZW9MZXZlbCwgbmFtZXNGaWx0ZXIpIHtcbiAgY29uc3Qgcm93cyA9IHRjX2RhdGEuZmlsdGVyKFxuICAgIChkKSA9PiBkLm1vZGUgPT09IG1vZGVLZXkgJiYgZC5nZW9ncmFwaHlfbGV2ZWwgPT09IGdlb0xldmVsICYmICghbmFtZXNGaWx0ZXIgfHwgbmFtZXNGaWx0ZXIuaW5jbHVkZXMoZC5nZW9ncmFwaHlfbmFtZSkpXG4gIClcbiAgY29uc3QgZXhpc3RpbmcgPSBuZXcgTWFwKHJvd3MuZmlsdGVyKChkKSA9PiBkLnNjZW5hcmlvID09PSBcImV4aXN0aW5nXzIwMjdcIikubWFwKChkKSA9PiBbZC5nZW9ncmFwaHlfbmFtZSwgZC5wY3RfbmVhcl9mYWNpbGl0eV0pKVxuICBjb25zdCBvdXQgPSBbXVxuICBmb3IgKGNvbnN0IFtzY2VuYXJpb0tleSwgcGF0aF0gb2YgW1tcIm5vX2J1aWxkXzIwNTVcIiwgXCJObyBCdWlsZFwiXSwgW1wicnRwXzIwNTVcIiwgXCJSVFBcIl1dKSB7XG4gICAgZm9yIChjb25zdCBkIG9mIHJvd3MuZmlsdGVyKChkKSA9PiBkLnNjZW5hcmlvID09PSBzY2VuYXJpb0tleSkpIHtcbiAgICAgIGNvbnN0IHN0YXJ0ID0gZXhpc3RpbmcuZ2V0KGQuZ2VvZ3JhcGh5X25hbWUpXG4gICAgICBpZiAoc3RhcnQgPT09IHVuZGVmaW5lZCkgY29udGludWVcbiAgICAgIG91dC5wdXNoKHtlbnRpdHk6IGQuZ2VvZ3JhcGh5X25hbWUsIHBhdGgsIHllYXI6IDIwMjcsIHZhbHVlOiBzdGFydH0pXG4gICAgICBvdXQucHVzaCh7ZW50aXR5OiBkLmdlb2dyYXBoeV9uYW1lLCBwYXRoLCB5ZWFyOiAyMDU1LCB2YWx1ZTogZC5wY3RfbmVhcl9mYWNpbGl0eX0pXG4gICAgfVxuICB9XG4gIHJldHVybiBvdXRcbn1cbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMiIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6Ilxudmlld29mIHNlbGVjdGVkQ291bnRpZXMgPSBJbnB1dHMuY2hlY2tib3goY291bnR5TmFtZXMsIHt2YWx1ZTogY291bnR5TmFtZXMsIGxhYmVsOiBcIkNvdW50aWVzXCJ9KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0zIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiXG5mdW5jdGlvbiBtb2RlQ2hhcnQobW9kZUtleSwgdGl0bGUsIHN1YnRpdGxlKSB7XG4gIGNvbnN0IGNvdW50eVJvd3MgPSBicmFuY2hSb3dzKG1vZGVLZXksIFwiQ291bnR5TmFtZVwiLCBzZWxlY3RlZENvdW50aWVzKVxuICBjb25zdCByZWdpb25Sb3dzID0gYnJhbmNoUm93cyhtb2RlS2V5LCBcIlJlZ2lvblwiLCBudWxsKVxuICBjb25zdCByZWdpb25Ob0J1aWxkMjA1NSA9IHJlZ2lvblJvd3MuZmluZCgoZCkgPT4gZC5wYXRoID09PSBcIk5vIEJ1aWxkXCIgJiYgZC55ZWFyID09PSAyMDU1KT8udmFsdWVcbiAgY29uc3QgcmVnaW9uUnRwMjA1NSA9IHJlZ2lvblJvd3MuZmluZCgoZCkgPT4gZC5wYXRoID09PSBcIlJUUFwiICYmIGQueWVhciA9PT0gMjA1NSk/LnZhbHVlXG4gIGNvbnN0IGRlbHRhUHAgPSByZWdpb25Ob0J1aWxkMjA1NSAhPT0gdW5kZWZpbmVkICYmIHJlZ2lvblJ0cDIwNTUgIT09IHVuZGVmaW5lZCA/IChyZWdpb25SdHAyMDU1IC0gcmVnaW9uTm9CdWlsZDIwNTUpICogMTAwIDogbnVsbFxuXG4gIHJldHVybiBQbG90LnBsb3Qoe1xuICAgIHdpZHRoLFxuICAgIGhlaWdodDogMzgwLFxuICAgIG1hcmdpblJpZ2h0OiAxMzAsXG4gICAgbWFyZ2luQm90dG9tOiA0NixcbiAgICBzdHlsZToge2JhY2tncm91bmQ6IFwiI2ZiZjlmNFwiLCBmb250RmFtaWx5OiBcIlBvcHBpbnMsIHNhbnMtc2VyaWZcIiwgY29sb3I6IElOS30sXG4gICAgdGl0bGUsXG4gICAgc3VidGl0bGUsXG4gICAgY2FwdGlvbjogXCJTb2xpZCA9IFJUUCAoQnVpbGQpIDIwNTUgwrcgRGFzaGVkID0gTm8gQnVpbGQgMjA1NSDCtyBib3RoIGJyYW5jaCBmcm9tIHRoZSBzYW1lIDIwMjcgYmFzZWxpbmUuIFNvdXJjZTogV0ZSQyBUcmFuc3BvcnRhdGlvbiBDaG9pY2VzICh2MTApLlwiLFxuICAgIHg6IHtkb21haW46IFsyMDI2LCAyMDU5XSwgdGlja3M6IFsyMDI3LCAyMDU1XSwgbGFiZWw6IFwiWWVhclwiLCB0aWNrRm9ybWF0OiBcImRcIn0sXG4gICAgeToge3BlcmNlbnQ6IHRydWUsIGdyaWQ6IHRydWUsIG5pY2U6IHRydWUsIGxhYmVsOiBcIiUgd2l0aGluIDEvNCBtaWxlIOKGkVwifSxcbiAgICBjb2xvcjoge2RvbWFpbjogY291bnR5TmFtZXMsIHJhbmdlOiBjb3VudHlQYWxldHRlLCBsZWdlbmQ6IHRydWV9LFxuICAgIG1hcmtzOiBbXG4gICAgICBQbG90LnJ1bGVZKFswXSwge3N0cm9rZTogXCIjMDAwMDAwMjJcIn0pLFxuICAgICAgLi4uW1wiTm8gQnVpbGRcIiwgXCJSVFBcIl0uZmxhdE1hcCgocGF0aCkgPT4gW1xuICAgICAgICBQbG90LmxpbmUoY291bnR5Um93cy5maWx0ZXIoKGQpID0+IGQucGF0aCA9PT0gcGF0aCksIHtcbiAgICAgICAgICB4OiBcInllYXJcIixcbiAgICAgICAgICB5OiBcInZhbHVlXCIsXG4gICAgICAgICAgejogXCJlbnRpdHlcIixcbiAgICAgICAgICBzdHJva2U6IFwiZW50aXR5XCIsXG4gICAgICAgICAgc3Ryb2tlV2lkdGg6IHBhdGggPT09IFwiUlRQXCIgPyAyLjUgOiAyLFxuICAgICAgICAgIHN0cm9rZURhc2hhcnJheTogUEFUSF9TVFlMRVtwYXRoXS5kYXNoLFxuICAgICAgICAgIHN0cm9rZU9wYWNpdHk6IHBhdGggPT09IFwiUlRQXCIgPyAxIDogMC44LFxuICAgICAgICB9KSxcbiAgICAgICAgUGxvdC5saW5lKHJlZ2lvblJvd3MuZmlsdGVyKChkKSA9PiBkLnBhdGggPT09IHBhdGgpLCB7XG4gICAgICAgICAgeDogXCJ5ZWFyXCIsXG4gICAgICAgICAgeTogXCJ2YWx1ZVwiLFxuICAgICAgICAgIHN0cm9rZTogUkVHSU9OX0NPTE9SLFxuICAgICAgICAgIHN0cm9rZVdpZHRoOiBwYXRoID09PSBcIlJUUFwiID8gMyA6IDIuNSxcbiAgICAgICAgICBzdHJva2VEYXNoYXJyYXk6IFBBVEhfU1RZTEVbcGF0aF0uZGFzaCxcbiAgICAgICAgfSksXG4gICAgICBdKSxcbiAgICAgIFBsb3QuZG90KGNvdW50eVJvd3MsIHtcbiAgICAgICAgeDogXCJ5ZWFyXCIsXG4gICAgICAgIHk6IFwidmFsdWVcIixcbiAgICAgICAgZmlsbDogXCJlbnRpdHlcIixcbiAgICAgICAgcjogMy41LFxuICAgICAgICB0aXA6IHRydWUsXG4gICAgICAgIGNoYW5uZWxzOiB7Q291bnR5OiBcImVudGl0eVwiLCBTY2VuYXJpbzogKGQpID0+IChkLnllYXIgPT09IDIwMjcgPyBcIkV4aXN0aW5nIDIwMjdcIiA6IFBBVEhfU1RZTEVbZC5wYXRoXS5sYWJlbCl9LFxuICAgICAgfSksXG4gICAgICBQbG90LmRvdChyZWdpb25Sb3dzLCB7XG4gICAgICAgIHg6IFwieWVhclwiLFxuICAgICAgICB5OiBcInZhbHVlXCIsXG4gICAgICAgIGZpbGw6IFJFR0lPTl9DT0xPUixcbiAgICAgICAgcjogNCxcbiAgICAgICAgdGlwOiB0cnVlLFxuICAgICAgICBjaGFubmVsczoge0dlb2dyYXBoeTogKCkgPT4gXCJXRlJDIHJlZ2lvblwiLCBTY2VuYXJpbzogKGQpID0+IChkLnllYXIgPT09IDIwMjcgPyBcIkV4aXN0aW5nIDIwMjdcIiA6IFBBVEhfU1RZTEVbZC5wYXRoXS5sYWJlbCl9LFxuICAgICAgfSksXG4gICAgICBQbG90LnRleHQoY291bnR5Um93cy5maWx0ZXIoKGQpID0+IGQucGF0aCA9PT0gXCJSVFBcIiAmJiBkLnllYXIgPT09IDIwNTUpLCB7XG4gICAgICAgIHg6IFwieWVhclwiLFxuICAgICAgICB5OiBcInZhbHVlXCIsXG4gICAgICAgIHRleHQ6IChkKSA9PiBkLmVudGl0eSxcbiAgICAgICAgZHg6IDEwLFxuICAgICAgICB0ZXh0QW5jaG9yOiBcInN0YXJ0XCIsXG4gICAgICAgIGZvbnRXZWlnaHQ6IDYwMCxcbiAgICAgICAgZmlsbDogKGQpID0+IGNvdW50eUNvbG9yLmdldChkLmVudGl0eSksXG4gICAgICB9KSxcbiAgICAgIFBsb3QudGV4dChyZWdpb25Sb3dzLmZpbHRlcigoZCkgPT4gZC5wYXRoID09PSBcIlJUUFwiICYmIGQueWVhciA9PT0gMjA1NSksIHtcbiAgICAgICAgeDogXCJ5ZWFyXCIsXG4gICAgICAgIHk6IFwidmFsdWVcIixcbiAgICAgICAgdGV4dDogKCkgPT4gXCJXRlJDIHJlZ2lvblwiLFxuICAgICAgICBkeDogMTAsXG4gICAgICAgIGR5OiAxNixcbiAgICAgICAgdGV4dEFuY2hvcjogXCJzdGFydFwiLFxuICAgICAgICBmb250U3R5bGU6IFwiaXRhbGljXCIsXG4gICAgICAgIGZpbGw6IFJFR0lPTl9DT0xPUixcbiAgICAgIH0pLFxuICAgICAgUGxvdC50ZXh0KGRlbHRhUHAgPT09IG51bGwgPyBbXSA6IFt7eWVhcjogMjA1NSwgdmFsdWU6IChyZWdpb25Ob0J1aWxkMjA1NSArIHJlZ2lvblJ0cDIwNTUpIC8gMn1dLCB7XG4gICAgICAgIHg6IFwieWVhclwiLFxuICAgICAgICB5OiBcInZhbHVlXCIsXG4gICAgICAgIGR4OiAxMCxcbiAgICAgICAgZHk6IC0yOCxcbiAgICAgICAgdGV4dDogKCkgPT4gYCR7ZGVsdGFQcCA+PSAwID8gXCIrXCIgOiBcIlwifSR7ZGVsdGFQcC50b0ZpeGVkKDEpfSBwcCwgUlRQIHZzIE5vIEJ1aWxkYCxcbiAgICAgICAgZm9udFdlaWdodDogNzAwLFxuICAgICAgICBmb250U2l6ZTogMTIsXG4gICAgICAgIGZpbGw6IElOSyxcbiAgICAgIH0pLFxuICAgIF0sXG4gIH0pXG59XG4ifSx7Im1ldGhvZE5hbWUiOiJpbnRlcnByZXQiLCJjZWxsTmFtZSI6Im9qcy1jZWxsLTQiLCJpbmxpbmUiOmZhbHNlLCJzb3VyY2UiOiJcbm1vZGVDaGFydChcImJpa2VcIiwgXCJCaWtlXCIsIFwiU2hhcmUgb2YgcG9wdWxhdGlvbiB3aXRoaW4gMS80IG1pbGUgb2YgYSBkZWRpY2F0ZWQgYmlrZSBmYWNpbGl0eVwiKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC01IiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoiXG5tb2RlQ2hhcnQoXCJ0cmFuc2l0XCIsIFwiVHJhbnNpdFwiLCBcIlNoYXJlIG9mIHBvcHVsYXRpb24gd2l0aGluIDEvNCBtaWxlIG9mIGEgZnJlcXVlbnQgYnVzIHN0b3AsIHN0YXRpb24sIG9yIGxpbmVcIilcbiJ9LHsibWV0aG9kTmFtZSI6ImludGVycHJldFF1aWV0Iiwic291cmNlIjoic2hpbnlJbnB1dCgnc2VsZWN0ZWRDb3VudGllcycpIn1dfQ==
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../../projects/transportation-choices";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "../..";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
