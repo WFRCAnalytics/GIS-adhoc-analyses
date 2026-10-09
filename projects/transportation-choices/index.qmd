@@ -32,7 +32,7 @@ This replaces the `_archive/` v9 arcpy scripts (01-08), which bundled SE and fac
 
 | Mode | Vintage | What's added | Source |
 |------------------|------------------|------------------|------------------|
-| Bike | 2027 (base) | On-street bike facilities + trails | `utah_bikeways`, filtered to `Facility1 <> 'Not Available'` |
+| Bike | 2027 (base) | On-street bike facilities + trails | `utah_bikeways`, filtered to `Facility1` excluding "Not Available" and the class-3 shared-roadway/shoulder family |
 | Bike | 2032 | *(placeholder -- not yet available)* | TBD, Sarah/Hugh via Suzie |
 | Bike | 2055 | RTP 2027 Preferred Scenario AT projects, line facilities only | `at_line_projects` |
 | Transit | 2027 (base) | Fixed-guideway stations + frequent bus stops | `uta_stops` + `uta_routes` |
@@ -122,21 +122,30 @@ print("All scenario SE years present.")
 ```
 
 ::: callout-note
-## Workshop-area geography is not reported yet
+## Geography levels beyond region and county
 
-The v9 pipeline summarized results by workshop area as well as region and county. No v10 boundary source has been identified for that geography level -- it will be added to `GEOGRAPHY_LEVELS` in @sec-compute once one exists.
+The v9 pipeline summarized results by workshop area as well as region and county. The `wftcm_taz` layer's `CITYGRP` field reproduces that same workshop-area breakdown (its values -- "Northern Salt Lake County," "Southwest Salt Lake County," "Southern Weber County," etc. -- line up with the v9 script's `SmallArea` boundary names), so it's used here as `WorkshopArea`. The layer's WFTDM district fields (`DISTLRG`/`DISTMED`/`DISTSML`) add three more levels of their own -- `CityName`, `DistrictLarge`, `DistrictMedium`, and `DistrictSmall` -- all without needing a separate boundary source. (`DISTSUPER`/`DSUP_NAME` also exists on the layer, but within the WFRC footprint it's identical to `CountyName`, so it isn't added as its own level.)
 :::
 
 ## Build Facility Geometry — Bike {#sec-bike-geometry}
 
-Bike facilities are line geometry, buffered directly: `utah_bikeways`'s `Facility1` field distinguishes facility type, and `"Not Available"` is the only value that means *no* bike facility, so everything else -- on-street bike lanes and trails alike -- is existing network. The 2055 vintage adds the RTP 2027 Preferred Scenario's active-transportation **line** projects as-is -- every row in `at_line_projects` is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching `utah_bikeways`'s own facility categories. The companion point layer (`at_point_projects`) is pedestrian/bike crossings, not bike-path segments, so it's excluded here -- `WFRCAnalytics/GIS-RTP-Phasing-Criteria` treats those crossings as a separate network-connectivity attribute rather than part of the facility network.
+Bike facilities are line geometry, buffered directly: `utah_bikeways`'s `Facility1` field distinguishes facility type, encoded with AGRC's 1/2/3 bikeway class suffixes (1 = physically separated cycle track, 2 = bike lane, 3 = shared roadway/shoulder). `"Not Available"` means no bike facility at all, but the class-3 family (`"Other bike route, unspecified (3)"`, `"Shoulder bikeway (3A)"`, `"Marked shared roadway (3B)"`, `"Signed shared roadway (3C)"`) is excluded too -- it's just a stripe or sign on a road shared with traffic, not a dedicated facility, and the v9 `_archive/` script excluded the same codes (`bike_l`/`bike_r NOT IN ('3','3A','3B','3C')`). Everything else -- bike lanes, buffered/protected cycle tracks, and trails -- is existing network. The 2055 vintage adds the RTP 2027 Preferred Scenario's active-transportation **line** projects as-is -- every row in `at_line_projects` is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching `utah_bikeways`'s own facility categories. The companion point layer (`at_point_projects`) is pedestrian/bike crossings, not bike-path segments, so it's excluded here -- `WFRCAnalytics/GIS-RTP-Phasing-Criteria` treats those crossings as a separate network-connectivity attribute rather than part of the facility network.
 
 ```{python}
 #| label: bike-raw-by-vintage
 
+# Excludes "Not Available" (no facility) and the class-3 shared-roadway/shoulder
+# family -- not a dedicated facility, matching the v9 _archive/ script's
+# bike_l/bike_r NOT IN ('3','3A','3B','3C') exclusion.
+_BIKE_EXCLUDED_FACILITY1_SQL = (
+    "'Not Available','Other bike route, unspecified (3)','Shoulder bikeway (3A)',"
+    "'Marked shared roadway (3B)','Signed shared roadway (3C)'"
+)
+
 bike_raw = {
     2027: gpd.read_file(
-        L["utah_bikeways"], where="Facility1 IS NOT NULL AND Facility1 <> 'Not Available'"
+        L["utah_bikeways"],
+        where=f"Facility1 IS NOT NULL AND Facility1 NOT IN ({_BIKE_EXCLUDED_FACILITY1_SQL})",
     ).to_crs(CRS)[["geometry"]],
     2032: gpd.GeoDataFrame(geometry=[], crs=CRS),  # placeholder: 2032 bike layer TBD
     2055: gpd.read_file(L["at_line_projects"]).to_crs(CRS)[["geometry"]],
@@ -168,10 +177,12 @@ for year, cum in bike_cum.items():
 
 ## Build Facility Geometry — Transit {#sec-transit-geometry}
 
-Transit works differently in a way that matters for the buffer, not just the source: it's built from **stop/station points**, never from route linework, and only from a *subset* of stops --
+Transit works differently in a way that matters for the buffer, not just the source. The 2027 base is built entirely from **stop/station points**, and only from a *subset* of stops --
 
 1.  LRT/CRT fixed-guideway stations, caught by `mode` containing `TRAX` or `FrontRunner`, and
 2.  **frequent bus stops only** -- `uta_routes` filtered to the frequent/fixed-guideway service tiers, matched back to stops through the comma-separated `route` field.
+
+(The 2055 vintage below does add route linework -- planned corridors buffered as lines, same as bike -- once it's clear a single centroid point badly undercounts a corridor's real coverage.)
 
 Every other bus stop is excluded. This two-part filter replaces v9's hardcoded route list with something that updates itself as UTA's service changes.
 
@@ -206,7 +217,15 @@ print(f"Frequent-route stops:      {len(hf_routes)}")
 print(f"Transit 2027 base (dedup): {len(transit_2027)}")
 ```
 
-The 2055 vintage adds the RTP's transit projects, but a planned rail or BRT corridor arrives as a line, not a point -- so each line project is reduced to its centroid here, keeping the whole transit buffer point-based rather than letting new corridors buffer like a continuous bike facility would. Not every project qualifies, though: only LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) project types count toward this mode, mirroring the Rail/BRT buffer-tier grouping `WFRCAnalytics/GIS-RTP-Phasing-Criteria` uses (which buffers FrontRunner, TRAX, and the Sugar House Streetcar together as one fixed-guideway-equivalent tier, separate from core local bus). Exploratory corridors, corridor preservation, transit/mobility hubs, maintenance facilities, park & rides, and gondolas are excluded -- they aren't LRT/CRT/high-frequency-bus stops themselves.
+The 2055 vintage adds the RTP's transit projects. A planned rail or BRT corridor arrives as a line, not a point, but reducing it to a single centroid badly undercounts its real catchment -- a corridor has stations spaced along its whole length, not clustered at its midpoint. Reasonableness-checking against the v9 benchmark confirmed this: collapsing lines to centroids put RTP 2050-equivalent transit coverage around 20%, far under the v9 pipeline's reported 33% for 2050 RTP. So line projects are buffered directly as corridors here, the same way bike line facilities already are, while point projects (new stations) stay point-buffered.
+
+::: callout-note
+## Full-line buffering is an interim choice, not the final answer
+
+Buffering a corridor's entire length overshoots too, in the other direction -- it assumes a station is reachable from every point along the line, when real stations are discrete and spaced out (rail stops are often a mile or more apart), leaving real gaps that a full-line buffer doesn't capture. Against the v9 benchmark this currently reads ~45% versus the reported 33% for 2050 RTP, roughly as far over as the centroid approach was under. The correct fix is what `WFRCAnalytics/GIS-RTP-Phasing-Criteria` already does: buffer each line, intersect with the real 2055 UF TDM model's stop nodes to get actual station locations, then apply mode-specific buffer tiers (Rail 0.5 mi, BRT 0.35 mi, Core 0.25 mi). That needs the TDM network GDB, which isn't available in this repo yet -- full-line buffering is the deliberate placeholder until it is.
+:::
+
+Not every project qualifies, though: only LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) project types count toward this mode, mirroring the Rail/BRT buffer-tier grouping `WFRCAnalytics/GIS-RTP-Phasing-Criteria` uses (which buffers FrontRunner, TRAX, and the Sugar House Streetcar together as one fixed-guideway-equivalent tier, separate from core local bus). Exploratory corridors, corridor preservation, transit/mobility hubs, maintenance facilities, park & rides, and gondolas are excluded -- they aren't LRT/CRT/high-frequency-bus stops themselves.
 
 ```{python}
 #| label: transit-raw-by-vintage
@@ -228,10 +247,7 @@ transit_raw = {
     2032: gpd.GeoDataFrame(geometry=[], crs=CRS),  # placeholder: LIN Stops file from Suzie
     2055: gpd.GeoDataFrame(
         pd.concat(
-            [
-                transit_2055_points[["geometry"]],
-                gpd.GeoDataFrame(geometry=transit_2055_lines.centroid, crs=CRS),
-            ],
+            [transit_2055_points[["geometry"]], transit_2055_lines[["geometry"]]],
             ignore_index=True,
         ),
         geometry="geometry",
@@ -265,7 +281,7 @@ for year, cum in transit_cum.items():
 
 ## Prepare TAZ Geography
 
-TAZ geometry itself doesn't change across scenarios -- only the population joined onto it does (that happens in @sec-compute, per scenario). So this runs once: filter to the four WFRC counties, and add the fields every downstream calculation needs -- `Region` (a constant, for the region-level rollup), `CountyName`, and each TAZ's total area in acres.
+TAZ geometry itself doesn't change across scenarios -- only the population joined onto it does (that happens in @sec-compute, per scenario). So this runs once: filter to the four WFRC counties, and add the fields every downstream calculation needs -- `Region` (a constant, for the region-level rollup), the geography breakdowns (`CountyName`, `WorkshopArea`, `CityName`, and the WFTDM district hierarchy), and each TAZ's total area in acres. These all come straight off fields already on the TAZ layer (`CITYGRP`, `DISTLRG`/`DISTMED`/`DISTSML`), so there's no separate boundary source to fetch or maintain.
 
 ```{python}
 #| label: prepare-taz
@@ -276,8 +292,15 @@ print(f"TAZ columns: {list(taz_raw.columns)}")
 taz = taz_raw[taz_raw["CO_FIPS"].isin(CONSTANTS["wfrc_county_fips"])].copy()
 taz["Region"] = "WFRC"
 taz["CountyName"] = taz["CO_NAME"].str.title()
+taz["WorkshopArea"] = taz["CITYGRP"].replace("", pd.NA)  # blank = not assigned to a workshop area
+taz["CityName"] = taz["CITY_NAME"]
+taz["DistrictLarge"] = taz["DLRG_NAME"]
+taz["DistrictMedium"] = taz["DMED_NAME"]
+taz["DistrictSmall"] = taz["DSML_NAME"]
 taz["AcresTotal"] = taz.geometry.area / 4046.8564224
 print(f"TAZ after county filter: {len(taz)} (from {len(taz_raw)})")
+for col in ["CountyName", "WorkshopArea", "CityName", "DistrictLarge", "DistrictMedium", "DistrictSmall"]:
+    print(f"  {col}: {taz[col].nunique()} unique, {taz[col].isna().sum()} null")
 ```
 
 ## Compute Compatible-Area % by Scenario {#sec-compute}
@@ -287,7 +310,15 @@ We don't know how population is distributed *within* a TAZ, only its total -- so
 ```{python}
 #| label: compute-tidy-results
 
-GEOGRAPHY_LEVELS = ["Region", "CountyName"]  # add "SmallArea" once a workshop-area boundary exists
+GEOGRAPHY_LEVELS = [
+    "Region",
+    "CountyName",
+    "WorkshopArea",
+    "CityName",
+    "DistrictLarge",
+    "DistrictMedium",
+    "DistrictSmall",
+]
 
 results = []
 for scenario in SCENARIOS:
@@ -310,7 +341,10 @@ for scenario in SCENARIOS:
             piece_totals = (
                 pieces.groupby(level)["HHPOPPiece"].sum().reindex(totals.index, fill_value=0)
             )
-            pct = piece_totals / totals
+            # Overlay geometry area can round-trip a hair above the true total
+            # (e.g. 1.0000000000000004) due to floating-point noise in the
+            # intersection -- clip rather than let it fail the sanity check below.
+            pct = (piece_totals / totals).clip(upper=1.0)
             for geography_name, value in pct.items():
                 results.append(
                     {
@@ -326,7 +360,18 @@ for scenario in SCENARIOS:
 
 tidy = pd.DataFrame(results)
 print(f"Tidy results: {len(tidy)} rows")
-assert tidy["pct_near_facility"].between(0, 1).all(), (
+
+# A handful of fine-grained geographies (e.g. Great Salt Lake open-water districts)
+# have zero households, so their share-of-population is undefined (0/0 = NaN) --
+# that's a legitimate result, not a bug, so it's excluded from the range check below.
+n_undefined = tidy["pct_near_facility"].isna().sum()
+if n_undefined:
+    zero_pop_geos = sorted(
+        tidy.loc[tidy["pct_near_facility"].isna(), "geography_name"].unique()
+    )
+    print(f"NOTE: {n_undefined} rows have undefined pct (zero-population geography): {zero_pop_geos}")
+
+assert tidy["pct_near_facility"].dropna().between(0, 1).all(), (
     "Percentage outside [0, 1] -- check overlay/weighting"
 )
 tidy.head()
@@ -334,7 +379,7 @@ tidy.head()
 
 ## Outputs
 
-One CSV per scenario, each long-format across modes and geography levels -- easier for a planner to open and filter than nine narrow files, and named so each scenario's file is unambiguous on its own.
+One CSV per scenario, each long-format across modes and geography levels -- easier for a planner to open and filter than nine narrow files, and named so each scenario's file is unambiguous on its own. A combined file across all three scenarios is also saved for the interactive charts below to read directly.
 
 ```{python}
 #| label: write-outputs
@@ -344,17 +389,28 @@ for scenario in SCENARIOS:
     out_path = PATHS["output"] / f"transportation_choices_{scenario['name']}.csv"
     tidy[tidy["scenario"] == scenario["name"]].to_csv(out_path, index=False)
     print(f"Saved -> {out_path}")
+
+tidy_out_path = PATHS["output"] / "transportation_choices_tidy.csv"
+tidy.to_csv(tidy_out_path, index=False)
+print(f"Saved -> {tidy_out_path}")
 ```
 
 ## Visualization
 
-No Build 2055 and RTP 2055 are **alternate futures**, not consecutive years -- both branch from the same Existing 2027 baseline, so each chart draws two separate lines per county forking from that shared starting point: dashed for No Build, solid for RTP. Pick one or more counties below; both charts update together, and the gray lines are always the WFRC region, so any county reads directly against the regional reference rather than in isolation. Hover any point for its exact value.
+No Build 2055 and RTP 2055 are **alternate futures**, not consecutive years -- both branch from the same Existing 2027 baseline, so each chart draws two separate lines per geography forking from that shared starting point: dashed for No Build, solid for RTP. Pick a geography level below (region, county, workshop area, city, or large/medium/small WFTDM district), then which geographies at that level to plot and which of the two 2055 scenarios to show -- Bike and Transit live in separate tabs underneath, both driven by the same controls. The gray line is always the WFRC region, so any geography reads directly against the regional reference rather than in isolation. Hover any point for its exact value.
 
-```{python}
-#| label: to-ojs
-#| echo: false
+```{ojs}
+//| label: load-tidy-data
+//| echo: false
 
-ojs_define(tc_data=tidy.to_dict(orient="records"))
+// Read client-side via FileAttachment rather than ojs_define() -- the
+// combination of ojs_define's embedded <script type="ojs-define"> data with
+// this page's panel-tabset layout left tc_data undefined at runtime for
+// every dependent cell. WFRCAnalytics/TDM-VAL-SchoolCollegeEnrollment uses
+// FileAttachment for all of its interactive pages, including ones with the
+// same panel-tabset/panel-input layout, so this follows that precedent
+// instead of re-diagnosing the ojs_define interaction further.
+tc_data = FileAttachment("output/transportation_choices_tidy.csv").csv({typed: true})
 ```
 
 ```{ojs}
@@ -370,18 +426,21 @@ PATH_STYLE = ({
   "No Build": {dash: "5,4", label: "No Build 2055"},
   "RTP": {dash: null, label: "RTP (Build) 2055"},
 })
+SCENARIO_OPTIONS = Object.keys(PATH_STYLE)
 
-countyNames = [...new Set(
-  tc_data.filter((d) => d.geography_level === "CountyName").map((d) => d.geography_name)
-)].sort()
-
-// Pulled from the WFRC brand palette (_extensions/.../brand.yml) --
-// wc-light-rail, rtp-mustard, wc-roadways, wc-trails -- validated for
-// CVD-safe separation (scripts/validate_palette.js from the dataviz skill).
-countyPalette = ["#3762ad", "#c98b3a", "#a3423c", "#799f4c"]
-countyColor = new Map(countyNames.map((name, i) => [name, countyPalette[i % countyPalette.length]]))
 REGION_COLOR = "#7f7a76" // brand wfrc-gray -- dashed/solid reference lines, deliberately neutral
 INK = "#023c5b" // brand wfrc-blue
+
+// Brand colors (_extensions/.../brand.yml) validated for CVD-safe separation
+// (scripts/validate_palette.js from the dataviz skill) cover a handful of
+// entities cleanly; d3's Tableau10 extends the palette for geography levels
+// with more selections (e.g. large districts) without hand-picking more
+// brand colors.
+BRAND_PALETTE = ["#3762ad", "#c98b3a", "#a3423c", "#799f4c"]
+function colorPalette(n) {
+  const base = [...BRAND_PALETTE, ...d3.schemeTableau10]
+  return Array.from({length: n}, (_, i) => base[i % base.length])
+}
 
 // Reshape {scenario, pct_near_facility} rows into {entity, path, year, value}
 // fork segments: one "No Build" segment and one "RTP" segment per entity,
@@ -405,22 +464,88 @@ function branchRows(modeKey, geoLevel, namesFilter) {
 ```
 
 ```{ojs}
-//| label: county-picker
+//| label: geo-level-source
 //| echo: false
 
-viewof selectedCounties = Inputs.checkbox(countyNames, {value: countyNames, label: "Counties"})
+GEO_LEVELS = ["Region", "CountyName", "WorkshopArea", "CityName", "DistrictLarge", "DistrictMedium", "DistrictSmall"]
+GEO_LEVEL_LABELS = ({
+  Region: "Region",
+  CountyName: "County",
+  WorkshopArea: "Workshop Area",
+  CityName: "City",
+  DistrictLarge: "Large District",
+  DistrictMedium: "Medium District",
+  DistrictSmall: "Small District",
+})
+```
+
+```{ojs}
+//| label: geo-names-source
+//| echo: false
+
+geoNamesForLevel = [...new Set(
+  tc_data
+    .filter((d) => d.geography_level === selectedGeoLevel && d.geography_name != null)
+    .map((d) => d.geography_name)
+)].sort()
+
+// Re-derived every time selectedGeoLevel changes, so this picker's default
+// resets automatically. Small levels (region, county, workshop area) start
+// fully selected like before; levels with dozens of districts start empty --
+// showing 50+ lines at once isn't a readable chart, so the user opts in.
+geoNamesDefault = geoNamesForLevel.length <= 12 ? geoNamesForLevel : []
+```
+
+```{ojs}
+//| label: controls-panel
+//| echo: false
+
+viewof selectedGeoLevel = Inputs.select(GEO_LEVELS, {
+  label: "Geography level",
+  format: (d) => GEO_LEVEL_LABELS[d],
+  value: "CountyName",
+})
+
+viewof selectedGeoNames = Inputs.select(geoNamesForLevel, {
+  label: "Geographies",
+  multiple: 4,
+  value: geoNamesDefault,
+})
+
+viewof selectedPaths = Inputs.checkbox(SCENARIO_OPTIONS, {
+  value: SCENARIO_OPTIONS,
+  label: "2055 scenario",
+  format: (d) => PATH_STYLE[d].label,
+})
 ```
 
 ```{ojs}
 //| label: chart-fn
 //| echo: false
 
-function modeChart(modeKey, title, subtitle) {
-  const countyRows = branchRows(modeKey, "CountyName", selectedCounties)
-  const regionRows = branchRows(modeKey, "Region", null)
-  const regionNoBuild2055 = regionRows.find((d) => d.path === "No Build" && d.year === 2055)?.value
-  const regionRtp2055 = regionRows.find((d) => d.path === "RTP" && d.year === 2055)?.value
-  const deltaPp = regionNoBuild2055 !== undefined && regionRtp2055 !== undefined ? (regionRtp2055 - regionNoBuild2055) * 100 : null
+function modeChart(modeKey, subtitle) {
+  const isRegionLevel = selectedGeoLevel === "Region"
+  const entityNames = isRegionLevel ? [] : selectedGeoNames
+  const palette = colorPalette(entityNames.length)
+  const entityColor = new Map(entityNames.map((name, i) => [name, palette[i]]))
+
+  // The gray WFRC reference line is always drawn; when Region itself is the
+  // selected level there's nothing else to plot, so entityRows is simply
+  // empty and the chart reduces to that one reference line.
+  const entityRows = branchRows(modeKey, selectedGeoLevel, entityNames).filter((d) => selectedPaths.includes(d.path))
+  const regionRows = branchRows(modeKey, "Region", null).filter((d) => selectedPaths.includes(d.path))
+
+  const regionAll = branchRows(modeKey, "Region", null)
+  const regionNoBuild2055 = regionAll.find((d) => d.path === "No Build" && d.year === 2055)?.value
+  const regionRtp2055 = regionAll.find((d) => d.path === "RTP" && d.year === 2055)?.value
+  const showDelta = selectedPaths.includes("No Build") && selectedPaths.includes("RTP") && regionNoBuild2055 !== undefined && regionRtp2055 !== undefined
+  const deltaPp = showDelta ? (regionRtp2055 - regionNoBuild2055) * 100 : null
+
+  const pathCaptions = {
+    "No Build": "Dashed = No Build 2055",
+    "RTP": "Solid = RTP (Build) 2055",
+  }
+  const caption = `${selectedPaths.map((p) => pathCaptions[p]).join(" · ")} · both branch from the same 2027 baseline. Source: WFRC Transportation Choices (v10).`
 
   return Plot.plot({
     width,
@@ -428,16 +553,15 @@ function modeChart(modeKey, title, subtitle) {
     marginRight: 130,
     marginBottom: 46,
     style: {background: "#fbf9f4", fontFamily: "Poppins, sans-serif", color: INK},
-    title,
     subtitle,
-    caption: "Solid = RTP (Build) 2055 · Dashed = No Build 2055 · both branch from the same 2027 baseline. Source: WFRC Transportation Choices (v10).",
+    caption,
     x: {domain: [2026, 2059], ticks: [2027, 2055], label: "Year", tickFormat: "d"},
     y: {percent: true, grid: true, nice: true, label: "% within 1/4 mile ↑"},
-    color: {domain: countyNames, range: countyPalette, legend: true},
+    color: entityNames.length ? {domain: entityNames, range: palette, legend: true} : undefined,
     marks: [
       Plot.ruleY([0], {stroke: "#00000022"}),
-      ...["No Build", "RTP"].flatMap((path) => [
-        Plot.line(countyRows.filter((d) => d.path === path), {
+      ...selectedPaths.flatMap((path) => [
+        Plot.line(entityRows.filter((d) => d.path === path), {
           x: "year",
           y: "value",
           z: "entity",
@@ -454,13 +578,13 @@ function modeChart(modeKey, title, subtitle) {
           strokeDasharray: PATH_STYLE[path].dash,
         }),
       ]),
-      Plot.dot(countyRows, {
+      Plot.dot(entityRows, {
         x: "year",
         y: "value",
         fill: "entity",
         r: 3.5,
         tip: true,
-        channels: {County: "entity", Scenario: (d) => (d.year === 2027 ? "Existing 2027" : PATH_STYLE[d.path].label)},
+        channels: {Geography: "entity", Scenario: (d) => (d.year === 2027 ? "Existing 2027" : PATH_STYLE[d.path].label)},
       }),
       Plot.dot(regionRows, {
         x: "year",
@@ -470,16 +594,16 @@ function modeChart(modeKey, title, subtitle) {
         tip: true,
         channels: {Geography: () => "WFRC region", Scenario: (d) => (d.year === 2027 ? "Existing 2027" : PATH_STYLE[d.path].label)},
       }),
-      Plot.text(countyRows.filter((d) => d.path === "RTP" && d.year === 2055), {
+      Plot.text(entityRows.filter((d) => d.path === (selectedPaths.includes("RTP") ? "RTP" : selectedPaths[0]) && d.year === 2055), {
         x: "year",
         y: "value",
         text: (d) => d.entity,
         dx: 10,
         textAnchor: "start",
         fontWeight: 600,
-        fill: (d) => countyColor.get(d.entity),
+        fill: (d) => entityColor.get(d.entity),
       }),
-      Plot.text(regionRows.filter((d) => d.path === "RTP" && d.year === 2055), {
+      Plot.text(regionRows.filter((d) => d.path === (selectedPaths.includes("RTP") ? "RTP" : selectedPaths[0]) && d.year === 2055), {
         x: "year",
         y: "value",
         text: () => "WFRC region",
@@ -504,24 +628,32 @@ function modeChart(modeKey, title, subtitle) {
 }
 ```
 
+::: {.panel-tabset}
+
+### Bike
+
 ```{ojs}
 //| label: fig-bike-interactive
 //| echo: false
 
-modeChart("bike", "Bike", "Share of population within 1/4 mile of a dedicated bike facility")
+modeChart("bike", "Share of population within 1/4 mile of a dedicated bike facility")
 ```
+
+### Transit
 
 ```{ojs}
 //| label: fig-transit-interactive
 //| echo: false
 
-modeChart("transit", "Transit", "Share of population within 1/4 mile of a frequent bus stop, station, or line")
+modeChart("transit", "Share of population within 1/4 mile of a frequent bus stop, station, or line")
 ```
+
+:::
 
 ::: callout-note
 ## Known rough edges
 
-This is a first pass, not a final design: colors are tuned for light mode only (no separate dark-mode palette yet), the fork layout hardcodes `existing_2027`/`no_build_2055`/`rtp_2055` as the three scenario names (adding a fourth scenario -- e.g. a second "build" alternative -- needs `branchRows()` updated, not just `SCENARIOS`), and the "pp vs No Build" annotation quietly disappears rather than erroring if either 2055 scenario is renamed or removed.
+This is a first pass, not a final design: colors are tuned for light mode only (no separate dark-mode palette yet), the fork layout hardcodes `existing_2027`/`no_build_2055`/`rtp_2055` as the three scenario names (adding a fourth scenario -- e.g. a second "build" alternative -- needs `branchRows()` updated, not just `SCENARIOS`), the "pp vs No Build" annotation and entity end-labels quietly disappear rather than erroring if a scenario checkbox is unchecked, and unchecking both scenario checkboxes leaves a blank chart (axes only, every line and point -- including the Existing 2027 baseline -- disappears with it) rather than a message explaining why.
 :::
 
 ### At a Glance
@@ -531,7 +663,7 @@ The region-level headline from the charts above, as a static summary -- easier t
 ```{python}
 #| label: fig-region-pct
 #| fig-cap: "Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."
-#| fig-alt: "Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP."
+#| fig-alt: "Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 66% in 2027, 63% under No Build, and 90% under RTP. Transit reaches 19% in 2027 and No Build, rising to 45% under RTP."
 
 import matplotlib
 import matplotlib.pyplot as plt
