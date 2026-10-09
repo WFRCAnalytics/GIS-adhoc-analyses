@@ -499,6 +499,7 @@ geoNamesDefault = geoNamesForLevel.length <= 12 ? geoNamesForLevel : []
 ```{ojs}
 //| label: controls-panel
 //| echo: false
+//| panel: input
 //| layout-ncol: 3
 
 viewof selectedGeoLevel = Inputs.select(GEO_LEVELS, {
