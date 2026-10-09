@@ -9,13 +9,14 @@ website:
   open-graph: true
   cookie-consent: false
 
-  # ── PER-PROJECT: remove or update this announcement per deployment ─────────
-  announcement:
-    icon: info-circle
-    dismissable: true
-    content: "**Alert** - This website currently contains mostly placeholder items and is currently under development."
-    type: primary
-    position: below-navbar
+  # No default announcement is shipped -- add one per-project directly in
+  # that project's own _quarto.yml under website:, e.g.:
+  #   announcement:
+  #     icon: info-circle
+  #     dismissable: true
+  #     content: "**Your message** — ..."
+  #     type: info          # primary | secondary | success | danger | warning | info | light | dark
+  #     position: below-navbar
 
   # repo-url: "https://github.com/WFRCAnalytics/wfrc-brand"
   # repo-actions: [source, issue]

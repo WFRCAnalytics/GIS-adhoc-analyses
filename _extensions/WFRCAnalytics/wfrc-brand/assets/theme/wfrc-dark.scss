@@ -282,11 +282,55 @@ a {
     background-color: lighten($body-bg, 5%) !important;
 }
 
-// Panel tabset selected tab
+// Active tab's own border — themed on all sides. Bootstrap's default
+// active-tab rule only sets background-color/border-bottom-color, leaving
+// top/left/right at the base .nav-link's transparent border, so this is
+// the only thing giving the active tab a visible box at all.
 .panel-tabset .nav-tabs .nav-link.active {
     color: darken($white, 5%) !important;
     background-color: lighten($body-bg, 5%);
-    border-color: lighten($wfrc-blue, 15%);
+    border-color: lighten($wfrc-blue, 15%); // #046da6
+}
+
+// Tab-content pane and the row's own underline (.nav-tabs) — NOT the bare
+// .nav-link selector: only the active tab (rule above) should ever show an
+// individual border. Inactive tabs stay borderless (Bootstrap's own
+// transparent default) until hover, below.
+.panel-tabset .nav-tabs,
+.panel-tabset .tab-content {
+    border-color: lighten($wfrc-blue, 15%); // #046da6
+}
+
+// border-bottom shorthand (style + width + color), not border-bottom-color
+// alone — restores style: solid and width: 1px explicitly rather than
+// assuming they're already correct, since a color-only override can be a
+// silent no-op if the row's underline is ever suppressed via border-style.
+.panel-tabset .nav-tabs {
+    border-bottom: 1px solid lighten($wfrc-blue, 15%); // #046da6
+}
+
+// Bootstrap's own hover/focus rule sets border-color to $gray-200 $gray-200
+// $nav-tabs-border-color (top / left-right / bottom). $gray-200 is already
+// remapped above, so top/left/right theme automatically; $nav-tabs-border-color
+// itself is never remapped, so the bottom side alone stays at Bootstrap's raw
+// default. :not(.active) keeps this from winning the specificity tie against
+// the active-tab rule below.
+.panel-tabset .nav-tabs .nav-link:not(.active):hover,
+.panel-tabset .nav-tabs .nav-link:not(.active):focus {
+    border-bottom-color: lighten($wfrc-blue, 15%); // #046da6
+}
+
+// border-bottom-color must match the active tab's own background (not the
+// border-color shorthand on the rule above, which overwrites all four
+// sides uniformly, including bottom) to preserve Bootstrap's "fused to the
+// content pane" illusion.
+.panel-tabset .nav-tabs .nav-link.active {
+    border-bottom-color: lighten($body-bg, 5%); // #0c2a3b
+}
+
+// Active tab and content pane share one background, reading as a single surface
+.panel-tabset .tab-content {
+    background-color: lighten($body-bg, 5%); // #0c2a3b
 }
 
 // WebR cell background
@@ -318,4 +362,10 @@ code span.cn {
 // WebR cell comment color
 .tok-comment {
     color: $body-secondary !important;
+}
+
+// Quarto input panels use Bootstrap's light card background, which clashes with the dark body
+.panel-input {
+  background-color: lighten($body-bg, 5%) !important;
+  color: $body-color;
 }

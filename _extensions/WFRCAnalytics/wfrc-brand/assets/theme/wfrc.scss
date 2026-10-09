@@ -158,6 +158,15 @@ $breadcrumb-divider: quote(">") !default;
     border-radius: 4px 4px 0px 0px;
 }
 
+// Panel tabset — structural only; border/background colors set per-mode.
+// Only the active tab (and an inactive tab on hover) ever shows an
+// individual border, so corner-squaring is the only thing that belongs
+// here at the bare .nav-link level — border-color does NOT, since that
+// would theme every tab's border permanently regardless of state.
+.panel-tabset .nav-tabs .nav-link {
+    border-radius: 0;
+}
+
 // Featured image overlay — uses hardcoded wfrc-blue rgba; acceptable as a
 // brand-permanent value (this overlay is intentional on both modes)
 .featured-image {
