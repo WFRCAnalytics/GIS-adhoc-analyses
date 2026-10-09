@@ -2,6 +2,7 @@
 title: "Transportation Choices"
 subtitle: "Share of population within 1/4 mile of a bike or transit facility, by scenario"
 date: today
+page-layout: full
 ---
 
 ## Purpose
