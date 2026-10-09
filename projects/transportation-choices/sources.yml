@@ -42,31 +42,28 @@ layers:
     description: Utah Bikeways (Facility1 field distinguishes facility type; "Not Available" = no bike facility)
 
   # ── RTP 2027 Preferred Scenario projects ────────────────────────────────────
-  # Same service used by WFRCAnalytics/GIS-RTP-Phasing-Criteria. Layer indices:
-  # 0=Transit_PSPoints, 2=AT_PSPoints, 3=Transit_PSLines, 5=AT_PSLines.
-  # plan_id is the project key on this service (not renamed here -- this
-  # project only needs the geometry for buffering, not per-project IDs).
+  # Public equivalent of the service used by WFRCAnalytics/GIS-RTP-Phasing-Criteria
+  # (switched from the private 062026 draft to the public 092026 vintage). Layer
+  # indices unchanged: 0=Transit_PSPoints, 2=AT_PSPoints, 3=Transit_PSLines,
+  # 5=AT_PSLines. plan_id is the project key on this service (not renamed here --
+  # this project only needs the geometry for buffering, not per-project IDs).
 
   at_point_projects:
-    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/2
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_092026_PUBLIC/FeatureServer/2
     cache: _data/remote/projects/at_points.gpkg
     description: "RTP 2027 AT projects -- points (AT_PSPoints, layer 2)"
-    access: private
 
   at_line_projects:
-    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/5
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_092026_PUBLIC/FeatureServer/5
     cache: _data/remote/projects/at_lines.gpkg
     description: "RTP 2027 AT projects -- lines (AT_PSLines, layer 5)"
-    access: private
 
   transit_point_projects:
-    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/0
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_092026_PUBLIC/FeatureServer/0
     cache: _data/remote/projects/transit_points.gpkg
     description: "RTP 2027 Transit projects -- points (Transit_PSPoints, layer 0)"
-    access: private
 
   transit_line_projects:
-    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/3
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_092026_PUBLIC/FeatureServer/3
     cache: _data/remote/projects/transit_lines.gpkg
     description: "RTP 2027 Transit projects -- lines (Transit_PSLines, layer 3)"
-    access: private

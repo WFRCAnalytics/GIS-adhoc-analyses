@@ -6,71 +6,44 @@ date: today
 
 ## Purpose
 
-How much of the Wasatch Front's population lives somewhere they can actually
-*choose* to bike or take transit instead of drive? Transportation Choices
-answers that with one number per place: the percent of people within 1/4
-mile of a dedicated bike facility, or of a frequent bus route, transit stop,
-or station.
+How much of the Wasatch Front's population lives somewhere they can actually *choose* to bike or take transit instead of drive? Transportation Choices answers that with one number per place: the percent of people within 1/4 mile of a dedicated bike facility, or of a frequent bus route, transit stop, or station.
 
-That number only means something next to a point of comparison, so we
-compute it for three scenarios. Each scenario is a combination of two
-independent inputs that do **not** have to match: a socioeconomic (SE)
-forecast year, and a GIS facility *vintage* year (what's actually built on
-the ground, or assumed built, as of some year).
+That number only means something next to a point of comparison, so we compute it for three scenarios. Each scenario is a combination of two independent inputs that do **not** have to match: a socioeconomic (SE) forecast year, and a GIS facility *vintage* year (what's actually built on the ground, or assumed built, as of some year).
 
 | Scenario | SE year | GIS vintage | Reads as |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | Existing 2027 | 2027 | 2027 | today |
 | No Build 2055 | 2055 | 2032 | 2055's population, with no further facilities built |
 | RTP (Build) 2055 | 2055 | 2055 | 2055's population, with the RTP's planned facilities built |
 
-Comparing No Build against RTP isolates the effect of *building the plan* --
-same future population, different infrastructure. Comparing Existing against
-either 2055 scenario shows how much of that effect is just growth.
+Comparing No Build against RTP isolates the effect of *building the plan* -- same future population, different infrastructure. Comparing Existing against either 2055 scenario shows how much of that effect is just growth.
 
-::: {.callout-important}
+::: callout-important
 ## The 2032 GIS vintage is a placeholder, not real data
 
-Neither mode has a real 2032 facility layer yet -- bike is waiting on a
-layer from Sarah/Hugh (via Suzie), transit on a LIN Stops file from Suzie.
-Until those arrive, 2032 is deliberately defined as "unchanged from 2027"
-(see `GIS_VINTAGES` below), so **No Build 2055 currently only isolates the
-effect of population growth, not a true no-further-investment scenario.**
-Re-run this page once the real 2032 data lands.
+Neither mode has a real 2032 facility layer yet -- bike is waiting on a layer from Sarah/Hugh (via Suzie), transit on a LIN Stops file from Suzie. Until those arrive, 2032 is deliberately defined as "unchanged from 2027" (see `GIS_VINTAGES` below), so **No Build 2055 currently only isolates the effect of population growth, not a true no-further-investment scenario.** Re-run this page once the real 2032 data lands.
 :::
 
-GIS facility data is *incremental* by vintage year and mode: each vintage
-layers new facilities on top of the previous one rather than restating
-everything from scratch. That's what makes the pipeline easy to extend --
-adding a scenario is one line in `SCENARIOS`, and adding a GIS vintage is one
-entry in `GIS_VINTAGES`.
+GIS facility data is *incremental* by vintage year and mode: each vintage layers new facilities on top of the previous one rather than restating everything from scratch. That's what makes the pipeline easy to extend -- adding a scenario is one line in `SCENARIOS`, and adding a GIS vintage is one entry in `GIS_VINTAGES`.
 
-This replaces the `_archive/` v9 arcpy scripts (01-08), which bundled SE and
-facility data together per scenario (so SE year and GIS vintage couldn't
-vary independently) and filtered transit stops with a hardcoded route list.
+This replaces the `_archive/` v9 arcpy scripts (01-08), which bundled SE and facility data together per scenario (so SE year and GIS vintage couldn't vary independently) and filtered transit stops with a hardcoded route list.
 
 ## Data Sources
 
 | Mode | Vintage | What's added | Source |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | Bike | 2027 (base) | On-street bike facilities + trails | `utah_bikeways`, filtered to `Facility1 <> 'Not Available'` |
 | Bike | 2032 | *(placeholder -- not yet available)* | TBD, Sarah/Hugh via Suzie |
-| Bike | 2055 | RTP 2027 Preferred Scenario AT projects | `at_line_projects`, `at_point_projects` |
+| Bike | 2055 | RTP 2027 Preferred Scenario AT projects, line facilities only | `at_line_projects` |
 | Transit | 2027 (base) | Fixed-guideway stations + frequent bus stops | `uta_stops` + `uta_routes` |
 | Transit | 2032 | *(placeholder -- unchanged from 2027)* | LIN Stops, not yet received from Suzie |
-| Transit | 2055 | RTP 2027 Preferred Scenario transit projects | `transit_line_projects`, `transit_point_projects` |
+| Transit | 2055 | RTP 2027 Preferred Scenario transit projects, filtered to LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) | `transit_line_projects`, `transit_point_projects` |
 
-Socioeconomic data is WFRC's v10 forecast, one CSV per year (2023-2065) under
-`_data/raw/SE_v10_20260921/`. TAZ geometry comes from the `WasatchFrontTAZ`
-REST service (`wftcm_taz`).
+Socioeconomic data is WFRC's v10 forecast, one CSV per year (2023-2065) under `_data/raw/SE_v10_20260921/`. TAZ geometry comes from the `WasatchFrontTAZ` REST service (`wftcm_taz`).
 
 ## Setup
 
-Two dictionaries carry all of the above as data rather than as logic:
-`GIS_VINTAGES` encodes what each vintage adds and which earlier vintage it
-builds on, and `SCENARIOS` just points at a `(se_year, gis_year)` pair for
-each named scenario. Nothing downstream needs to change to add a scenario or
-a vintage -- only these two structures do.
+Two dictionaries carry all of the above as data rather than as logic: `GIS_VINTAGES` encodes what each vintage adds and which earlier vintage it builds on, and `SCENARIOS` just points at a `(se_year, gis_year)` pair for each named scenario. Nothing downstream needs to change to add a scenario or a vintage -- only these two structures do.
 
 ```{python}
 #| label: setup
@@ -99,7 +72,7 @@ GIS_VINTAGES = {
     "bike": {
         2027: {"adds": ["utah_bikeways"], "builds_on": None},
         2032: {"adds": [], "builds_on": 2027},  # placeholder: layer TBD (Sarah/Hugh via Suzie)
-        2055: {"adds": ["at_line_projects", "at_point_projects"], "builds_on": 2032},
+        2055: {"adds": ["at_line_projects"], "builds_on": 2032},
     },
     "transit": {
         2027: {"adds": ["uta_stops", "uta_routes"], "builds_on": None},
@@ -118,9 +91,7 @@ SCENARIOS = [
 
 ## Data Acquisition
 
-Every REST layer any vintage needs gets fetched once, up front, by reading
-the keys straight out of `GIS_VINTAGES` -- add a layer to a vintage and it's
-automatically requested here too.
+Every REST layer any vintage needs gets fetched once, up front, by reading the keys straight out of `GIS_VINTAGES` -- add a layer to a vintage and it's automatically requested here too.
 
 ```{python}
 #| label: fetch-rest-layers
@@ -136,31 +107,29 @@ print(f"Fetched {len(L)} REST layers: {rest_keys}")
 ```{python}
 #| label: check-se-years
 
-se_years_available = sorted(int(p.stem.removeprefix("SE_")) for p in PATHS["se_dir"].glob("SE_*.csv"))
+se_years_available = sorted(
+    int(p.stem.removeprefix("SE_")) for p in PATHS["se_dir"].glob("SE_*.csv")
+)
 assert se_years_available, f"No SE files found under {PATHS['se_dir']}"
 for scenario in SCENARIOS:
     assert scenario["se_year"] in se_years_available, (
         f"Scenario {scenario['name']!r} needs SE_{scenario['se_year']}.csv -- not found"
     )
-print(f"SE years available: {se_years_available[0]}-{se_years_available[-1]} ({len(se_years_available)} files)")
+print(
+    f"SE years available: {se_years_available[0]}-{se_years_available[-1]} ({len(se_years_available)} files)"
+)
 print("All scenario SE years present.")
 ```
 
-::: {.callout-note}
+::: callout-note
 ## Workshop-area geography is not reported yet
 
-The v9 pipeline summarized results by workshop area as well as region and
-county. No v10 boundary source has been identified for that geography level
--- it will be added to `GEOGRAPHY_LEVELS` in @sec-compute once one exists.
+The v9 pipeline summarized results by workshop area as well as region and county. No v10 boundary source has been identified for that geography level -- it will be added to `GEOGRAPHY_LEVELS` in @sec-compute once one exists.
 :::
 
 ## Build Facility Geometry — Bike {#sec-bike-geometry}
 
-Bike facilities are line geometry, buffered directly: `utah_bikeways`'s
-`Facility1` field distinguishes facility type, and `"Not Available"` is the
-only value that means *no* bike facility, so everything else -- on-street
-bike lanes and trails alike -- is existing network. The 2055 vintage adds
-the RTP 2027 Preferred Scenario's active-transportation projects as-is.
+Bike facilities are line geometry, buffered directly: `utah_bikeways`'s `Facility1` field distinguishes facility type, and `"Not Available"` is the only value that means *no* bike facility, so everything else -- on-street bike lanes and trails alike -- is existing network. The 2055 vintage adds the RTP 2027 Preferred Scenario's active-transportation **line** projects as-is -- every row in `at_line_projects` is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching `utah_bikeways`'s own facility categories. The companion point layer (`at_point_projects`) is pedestrian/bike crossings, not bike-path segments, so it's excluded here -- `WFRCAnalytics/GIS-RTP-Phasing-Criteria` treats those crossings as a separate network-connectivity attribute rather than part of the facility network.
 
 ```{python}
 #| label: bike-raw-by-vintage
@@ -170,27 +139,13 @@ bike_raw = {
         L["utah_bikeways"], where="Facility1 IS NOT NULL AND Facility1 <> 'Not Available'"
     ).to_crs(CRS)[["geometry"]],
     2032: gpd.GeoDataFrame(geometry=[], crs=CRS),  # placeholder: 2032 bike layer TBD
-    2055: gpd.GeoDataFrame(
-        pd.concat(
-            [
-                gpd.read_file(L["at_line_projects"]).to_crs(CRS)[["geometry"]],
-                gpd.read_file(L["at_point_projects"]).to_crs(CRS)[["geometry"]],
-            ],
-            ignore_index=True,
-        ),
-        geometry="geometry",
-        crs=CRS,
-    ),
+    2055: gpd.read_file(L["at_line_projects"]).to_crs(CRS)[["geometry"]],
 }
 for year, gdf in bike_raw.items():
     print(f"Bike {year} adds: {len(gdf)} features")
 ```
 
-Each vintage's cumulative network is its own `adds` plus everything the
-vintage it `builds_on` already had -- so a vintage with nothing new yet
-(2032, for now) is simply identical to the vintage beneath it, not empty.
-Buffering and dissolving that cumulative network once per vintage gives the
-geometry every scenario needing that vintage can reuse.
+Each vintage's cumulative network is its own `adds` plus everything the vintage it `builds_on` already had -- so a vintage with nothing new yet (2032, for now) is simply identical to the vintage beneath it, not empty. Buffering and dissolving that cumulative network once per vintage gives the geometry every scenario needing that vintage can reuse.
 
 ```{python}
 #| label: bike-buffers-by-vintage
@@ -199,7 +154,9 @@ bike_cum = {}
 for year in sorted(GIS_VINTAGES["bike"]):
     builds_on = GIS_VINTAGES["bike"][year]["builds_on"]
     parts = [bike_raw[year]] if builds_on is None else [bike_cum[builds_on], bike_raw[year]]
-    bike_cum[year] = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), geometry="geometry", crs=CRS)
+    bike_cum[year] = gpd.GeoDataFrame(
+        pd.concat(parts, ignore_index=True), geometry="geometry", crs=CRS
+    )
 
 bike_buffers = {
     year: gpd.GeoDataFrame(geometry=[cum.buffer(CONSTANTS["buffer_m"]).union_all()], crs=CRS)
@@ -211,37 +168,36 @@ for year, cum in bike_cum.items():
 
 ## Build Facility Geometry — Transit {#sec-transit-geometry}
 
-Transit works differently in a way that matters for the buffer, not just the
-source: it's built from **stop/station points**, never from route
-linework, and only from a *subset* of stops --
+Transit works differently in a way that matters for the buffer, not just the source: it's built from **stop/station points**, never from route linework, and only from a *subset* of stops --
 
-1. LRT/CRT fixed-guideway stations, caught by `mode` containing `TRAX` or
-   `FrontRunner`, and
-2. **frequent bus stops only** -- `uta_routes` filtered to the
-   frequent/fixed-guideway service tiers, matched back to stops through the
-   comma-separated `route` field.
+1.  LRT/CRT fixed-guideway stations, caught by `mode` containing `TRAX` or `FrontRunner`, and
+2.  **frequent bus stops only** -- `uta_routes` filtered to the frequent/fixed-guideway service tiers, matched back to stops through the comma-separated `route` field.
 
-Every other bus stop is excluded. This two-part filter replaces v9's
-hardcoded route list with something that updates itself as UTA's service
-changes.
+Every other bus stop is excluded. This two-part filter replaces v9's hardcoded route list with something that updates itself as UTA's service changes.
 
 ```{python}
 #| label: transit-2027-base
 
 _HF_ROUTETYPES_SQL = "'Frequent','BRT','Blue Line','Red Line','Green Line','S Line','FrontRunner'"
 hf_route_abbrs = set(
-    gpd.read_file(L["uta_routes"], where=f"routetype IN ({_HF_ROUTETYPES_SQL})")["lineabbr"].astype(str)
+    gpd.read_file(L["uta_routes"], where=f"routetype IN ({_HF_ROUTETYPES_SQL})")["lineabbr"].astype(
+        str
+    )
 )
 
 stops_raw = gpd.read_file(L["uta_stops"]).to_crs(CRS)
 fixed_guideway = stops_raw[stops_raw["mode"].str.contains("TRAX|FrontRunner|BRT", na=False)]
 hf_routes = stops_raw[
     stops_raw["route"].apply(
-        lambda r: False if pd.isna(r) else bool({t.strip() for t in str(r).split(",")} & hf_route_abbrs)
+        lambda r: (
+            False if pd.isna(r) else bool({t.strip() for t in str(r).split(",")} & hf_route_abbrs)
+        )
     )
 ]
 transit_2027 = gpd.GeoDataFrame(
-    pd.concat([fixed_guideway[["geometry"]], hf_routes[["geometry"]]], ignore_index=True).drop_duplicates(),
+    pd.concat(
+        [fixed_guideway[["geometry"]], hf_routes[["geometry"]]], ignore_index=True
+    ).drop_duplicates(),
     geometry="geometry",
     crs=CRS,
 )
@@ -250,16 +206,23 @@ print(f"Frequent-route stops:      {len(hf_routes)}")
 print(f"Transit 2027 base (dedup): {len(transit_2027)}")
 ```
 
-The 2055 vintage adds the RTP's transit projects, but a planned rail or BRT
-corridor arrives as a line, not a point -- so each line project is reduced
-to its centroid here, keeping the whole transit buffer point-based rather
-than letting new corridors buffer like a continuous bike facility would.
+The 2055 vintage adds the RTP's transit projects, but a planned rail or BRT corridor arrives as a line, not a point -- so each line project is reduced to its centroid here, keeping the whole transit buffer point-based rather than letting new corridors buffer like a continuous bike facility would. Not every project qualifies, though: only LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) project types count toward this mode, mirroring the Rail/BRT buffer-tier grouping `WFRCAnalytics/GIS-RTP-Phasing-Criteria` uses (which buffers FrontRunner, TRAX, and the Sugar House Streetcar together as one fixed-guideway-equivalent tier, separate from core local bus). Exploratory corridors, corridor preservation, transit/mobility hubs, maintenance facilities, park & rides, and gondolas are excluded -- they aren't LRT/CRT/high-frequency-bus stops themselves.
 
 ```{python}
 #| label: transit-raw-by-vintage
 
-transit_2055_lines = gpd.read_file(L["transit_line_projects"]).to_crs(CRS)
-transit_2055_points = gpd.read_file(L["transit_point_projects"]).to_crs(CRS)
+# RTP project types that count as LRT/CRT/streetcar rail or high-frequency bus --
+# excludes exploratory corridors, corridor preservation, transit/mobility hubs,
+# maintenance facilities, park & rides, and gondolas (see prose above).
+_TRANSIT_LINE_TYPES_SQL = "'Light Rail','Commuter Rail','Street Car','Bus Rapid Transit','Enhanced Bus'"
+_TRANSIT_POINT_TYPES_SQL = "'New Station'"
+
+transit_2055_lines = gpd.read_file(
+    L["transit_line_projects"], where=f"improvement_type IN ({_TRANSIT_LINE_TYPES_SQL})"
+).to_crs(CRS)
+transit_2055_points = gpd.read_file(
+    L["transit_point_projects"], where=f"improvement_type IN ({_TRANSIT_POINT_TYPES_SQL})"
+).to_crs(CRS)
 transit_raw = {
     2027: transit_2027,
     2032: gpd.GeoDataFrame(geometry=[], crs=CRS),  # placeholder: LIN Stops file from Suzie
@@ -285,8 +248,12 @@ for year, gdf in transit_raw.items():
 transit_cum = {}
 for year in sorted(GIS_VINTAGES["transit"]):
     builds_on = GIS_VINTAGES["transit"][year]["builds_on"]
-    parts = [transit_raw[year]] if builds_on is None else [transit_cum[builds_on], transit_raw[year]]
-    transit_cum[year] = gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), geometry="geometry", crs=CRS)
+    parts = (
+        [transit_raw[year]] if builds_on is None else [transit_cum[builds_on], transit_raw[year]]
+    )
+    transit_cum[year] = gpd.GeoDataFrame(
+        pd.concat(parts, ignore_index=True), geometry="geometry", crs=CRS
+    )
 
 transit_buffers = {
     year: gpd.GeoDataFrame(geometry=[cum.buffer(CONSTANTS["buffer_m"]).union_all()], crs=CRS)
@@ -298,11 +265,7 @@ for year, cum in transit_cum.items():
 
 ## Prepare TAZ Geography
 
-TAZ geometry itself doesn't change across scenarios -- only the population
-joined onto it does (that happens in @sec-compute, per scenario). So this
-runs once: filter to the four WFRC counties, and add the fields every
-downstream calculation needs -- `Region` (a constant, for the region-level
-rollup), `CountyName`, and each TAZ's total area in acres.
+TAZ geometry itself doesn't change across scenarios -- only the population joined onto it does (that happens in @sec-compute, per scenario). So this runs once: filter to the four WFRC counties, and add the fields every downstream calculation needs -- `Region` (a constant, for the region-level rollup), `CountyName`, and each TAZ's total area in acres.
 
 ```{python}
 #| label: prepare-taz
@@ -319,15 +282,7 @@ print(f"TAZ after county filter: {len(taz)} (from {len(taz_raw)})")
 
 ## Compute Compatible-Area % by Scenario {#sec-compute}
 
-We don't know how population is distributed *within* a TAZ, only its total
--- so where a facility buffer only partly covers a TAZ, we assume population
-spreads evenly across the TAZ's area and credit that TAZ with the same
-share of its population: `HHPOPPiece = HHPOP * (piece area / total area)`.
-Summing `HHPOPPiece` over all pieces and dividing by total `HHPOP` for a
-geography gives the percent of its population within 1/4 mile of a
-facility -- which is exactly `SCENARIOS × modes × geography levels` worth of
-one number each, so the result is a single tidy table rather than the nine
-separate CSVs the old per-scenario scripts produced.
+We don't know how population is distributed *within* a TAZ, only its total -- so where a facility buffer only partly covers a TAZ, we assume population spreads evenly across the TAZ's area and credit that TAZ with the same share of its population: `HHPOPPiece = HHPOP * (piece area / total area)`. Summing `HHPOPPiece` over all pieces and dividing by total `HHPOP` for a geography gives the percent of its population within 1/4 mile of a facility -- which is exactly `SCENARIOS × modes × geography levels` worth of one number each, so the result is a single tidy table rather than the nine separate CSVs the old per-scenario scripts produced.
 
 ```{python}
 #| label: compute-tidy-results
@@ -341,7 +296,9 @@ for scenario in SCENARIOS:
     se = pd.read_csv(se_path)
     se.columns = se.columns.str.lstrip(";")  # v10 export has a stray leading ';' on the header row
 
-    taz_se = taz.merge(se[[CONSTANTS["se_join_field"], "HHPOP"]], on=CONSTANTS["se_join_field"], how="left")
+    taz_se = taz.merge(
+        se[[CONSTANTS["se_join_field"], "HHPOP"]], on=CONSTANTS["se_join_field"], how="left"
+    )
 
     for mode, buffers in (("bike", bike_buffers), ("transit", transit_buffers)):
         pieces = gpd.overlay(taz_se, buffers[scenario["gis_year"]], how="intersection")
@@ -350,7 +307,9 @@ for scenario in SCENARIOS:
 
         for level in GEOGRAPHY_LEVELS:
             totals = taz_se.groupby(level)["HHPOP"].sum()
-            piece_totals = pieces.groupby(level)["HHPOPPiece"].sum().reindex(totals.index, fill_value=0)
+            piece_totals = (
+                pieces.groupby(level)["HHPOPPiece"].sum().reindex(totals.index, fill_value=0)
+            )
             pct = piece_totals / totals
             for geography_name, value in pct.items():
                 results.append(
@@ -367,15 +326,15 @@ for scenario in SCENARIOS:
 
 tidy = pd.DataFrame(results)
 print(f"Tidy results: {len(tidy)} rows")
-assert tidy["pct_near_facility"].between(0, 1).all(), "Percentage outside [0, 1] -- check overlay/weighting"
+assert tidy["pct_near_facility"].between(0, 1).all(), (
+    "Percentage outside [0, 1] -- check overlay/weighting"
+)
 tidy.head()
 ```
 
 ## Outputs
 
-One CSV per scenario, each long-format across modes and geography levels --
-easier for a planner to open and filter than nine narrow files, and named so
-each scenario's file is unambiguous on its own.
+One CSV per scenario, each long-format across modes and geography levels -- easier for a planner to open and filter than nine narrow files, and named so each scenario's file is unambiguous on its own.
 
 ```{python}
 #| label: write-outputs
@@ -389,13 +348,7 @@ for scenario in SCENARIOS:
 
 ## Visualization
 
-No Build 2055 and RTP 2055 are **alternate futures**, not consecutive years
--- both branch from the same Existing 2027 baseline, so each chart draws two
-separate lines per county forking from that shared starting point: dashed
-for No Build, solid for RTP. Pick one or more counties below; both charts
-update together, and the gray lines are always the WFRC region, so any
-county reads directly against the regional reference rather than in
-isolation. Hover any point for its exact value.
+No Build 2055 and RTP 2055 are **alternate futures**, not consecutive years -- both branch from the same Existing 2027 baseline, so each chart draws two separate lines per county forking from that shared starting point: dashed for No Build, solid for RTP. Pick one or more counties below; both charts update together, and the gray lines are always the WFRC region, so any county reads directly against the regional reference rather than in isolation. Hover any point for its exact value.
 
 ```{python}
 #| label: to-ojs
@@ -565,24 +518,15 @@ modeChart("bike", "Bike", "Share of population within 1/4 mile of a dedicated bi
 modeChart("transit", "Transit", "Share of population within 1/4 mile of a frequent bus stop, station, or line")
 ```
 
-::: {.callout-note}
+::: callout-note
 ## Known rough edges
 
-This is a first pass, not a final design: colors are tuned for light mode
-only (no separate dark-mode palette yet), the fork layout hardcodes
-`existing_2027`/`no_build_2055`/`rtp_2055` as the three scenario names
-(adding a fourth scenario -- e.g. a second "build" alternative -- needs
-`branchRows()` updated, not just `SCENARIOS`), and the "pp vs No Build"
-annotation quietly disappears rather than erroring if either 2055 scenario
-is renamed or removed.
+This is a first pass, not a final design: colors are tuned for light mode only (no separate dark-mode palette yet), the fork layout hardcodes `existing_2027`/`no_build_2055`/`rtp_2055` as the three scenario names (adding a fourth scenario -- e.g. a second "build" alternative -- needs `branchRows()` updated, not just `SCENARIOS`), and the "pp vs No Build" annotation quietly disappears rather than erroring if either 2055 scenario is renamed or removed.
 :::
 
 ### At a Glance
 
-The region-level headline from the charts above, as a static summary --
-easier to screenshot, print, or drop into a slide than an interactive
-chart. Saved to `output/region_pct.png`, which the repo homepage also
-embeds directly, so it's the same image in both places, not a separate one.
+The region-level headline from the charts above, as a static summary -- easier to screenshot, print, or drop into a slide than an interactive chart. Saved to `output/region_pct.png`, which the repo homepage also embeds directly, so it's the same image in both places, not a separate one.
 
 ```{python}
 #| label: fig-region-pct
@@ -593,16 +537,27 @@ import matplotlib.pyplot as plt
 
 region = tidy[tidy["geography_level"] == "Region"].copy()
 scenario_order = [s["name"] for s in SCENARIOS]
-scenario_labels = {"existing_2027": "Existing\n2027", "no_build_2055": "No Build\n2055", "rtp_2055": "RTP\n2055"}
+scenario_labels = {
+    "existing_2027": "Existing\n2027",
+    "no_build_2055": "No Build\n2055",
+    "rtp_2055": "RTP\n2055",
+}
 region["scenario"] = pd.Categorical(region["scenario"], categories=scenario_order, ordered=True)
 region = region.sort_values("scenario")
 
-MODE_COLORS = {"bike": "#036fa8", "transit": "#9d4879"}  # brand blue / rtp-fuschia -- fixed order, not cycled
+MODE_COLORS = {
+    "bike": "#036fa8",
+    "transit": "#9d4879",
+}  # brand blue / rtp-fuschia -- fixed order, not cycled
 INK = "#023c5b"  # brand wfrc-blue
 BG = "#fbf9f4"  # matches the interactive charts above
 
-bike_existing = region.query("mode == 'bike' and scenario == 'existing_2027'")["pct_near_facility"].iloc[0]
-transit_existing = region.query("mode == 'transit' and scenario == 'existing_2027'")["pct_near_facility"].iloc[0]
+bike_existing = region.query("mode == 'bike' and scenario == 'existing_2027'")[
+    "pct_near_facility"
+].iloc[0]
+transit_existing = region.query("mode == 'transit' and scenario == 'existing_2027'")[
+    "pct_near_facility"
+].iloc[0]
 
 # Editorial bar-chart treatment: headline + deck above the chart, direct
 # value labels on each bar instead of a y-axis, an inline color key instead
@@ -621,18 +576,35 @@ bar_width = 0.32
 x_positions = {"existing_2027": 0.0, "no_build_2055": 1.6, "rtp_2055": 2.6}
 x = [x_positions[s] for s in scenario_order]
 for i, mode in enumerate(("bike", "transit")):
-    vals = region[region["mode"] == mode].set_index("scenario")["pct_near_facility"].reindex(scenario_order) * 100
+    vals = (
+        region[region["mode"] == mode]
+        .set_index("scenario")["pct_near_facility"]
+        .reindex(scenario_order)
+        * 100
+    )
     offset = (i - 0.5) * bar_width
     ax.bar([xi + offset for xi in x], vals, width=bar_width, color=MODE_COLORS[mode], zorder=3)
     for xi, v in zip(x, vals):
-        ax.text(xi + offset, v + 3, f"{v:.0f}%", ha="center", va="bottom", fontsize=10.5, fontweight="bold", color=MODE_COLORS[mode])
+        ax.text(
+            xi + offset,
+            v + 3,
+            f"{v:.0f}%",
+            ha="center",
+            va="bottom",
+            fontsize=10.5,
+            fontweight="bold",
+            color=MODE_COLORS[mode],
+        )
 
 # Divider + bracket reinforce the same point visually: a dotted line splits
 # the baseline from the 2055 pair, and a bracket spans only the pair it
 # actually groups.
 divider_x = (x_positions["existing_2027"] + x_positions["no_build_2055"]) / 2
 ax.axvline(divider_x, color=INK, alpha=0.15, linestyle=":", linewidth=1, zorder=1)
-bracket_left, bracket_right = x_positions["no_build_2055"] - bar_width, x_positions["rtp_2055"] + bar_width
+bracket_left, bracket_right = (
+    x_positions["no_build_2055"] - bar_width,
+    x_positions["rtp_2055"] + bar_width,
+)
 ax.plot(
     [bracket_left, bracket_left, bracket_right, bracket_right],
     [103, 106, 106, 103],
@@ -640,7 +612,16 @@ ax.plot(
     linewidth=1,
     zorder=4,
 )
-ax.text((bracket_left + bracket_right) / 2, 108, "2055 — two alternative futures", ha="center", va="bottom", fontsize=9.5, style="italic", color=INK)
+ax.text(
+    (bracket_left + bracket_right) / 2,
+    108,
+    "2055 — two alternative futures",
+    ha="center",
+    va="bottom",
+    fontsize=9.5,
+    style="italic",
+    color=INK,
+)
 
 ax.set_xticks(x)
 ax.set_xticklabels([scenario_labels[s] for s in scenario_order], fontsize=11, color=INK)
@@ -653,7 +634,16 @@ ax.spines["bottom"].set_color(INK)
 ax.spines["bottom"].set_linewidth(1)
 ax.tick_params(length=0)
 
-fig.text(0.03, 0.95, "Bike access far outpaces transit, in every scenario", ha="left", va="top", fontsize=15, fontweight="bold", color=INK)
+fig.text(
+    0.03,
+    0.95,
+    "Bike access far outpaces transit, in every scenario",
+    ha="left",
+    va="top",
+    fontsize=15,
+    fontweight="bold",
+    color=INK,
+)
 fig.text(
     0.03,
     0.88,
@@ -667,7 +657,15 @@ fig.text(0.03, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS[
 fig.text(0.05, 0.805, "Bike", ha="left", va="top", fontsize=10.5, color=INK)
 fig.text(0.115, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["transit"])
 fig.text(0.135, 0.805, "Transit", ha="left", va="top", fontsize=10.5, color=INK)
-fig.text(0.03, 0.03, "Source: WFRC Transportation Choices analysis (v10)", ha="left", fontsize=8.5, color="#8a8f98", style="italic")
+fig.text(
+    0.03,
+    0.03,
+    "Source: WFRC Transportation Choices analysis (v10)",
+    ha="left",
+    fontsize=8.5,
+    color="#8a8f98",
+    style="italic",
+)
 
 fig.savefig(PATHS["output"] / "region_pct.png", facecolor=fig.get_facecolor(), dpi=150)
 plt.show()
