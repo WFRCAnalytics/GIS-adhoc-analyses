@@ -533,7 +533,10 @@ The region-level headline from the charts above, as a static summary -- easier t
 #| fig-cap: "Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."
 #| fig-alt: "Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP."
 
+import matplotlib
 import matplotlib.pyplot as plt
+
+matplotlib.rcParams["font.family"] = "Poppins"  # matches center-buildout-capacity's branding
 
 region = tidy[tidy["geography_level"] == "Region"].copy()
 scenario_order = [s["name"] for s in SCENARIOS]
@@ -592,7 +595,7 @@ for i, mode in enumerate(("bike", "transit")):
             ha="center",
             va="bottom",
             fontsize=10.5,
-            fontweight="bold",
+            fontfamily="Poppins SemiBold",
             color=MODE_COLORS[mode],
         )
 
@@ -641,7 +644,7 @@ fig.text(
     ha="left",
     va="top",
     fontsize=15,
-    fontweight="bold",
+    fontfamily="Poppins SemiBold",
     color=INK,
 )
 fig.text(
@@ -653,9 +656,17 @@ fig.text(
     fontsize=10.5,
     color="#55595e",
 )
-fig.text(0.03, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["bike"])
+# Poppins has no glyph for "●" (renders as tofu) -- fall back to DejaVu Sans
+# for just the bullet markers, keep Poppins for the labels.
+fig.text(
+    0.03, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["bike"],
+    fontfamily="DejaVu Sans",
+)
 fig.text(0.05, 0.805, "Bike", ha="left", va="top", fontsize=10.5, color=INK)
-fig.text(0.115, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["transit"])
+fig.text(
+    0.115, 0.80, "●", ha="left", va="top", fontsize=13, color=MODE_COLORS["transit"],
+    fontfamily="DejaVu Sans",
+)
 fig.text(0.135, 0.805, "Transit", ha="left", va="top", fontsize=10.5, color=INK)
 fig.text(
     0.03,

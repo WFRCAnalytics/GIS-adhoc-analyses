@@ -1211,148 +1211,159 @@ Figure&nbsp;2
 <div id="cell-fig-region-pct" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> tidy[tidy[<span class="st">"geography_level"</span>] <span class="op">==</span> <span class="st">"Region"</span>].copy()</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>scenario_order <span class="op">=</span> [s[<span class="st">"name"</span>] <span class="cf">for</span> s <span class="kw">in</span> SCENARIOS]</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>scenario_labels <span class="op">=</span> {</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"existing_2027"</span>: <span class="st">"Existing</span><span class="ch">\n</span><span class="st">2027"</span>,</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"no_build_2055"</span>: <span class="st">"No Build</span><span class="ch">\n</span><span class="st">2055"</span>,</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rtp_2055"</span>: <span class="st">"RTP</span><span class="ch">\n</span><span class="st">2055"</span>,</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>region[<span class="st">"scenario"</span>] <span class="op">=</span> pd.Categorical(region[<span class="st">"scenario"</span>], categories<span class="op">=</span>scenario_order, ordered<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> region.sort_values(<span class="st">"scenario"</span>)</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>MODE_COLORS <span class="op">=</span> {</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bike"</span>: <span class="st">"#036fa8"</span>,</span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transit"</span>: <span class="st">"#9d4879"</span>,</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>}  <span class="co"># brand blue / rtp-fuschia -- fixed order, not cycled</span></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>INK <span class="op">=</span> <span class="st">"#023c5b"</span>  <span class="co"># brand wfrc-blue</span></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>BG <span class="op">=</span> <span class="st">"#fbf9f4"</span>  <span class="co"># matches the interactive charts above</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>bike_existing <span class="op">=</span> region.query(<span class="st">"mode == 'bike' and scenario == 'existing_2027'"</span>)[</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pct_near_facility"</span></span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>].iloc[<span class="dv">0</span>]</span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>transit_existing <span class="op">=</span> region.query(<span class="st">"mode == 'transit' and scenario == 'existing_2027'"</span>)[</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>matplotlib.rcParams[<span class="st">"font.family"</span>] <span class="op">=</span> <span class="st">"Poppins"</span>  <span class="co"># matches center-buildout-capacity's branding</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> tidy[tidy[<span class="st">"geography_level"</span>] <span class="op">==</span> <span class="st">"Region"</span>].copy()</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>scenario_order <span class="op">=</span> [s[<span class="st">"name"</span>] <span class="cf">for</span> s <span class="kw">in</span> SCENARIOS]</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>scenario_labels <span class="op">=</span> {</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"existing_2027"</span>: <span class="st">"Existing</span><span class="ch">\n</span><span class="st">2027"</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"no_build_2055"</span>: <span class="st">"No Build</span><span class="ch">\n</span><span class="st">2055"</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rtp_2055"</span>: <span class="st">"RTP</span><span class="ch">\n</span><span class="st">2055"</span>,</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>region[<span class="st">"scenario"</span>] <span class="op">=</span> pd.Categorical(region[<span class="st">"scenario"</span>], categories<span class="op">=</span>scenario_order, ordered<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> region.sort_values(<span class="st">"scenario"</span>)</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>MODE_COLORS <span class="op">=</span> {</span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bike"</span>: <span class="st">"#036fa8"</span>,</span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transit"</span>: <span class="st">"#9d4879"</span>,</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>}  <span class="co"># brand blue / rtp-fuschia -- fixed order, not cycled</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>INK <span class="op">=</span> <span class="st">"#023c5b"</span>  <span class="co"># brand wfrc-blue</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>BG <span class="op">=</span> <span class="st">"#fbf9f4"</span>  <span class="co"># matches the interactive charts above</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>bike_existing <span class="op">=</span> region.query(<span class="st">"mode == 'bike' and scenario == 'existing_2027'"</span>)[</span>
 <span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pct_near_facility"</span></span>
 <span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>].iloc[<span class="dv">0</span>]</span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Editorial bar-chart treatment: headline + deck above the chart, direct</span></span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="co"># value labels on each bar instead of a y-axis, an inline color key instead</span></span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="co"># of a boxed legend, and a small source caption -- no gridlines or borders</span></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="co"># competing with the numbers themselves.</span></span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">8.5</span>, <span class="fl">5.5</span>))</span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(BG)</span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>ax.set_facecolor(BG)</span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(top<span class="op">=</span><span class="fl">0.76</span>, bottom<span class="op">=</span><span class="fl">0.16</span>, left<span class="op">=</span><span class="fl">0.03</span>, right<span class="op">=</span><span class="fl">0.97</span>)</span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>bar_width <span class="op">=</span> <span class="fl">0.32</span></span>
-<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Existing 2027 sits apart on its own; No Build and RTP sit close together</span></span>
-<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a><span class="co"># as a pair -- uneven spacing (not evenly-spaced ticks) so the layout itself</span></span>
-<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a><span class="co"># signals "one baseline, two alternative 2055 outcomes" rather than a</span></span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="co"># three-step timeline.</span></span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>x_positions <span class="op">=</span> {<span class="st">"existing_2027"</span>: <span class="fl">0.0</span>, <span class="st">"no_build_2055"</span>: <span class="fl">1.6</span>, <span class="st">"rtp_2055"</span>: <span class="fl">2.6</span>}</span>
-<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [x_positions[s] <span class="cf">for</span> s <span class="kw">in</span> scenario_order]</span>
-<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, mode <span class="kw">in</span> <span class="bu">enumerate</span>((<span class="st">"bike"</span>, <span class="st">"transit"</span>)):</span>
-<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> (</span>
-<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>        region[region[<span class="st">"mode"</span>] <span class="op">==</span> mode]</span>
-<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>        .set_index(<span class="st">"scenario"</span>)[<span class="st">"pct_near_facility"</span>]</span>
-<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>        .reindex(scenario_order)</span>
-<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>        <span class="op">*</span> <span class="dv">100</span></span>
-<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> (i <span class="op">-</span> <span class="fl">0.5</span>) <span class="op">*</span> bar_width</span>
-<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>    ax.bar([xi <span class="op">+</span> offset <span class="cf">for</span> xi <span class="kw">in</span> x], vals, width<span class="op">=</span>bar_width, color<span class="op">=</span>MODE_COLORS[mode], zorder<span class="op">=</span><span class="dv">3</span>)</span>
-<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xi, v <span class="kw">in</span> <span class="bu">zip</span>(x, vals):</span>
-<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>        ax.text(</span>
-<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>            xi <span class="op">+</span> offset,</span>
-<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>            v <span class="op">+</span> <span class="dv">3</span>,</span>
-<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.0f}</span><span class="ss">%"</span>,</span>
-<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a>            ha<span class="op">=</span><span class="st">"center"</span>,</span>
-<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a>            va<span class="op">=</span><span class="st">"bottom"</span>,</span>
-<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="fl">10.5</span>,</span>
-<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a>            fontweight<span class="op">=</span><span class="st">"bold"</span>,</span>
-<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a>            color<span class="op">=</span>MODE_COLORS[mode],</span>
-<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a><span class="co"># Divider + bracket reinforce the same point visually: a dotted line splits</span></span>
-<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a><span class="co"># the baseline from the 2055 pair, and a bracket spans only the pair it</span></span>
-<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a><span class="co"># actually groups.</span></span>
-<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a>divider_x <span class="op">=</span> (x_positions[<span class="st">"existing_2027"</span>] <span class="op">+</span> x_positions[<span class="st">"no_build_2055"</span>]) <span class="op">/</span> <span class="dv">2</span></span>
-<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a>ax.axvline(divider_x, color<span class="op">=</span>INK, alpha<span class="op">=</span><span class="fl">0.15</span>, linestyle<span class="op">=</span><span class="st">":"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, zorder<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>bracket_left, bracket_right <span class="op">=</span> (</span>
-<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>    x_positions[<span class="st">"no_build_2055"</span>] <span class="op">-</span> bar_width,</span>
-<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>    x_positions[<span class="st">"rtp_2055"</span>] <span class="op">+</span> bar_width,</span>
-<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
-<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a>    [bracket_left, bracket_left, bracket_right, bracket_right],</span>
-<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">103</span>, <span class="dv">106</span>, <span class="dv">106</span>, <span class="dv">103</span>],</span>
-<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
-<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a>    zorder<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a>ax.text(</span>
-<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a>    (bracket_left <span class="op">+</span> bracket_right) <span class="op">/</span> <span class="dv">2</span>,</span>
-<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a>    <span class="dv">108</span>,</span>
-<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2055 — two alternative futures"</span>,</span>
-<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"center"</span>,</span>
-<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"bottom"</span>,</span>
-<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">9.5</span>,</span>
-<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"italic"</span>,</span>
-<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
-<span id="cb27-89"><a href="#cb27-89" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-90"><a href="#cb27-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-91"><a href="#cb27-91" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(x)</span>
-<span id="cb27-92"><a href="#cb27-92" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([scenario_labels[s] <span class="cf">for</span> s <span class="kw">in</span> scenario_order], fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>INK)</span>
-<span id="cb27-93"><a href="#cb27-93" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(x_positions[<span class="st">"existing_2027"</span>] <span class="op">-</span> <span class="fl">0.6</span>, x_positions[<span class="st">"rtp_2055"</span>] <span class="op">+</span> <span class="fl">0.6</span>)</span>
-<span id="cb27-94"><a href="#cb27-94" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">118</span>)</span>
-<span id="cb27-95"><a href="#cb27-95" aria-hidden="true" tabindex="-1"></a>ax.set_yticks([])</span>
-<span id="cb27-96"><a href="#cb27-96" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> side <span class="kw">in</span> (<span class="st">"top"</span>, <span class="st">"right"</span>, <span class="st">"left"</span>):</span>
-<span id="cb27-97"><a href="#cb27-97" aria-hidden="true" tabindex="-1"></a>    ax.spines[side].set_visible(<span class="va">False</span>)</span>
-<span id="cb27-98"><a href="#cb27-98" aria-hidden="true" tabindex="-1"></a>ax.spines[<span class="st">"bottom"</span>].set_color(INK)</span>
-<span id="cb27-99"><a href="#cb27-99" aria-hidden="true" tabindex="-1"></a>ax.spines[<span class="st">"bottom"</span>].set_linewidth(<span class="dv">1</span>)</span>
-<span id="cb27-100"><a href="#cb27-100" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb27-101"><a href="#cb27-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-102"><a href="#cb27-102" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
-<span id="cb27-103"><a href="#cb27-103" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
-<span id="cb27-104"><a href="#cb27-104" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.95</span>,</span>
-<span id="cb27-105"><a href="#cb27-105" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Bike access far outpaces transit, in every scenario"</span>,</span>
-<span id="cb27-106"><a href="#cb27-106" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
-<span id="cb27-107"><a href="#cb27-107" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
-<span id="cb27-108"><a href="#cb27-108" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="dv">15</span>,</span>
-<span id="cb27-109"><a href="#cb27-109" aria-hidden="true" tabindex="-1"></a>    fontweight<span class="op">=</span><span class="st">"bold"</span>,</span>
-<span id="cb27-110"><a href="#cb27-110" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
-<span id="cb27-111"><a href="#cb27-111" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-112"><a href="#cb27-112" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
-<span id="cb27-113"><a href="#cb27-113" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
-<span id="cb27-114"><a href="#cb27-114" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.88</span>,</span>
-<span id="cb27-115"><a href="#cb27-115" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Share of WFRC-region population within 1/4 mile of a facility — today, </span><span class="sc">{</span>bike_existing <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% for bike vs </span><span class="sc">{</span>transit_existing <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% for transit"</span>,</span>
-<span id="cb27-116"><a href="#cb27-116" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
-<span id="cb27-117"><a href="#cb27-117" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
-<span id="cb27-118"><a href="#cb27-118" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">10.5</span>,</span>
-<span id="cb27-119"><a href="#cb27-119" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"#55595e"</span>,</span>
-<span id="cb27-120"><a href="#cb27-120" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-121"><a href="#cb27-121" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.03</span>, <span class="fl">0.80</span>, <span class="st">"●"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span>MODE_COLORS[<span class="st">"bike"</span>])</span>
-<span id="cb27-122"><a href="#cb27-122" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.05</span>, <span class="fl">0.805</span>, <span class="st">"Bike"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>INK)</span>
-<span id="cb27-123"><a href="#cb27-123" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.115</span>, <span class="fl">0.80</span>, <span class="st">"●"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span>MODE_COLORS[<span class="st">"transit"</span>])</span>
-<span id="cb27-124"><a href="#cb27-124" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.135</span>, <span class="fl">0.805</span>, <span class="st">"Transit"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>INK)</span>
-<span id="cb27-125"><a href="#cb27-125" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
-<span id="cb27-126"><a href="#cb27-126" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
-<span id="cb27-127"><a href="#cb27-127" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
-<span id="cb27-128"><a href="#cb27-128" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Source: WFRC Transportation Choices analysis (v10)"</span>,</span>
-<span id="cb27-129"><a href="#cb27-129" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
-<span id="cb27-130"><a href="#cb27-130" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">8.5</span>,</span>
-<span id="cb27-131"><a href="#cb27-131" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"#8a8f98"</span>,</span>
-<span id="cb27-132"><a href="#cb27-132" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"italic"</span>,</span>
-<span id="cb27-133"><a href="#cb27-133" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-134"><a href="#cb27-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-135"><a href="#cb27-135" aria-hidden="true" tabindex="-1"></a>fig.savefig(PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="st">"region_pct.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor(), dpi<span class="op">=</span><span class="dv">150</span>)</span>
-<span id="cb27-136"><a href="#cb27-136" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>transit_existing <span class="op">=</span> region.query(<span class="st">"mode == 'transit' and scenario == 'existing_2027'"</span>)[</span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pct_near_facility"</span></span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a>].iloc[<span class="dv">0</span>]</span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Editorial bar-chart treatment: headline + deck above the chart, direct</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a><span class="co"># value labels on each bar instead of a y-axis, an inline color key instead</span></span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a><span class="co"># of a boxed legend, and a small source caption -- no gridlines or borders</span></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a><span class="co"># competing with the numbers themselves.</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="fl">8.5</span>, <span class="fl">5.5</span>))</span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(BG)</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>ax.set_facecolor(BG)</span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>fig.subplots_adjust(top<span class="op">=</span><span class="fl">0.76</span>, bottom<span class="op">=</span><span class="fl">0.16</span>, left<span class="op">=</span><span class="fl">0.03</span>, right<span class="op">=</span><span class="fl">0.97</span>)</span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>bar_width <span class="op">=</span> <span class="fl">0.32</span></span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Existing 2027 sits apart on its own; No Build and RTP sit close together</span></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="co"># as a pair -- uneven spacing (not evenly-spaced ticks) so the layout itself</span></span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a><span class="co"># signals "one baseline, two alternative 2055 outcomes" rather than a</span></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a><span class="co"># three-step timeline.</span></span>
+<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a>x_positions <span class="op">=</span> {<span class="st">"existing_2027"</span>: <span class="fl">0.0</span>, <span class="st">"no_build_2055"</span>: <span class="fl">1.6</span>, <span class="st">"rtp_2055"</span>: <span class="fl">2.6</span>}</span>
+<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> [x_positions[s] <span class="cf">for</span> s <span class="kw">in</span> scenario_order]</span>
+<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, mode <span class="kw">in</span> <span class="bu">enumerate</span>((<span class="st">"bike"</span>, <span class="st">"transit"</span>)):</span>
+<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> (</span>
+<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a>        region[region[<span class="st">"mode"</span>] <span class="op">==</span> mode]</span>
+<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a>        .set_index(<span class="st">"scenario"</span>)[<span class="st">"pct_near_facility"</span>]</span>
+<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a>        .reindex(scenario_order)</span>
+<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a>        <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> (i <span class="op">-</span> <span class="fl">0.5</span>) <span class="op">*</span> bar_width</span>
+<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>    ax.bar([xi <span class="op">+</span> offset <span class="cf">for</span> xi <span class="kw">in</span> x], vals, width<span class="op">=</span>bar_width, color<span class="op">=</span>MODE_COLORS[mode], zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> xi, v <span class="kw">in</span> <span class="bu">zip</span>(x, vals):</span>
+<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>        ax.text(</span>
+<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a>            xi <span class="op">+</span> offset,</span>
+<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a>            v <span class="op">+</span> <span class="dv">3</span>,</span>
+<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.0f}</span><span class="ss">%"</span>,</span>
+<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a>            ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a>            va<span class="op">=</span><span class="st">"bottom"</span>,</span>
+<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a>            fontsize<span class="op">=</span><span class="fl">10.5</span>,</span>
+<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a>            fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>,</span>
+<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a>            color<span class="op">=</span>MODE_COLORS[mode],</span>
+<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Divider + bracket reinforce the same point visually: a dotted line splits</span></span>
+<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a><span class="co"># the baseline from the 2055 pair, and a bracket spans only the pair it</span></span>
+<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a><span class="co"># actually groups.</span></span>
+<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a>divider_x <span class="op">=</span> (x_positions[<span class="st">"existing_2027"</span>] <span class="op">+</span> x_positions[<span class="st">"no_build_2055"</span>]) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a>ax.axvline(divider_x, color<span class="op">=</span>INK, alpha<span class="op">=</span><span class="fl">0.15</span>, linestyle<span class="op">=</span><span class="st">":"</span>, linewidth<span class="op">=</span><span class="dv">1</span>, zorder<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a>bracket_left, bracket_right <span class="op">=</span> (</span>
+<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a>    x_positions[<span class="st">"no_build_2055"</span>] <span class="op">-</span> bar_width,</span>
+<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a>    x_positions[<span class="st">"rtp_2055"</span>] <span class="op">+</span> bar_width,</span>
+<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a>ax.plot(</span>
+<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a>    [bracket_left, bracket_left, bracket_right, bracket_right],</span>
+<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a>    [<span class="dv">103</span>, <span class="dv">106</span>, <span class="dv">106</span>, <span class="dv">103</span>],</span>
+<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
+<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a>    zorder<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a>ax.text(</span>
+<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a>    (bracket_left <span class="op">+</span> bracket_right) <span class="op">/</span> <span class="dv">2</span>,</span>
+<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a>    <span class="dv">108</span>,</span>
+<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2055 — two alternative futures"</span>,</span>
+<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"center"</span>,</span>
+<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"bottom"</span>,</span>
+<span id="cb27-89"><a href="#cb27-89" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">9.5</span>,</span>
+<span id="cb27-90"><a href="#cb27-90" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"italic"</span>,</span>
+<span id="cb27-91"><a href="#cb27-91" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
+<span id="cb27-92"><a href="#cb27-92" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-93"><a href="#cb27-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-94"><a href="#cb27-94" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(x)</span>
+<span id="cb27-95"><a href="#cb27-95" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([scenario_labels[s] <span class="cf">for</span> s <span class="kw">in</span> scenario_order], fontsize<span class="op">=</span><span class="dv">11</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-96"><a href="#cb27-96" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(x_positions[<span class="st">"existing_2027"</span>] <span class="op">-</span> <span class="fl">0.6</span>, x_positions[<span class="st">"rtp_2055"</span>] <span class="op">+</span> <span class="fl">0.6</span>)</span>
+<span id="cb27-97"><a href="#cb27-97" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, <span class="dv">118</span>)</span>
+<span id="cb27-98"><a href="#cb27-98" aria-hidden="true" tabindex="-1"></a>ax.set_yticks([])</span>
+<span id="cb27-99"><a href="#cb27-99" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> side <span class="kw">in</span> (<span class="st">"top"</span>, <span class="st">"right"</span>, <span class="st">"left"</span>):</span>
+<span id="cb27-100"><a href="#cb27-100" aria-hidden="true" tabindex="-1"></a>    ax.spines[side].set_visible(<span class="va">False</span>)</span>
+<span id="cb27-101"><a href="#cb27-101" aria-hidden="true" tabindex="-1"></a>ax.spines[<span class="st">"bottom"</span>].set_color(INK)</span>
+<span id="cb27-102"><a href="#cb27-102" aria-hidden="true" tabindex="-1"></a>ax.spines[<span class="st">"bottom"</span>].set_linewidth(<span class="dv">1</span>)</span>
+<span id="cb27-103"><a href="#cb27-103" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb27-104"><a href="#cb27-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-105"><a href="#cb27-105" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
+<span id="cb27-106"><a href="#cb27-106" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
+<span id="cb27-107"><a href="#cb27-107" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.95</span>,</span>
+<span id="cb27-108"><a href="#cb27-108" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Bike access far outpaces transit, in every scenario"</span>,</span>
+<span id="cb27-109"><a href="#cb27-109" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
+<span id="cb27-110"><a href="#cb27-110" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb27-111"><a href="#cb27-111" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="dv">15</span>,</span>
+<span id="cb27-112"><a href="#cb27-112" aria-hidden="true" tabindex="-1"></a>    fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>,</span>
+<span id="cb27-113"><a href="#cb27-113" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span>INK,</span>
+<span id="cb27-114"><a href="#cb27-114" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-115"><a href="#cb27-115" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
+<span id="cb27-116"><a href="#cb27-116" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
+<span id="cb27-117"><a href="#cb27-117" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.88</span>,</span>
+<span id="cb27-118"><a href="#cb27-118" aria-hidden="true" tabindex="-1"></a>    <span class="ss">f"Share of WFRC-region population within 1/4 mile of a facility — today, </span><span class="sc">{</span>bike_existing <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% for bike vs </span><span class="sc">{</span>transit_existing <span class="op">*</span> <span class="dv">100</span><span class="sc">:.0f}</span><span class="ss">% for transit"</span>,</span>
+<span id="cb27-119"><a href="#cb27-119" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
+<span id="cb27-120"><a href="#cb27-120" aria-hidden="true" tabindex="-1"></a>    va<span class="op">=</span><span class="st">"top"</span>,</span>
+<span id="cb27-121"><a href="#cb27-121" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">10.5</span>,</span>
+<span id="cb27-122"><a href="#cb27-122" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"#55595e"</span>,</span>
+<span id="cb27-123"><a href="#cb27-123" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-124"><a href="#cb27-124" aria-hidden="true" tabindex="-1"></a><span class="co"># Poppins has no glyph for "●" (renders as tofu) -- fall back to DejaVu Sans</span></span>
+<span id="cb27-125"><a href="#cb27-125" aria-hidden="true" tabindex="-1"></a><span class="co"># for just the bullet markers, keep Poppins for the labels.</span></span>
+<span id="cb27-126"><a href="#cb27-126" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
+<span id="cb27-127"><a href="#cb27-127" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>, <span class="fl">0.80</span>, <span class="st">"●"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span>MODE_COLORS[<span class="st">"bike"</span>],</span>
+<span id="cb27-128"><a href="#cb27-128" aria-hidden="true" tabindex="-1"></a>    fontfamily<span class="op">=</span><span class="st">"DejaVu Sans"</span>,</span>
+<span id="cb27-129"><a href="#cb27-129" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-130"><a href="#cb27-130" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.05</span>, <span class="fl">0.805</span>, <span class="st">"Bike"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-131"><a href="#cb27-131" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
+<span id="cb27-132"><a href="#cb27-132" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.115</span>, <span class="fl">0.80</span>, <span class="st">"●"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, color<span class="op">=</span>MODE_COLORS[<span class="st">"transit"</span>],</span>
+<span id="cb27-133"><a href="#cb27-133" aria-hidden="true" tabindex="-1"></a>    fontfamily<span class="op">=</span><span class="st">"DejaVu Sans"</span>,</span>
+<span id="cb27-134"><a href="#cb27-134" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-135"><a href="#cb27-135" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.135</span>, <span class="fl">0.805</span>, <span class="st">"Transit"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="fl">10.5</span>, color<span class="op">=</span>INK)</span>
+<span id="cb27-136"><a href="#cb27-136" aria-hidden="true" tabindex="-1"></a>fig.text(</span>
+<span id="cb27-137"><a href="#cb27-137" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
+<span id="cb27-138"><a href="#cb27-138" aria-hidden="true" tabindex="-1"></a>    <span class="fl">0.03</span>,</span>
+<span id="cb27-139"><a href="#cb27-139" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Source: WFRC Transportation Choices analysis (v10)"</span>,</span>
+<span id="cb27-140"><a href="#cb27-140" aria-hidden="true" tabindex="-1"></a>    ha<span class="op">=</span><span class="st">"left"</span>,</span>
+<span id="cb27-141"><a href="#cb27-141" aria-hidden="true" tabindex="-1"></a>    fontsize<span class="op">=</span><span class="fl">8.5</span>,</span>
+<span id="cb27-142"><a href="#cb27-142" aria-hidden="true" tabindex="-1"></a>    color<span class="op">=</span><span class="st">"#8a8f98"</span>,</span>
+<span id="cb27-143"><a href="#cb27-143" aria-hidden="true" tabindex="-1"></a>    style<span class="op">=</span><span class="st">"italic"</span>,</span>
+<span id="cb27-144"><a href="#cb27-144" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-145"><a href="#cb27-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-146"><a href="#cb27-146" aria-hidden="true" tabindex="-1"></a>fig.savefig(PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="st">"region_pct.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor(), dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb27-147"><a href="#cb27-147" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="fig-region-pct" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-region-pct-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."><img src="index_files/figure-html/fig-region-pct-output-1.png" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP." width="786" height="508" class="figure-img"></a>
+<a href="index_files/figure-html/fig-region-pct-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."><img src="index_files/figure-html/fig-region-pct-output-1.png" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 88% in 2027, 85% under No Build, and 94% under RTP. Transit reaches 19% in both 2027 and No Build, rising to 21% under RTP." width="786" height="509" class="figure-img"></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP.
