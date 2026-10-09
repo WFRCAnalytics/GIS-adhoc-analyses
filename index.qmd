@@ -16,3 +16,9 @@ REMM's 2025 estimate, its 2055 forecast, and full buildout capacity for six Wasa
 
 ![Employment capacity across six WCV centers. Click to enlarge.](projects/center-buildout-capacity/output/employment_buildout.png){.lightbox group="center-buildout-capacity"}
 :::
+
+## [Transportation Choices](projects/transportation-choices/index.qmd)
+
+Percent of the WFRC-region population within 1/4 mile of a dedicated bike facility, or a frequent bus route / transit stop / station, across three scenarios: Existing 2027, No Build 2055, and RTP (Build) 2055.
+
+![Share of population within 1/4 mile of a bike or transit facility, by scenario. Click to enlarge.](projects/transportation-choices/output/region_pct.png){.lightbox group="transportation-choices"}

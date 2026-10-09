@@ -1,0 +1,72 @@
+# sources.yml
+# Registry of ArcGIS REST data sources used by this analysis only.
+#
+# Each entry defines:
+#   url:         Full ArcGIS FeatureServer (or MapServer) layer URL
+#   cache:       Local .gpkg file path written by ensure_layers(), relative
+#                to this sources.yml (not the repo root)
+#   description: Human-readable label
+#   access:      (optional) "private" = requires a login; token auto-generated
+#                from .env credentials by ensure_layers(). Omit for public layers.
+#   where:       (optional) SQL where clause to filter features server-side
+#   pagination:  (optional) "offset" for query-layer/joined services with
+#                unstable OBJECTIDs (see arcgis_utils.py docstring). Requires order_by.
+#   order_by:    (optional) stable sort field, required when pagination: offset
+#
+# Call ensure_layers([...]) from gis_adhoc_analyses.layer_cache to verify caches exist
+# before reading with gpd.read_file(L["key"]).
+#
+# To re-download a specific layer: ensure_layers(["wftcm_taz"], force=["wftcm_taz"])
+# To re-download every layer used:  ensure_layers([...], force=True)
+
+layers:
+
+  wftcm_taz:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/ArcGIS/rest/services/WasatchFrontTAZ/FeatureServer/0
+    cache: _data/remote/wftdm_taz_v10.gpkg
+    description: WFTDM Transportation Analysis Zones
+
+  uta_stops:
+    url: https://maps.rideuta.com/server/rest/services/Hosted/UTA_Stops_and_Most_Recent_Ridership/FeatureServer/0
+    cache: _data/remote/uta_stops.gpkg
+    description: UTA Transit Stops
+
+  uta_routes:
+    url: https://maps.rideuta.com/server/rest/services/Hosted/UTA_Routes_and_Most_Recent_Ridership/FeatureServer/0
+    cache: _data/remote/uta_routes.gpkg
+    description: UTA routes with most recent ridership data (routetype field used to identify frequent/fixed-guideway service)
+
+  utah_bikeways:
+    url: https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/Bikeways/FeatureServer/0
+    cache: _data/remote/utah_bikeways.gpkg
+    description: Utah Bikeways (Facility1 field distinguishes facility type; "Not Available" = no bike facility)
+
+  # ── RTP 2027 Preferred Scenario projects ────────────────────────────────────
+  # Same service used by WFRCAnalytics/GIS-RTP-Phasing-Criteria. Layer indices:
+  # 0=Transit_PSPoints, 2=AT_PSPoints, 3=Transit_PSLines, 5=AT_PSLines.
+  # plan_id is the project key on this service (not renamed here -- this
+  # project only needs the geometry for buffering, not per-project IDs).
+
+  at_point_projects:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/2
+    cache: _data/remote/projects/at_points.gpkg
+    description: "RTP 2027 AT projects -- points (AT_PSPoints, layer 2)"
+    access: private
+
+  at_line_projects:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/5
+    cache: _data/remote/projects/at_lines.gpkg
+    description: "RTP 2027 AT projects -- lines (AT_PSLines, layer 5)"
+    access: private
+
+  transit_point_projects:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/0
+    cache: _data/remote/projects/transit_points.gpkg
+    description: "RTP 2027 Transit projects -- points (Transit_PSPoints, layer 0)"
+    access: private
+
+  transit_line_projects:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/arcgis/rest/services/RTP2027_PreferredScenario_062026/FeatureServer/3
+    cache: _data/remote/projects/transit_lines.gpkg
+    description: "RTP 2027 Transit projects -- lines (Transit_PSLines, layer 3)"
+    access: private

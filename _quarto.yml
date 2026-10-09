@@ -28,6 +28,8 @@ website:
         href: index.qmd
       - text: "Center Buildout Capacity"
         href: projects/center-buildout-capacity/index.qmd
+      - text: "Transportation Choices"
+        href: projects/transportation-choices/index.qmd
     right:
       - icon: github
         href: https://github.com/WFRCAnalytics/GIS-adhoc-analyses

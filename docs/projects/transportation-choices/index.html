@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-10-08">
+
+<title>Transportation Choices – Geospatial Analyses</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="..\..\site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_color_transparent.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-60ec1177cfdf62637d5ff5fe2fc1aa23.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-89f44826677438c52e290590fe6b0c8e.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-60ec1177cfdf62637d5ff5fe2fc1aa23.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-f96da35c58a883d9a937a5a25c4fe9c6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-14540104ef5e7208af7b006b4b6226a6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-f96da35c58a883d9a937a5a25c4fe9c6.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="..\..\site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_color_transparent.png" alt="" class="navbar-logo light-content">
+    <img src="..\..\site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_white_transparent.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Geospatial Analyses</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/center-buildout-capacity/index.html"> 
+<span class="menu-text">Center Buildout Capacity</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../projects/transportation-choices/index.html" aria-current="page"> 
+<span class="menu-text">Transportation Choices</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/WFRCAnalytics/GIS-adhoc-analyses"> <i class="bi bi-github" role="img" aria-label="GitHub repository">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Transportation Choices</h1>
+            <p class="subtitle lead">Share of population within 1/4 mile of a bike or transit facility, by scenario</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">October 8, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#data-acquisition" id="toc-data-acquisition" class="nav-link" data-scroll-target="#data-acquisition">Data Acquisition</a></li>
+  <li><a href="#sec-bike-geometry" id="toc-sec-bike-geometry" class="nav-link" data-scroll-target="#sec-bike-geometry">Build Facility Geometry — Bike</a></li>
+  <li><a href="#sec-transit-geometry" id="toc-sec-transit-geometry" class="nav-link" data-scroll-target="#sec-transit-geometry">Build Facility Geometry — Transit</a></li>
+  <li><a href="#prepare-taz-geography" id="toc-prepare-taz-geography" class="nav-link" data-scroll-target="#prepare-taz-geography">Prepare TAZ Geography</a></li>
+  <li><a href="#sec-compute" id="toc-sec-compute" class="nav-link" data-scroll-target="#sec-compute">Compute Compatible-Area % by Scenario</a></li>
+  <li><a href="#outputs" id="toc-outputs" class="nav-link" data-scroll-target="#outputs">Outputs</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization">Visualization</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+
+<section id="purpose" class="level2">
+<h2 class="anchored" data-anchor-id="purpose">Purpose</h2>
+<p>How much of the Wasatch Front’s population lives somewhere they can actually <em>choose</em> to bike or take transit instead of drive? Transportation Choices answers that with one number per place: the percent of people within 1/4 mile of a dedicated bike facility, or of a frequent bus route, transit stop, or station.</p>
+<p>That number only means something next to a point of comparison, so we compute it for three scenarios. Each scenario is a combination of two independent inputs that do <strong>not</strong> have to match: a socioeconomic (SE) forecast year, and a GIS facility <em>vintage</em> year (what’s actually built on the ground, or assumed built, as of some year).</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>SE year</th>
+<th>GIS vintage</th>
+<th>Reads as</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Existing 2027</td>
+<td>2027</td>
+<td>2027</td>
+<td>today</td>
+</tr>
+<tr class="even">
+<td>No Build 2055</td>
+<td>2055</td>
+<td>2032</td>
+<td>2055’s population, with no further facilities built</td>
+</tr>
+<tr class="odd">
+<td>RTP (Build) 2055</td>
+<td>2055</td>
+<td>2055</td>
+<td>2055’s population, with the RTP’s planned facilities built</td>
+</tr>
+</tbody>
+</table>
+<p>Comparing No Build against RTP isolates the effect of <em>building the plan</em> – same future population, different infrastructure. Comparing Existing against either 2055 scenario shows how much of that effect is just growth.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>The 2032 GIS vintage is a placeholder, not real data
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Neither mode has a real 2032 facility layer yet – bike is waiting on a layer from Sarah/Hugh (via Suzie), transit on a LIN Stops file from Suzie. Until those arrive, 2032 is deliberately defined as “unchanged from 2027” (see <code>GIS_VINTAGES</code> below), so <strong>No Build 2055 currently only isolates the effect of population growth, not a true no-further-investment scenario.</strong> Re-run this page once the real 2032 data lands.</p>
+</div>
+</div>
+<p>GIS facility data is <em>incremental</em> by vintage year and mode: each vintage layers new facilities on top of the previous one rather than restating everything from scratch. That’s what makes the pipeline easy to extend – adding a scenario is one line in <code>SCENARIOS</code>, and adding a GIS vintage is one entry in <code>GIS_VINTAGES</code>.</p>
+<p>This replaces the <code>_archive/</code> v9 arcpy scripts (01-08), which bundled SE and facility data together per scenario (so SE year and GIS vintage couldn’t vary independently) and filtered transit stops with a hardcoded route list.</p>
+</section>
+<section id="data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Mode</th>
+<th>Vintage</th>
+<th>What’s added</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bike</td>
+<td>2027 (base)</td>
+<td>On-street bike facilities + trails</td>
+<td><code>utah_bikeways</code>, filtered to <code>Facility1 &lt;&gt; 'Not Available'</code></td>
+</tr>
+<tr class="even">
+<td>Bike</td>
+<td>2032</td>
+<td><em>(placeholder – not yet available)</em></td>
+<td>TBD, Sarah/Hugh via Suzie</td>
+</tr>
+<tr class="odd">
+<td>Bike</td>
+<td>2055</td>
+<td>RTP 2027 Preferred Scenario AT projects</td>
+<td><code>at_line_projects</code>, <code>at_point_projects</code></td>
+</tr>
+<tr class="even">
+<td>Transit</td>
+<td>2027 (base)</td>
+<td>Fixed-guideway stations + frequent bus stops</td>
+<td><code>uta_stops</code> + <code>uta_routes</code></td>
+</tr>
+<tr class="odd">
+<td>Transit</td>
+<td>2032</td>
+<td><em>(placeholder – unchanged from 2027)</em></td>
+<td>LIN Stops, not yet received from Suzie</td>
+</tr>
+<tr class="even">
+<td>Transit</td>
+<td>2055</td>
+<td>RTP 2027 Preferred Scenario transit projects</td>
+<td><code>transit_line_projects</code>, <code>transit_point_projects</code></td>
+</tr>
+</tbody>
+</table>
+<p>Socioeconomic data is WFRC’s v10 forecast, one CSV per year (2023-2065) under <code>_data/raw/SE_v10_20260921/</code>. TAZ geometry comes from the <code>WasatchFrontTAZ</code> REST service (<code>wftcm_taz</code>).</p>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>Two dictionaries carry all of the above as data rather than as logic: <code>GIS_VINTAGES</code> encodes what each vintage adds and which earlier vintage it builds on, and <code>SCENARIOS</code> just points at a <code>(se_year, gis_year)</code> pair for each named scenario. Nothing downstream needs to change to add a scenario or a vintage – only these two structures do.</p>
+<div id="setup" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gis_adhoc_analyses.layer_cache <span class="im">import</span> ensure_layers</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>PATHS <span class="op">=</span> {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"se_dir"</span>: Path(<span class="st">"_data/raw/SE_v10_20260921"</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"output"</span>: Path(<span class="st">"output"</span>),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>CRS <span class="op">=</span> <span class="st">"EPSG:26912"</span>  <span class="co"># UTM 12N, meters -- project everything to this before buffering/intersecting</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>CONSTANTS <span class="op">=</span> {</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"buffer_m"</span>: <span class="fl">0.25</span> <span class="op">*</span> <span class="fl">1609.34</span>,  <span class="co"># 0.25 mi in meters</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"wfrc_county_fips"</span>: [<span class="dv">3</span>, <span class="dv">11</span>, <span class="dv">35</span>, <span class="dv">57</span>],  <span class="co"># Box Elder, Davis, Salt Lake, Weber</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"se_join_field"</span>: <span class="st">"TAZID"</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Incremental by vintage year: "adds" are layer keys new at that vintage,</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># "builds_on" is the vintage it layers on top of (None = base vintage).</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>GIS_VINTAGES <span class="op">=</span> {</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bike"</span>: {</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2027</span>: {<span class="st">"adds"</span>: [<span class="st">"utah_bikeways"</span>], <span class="st">"builds_on"</span>: <span class="va">None</span>},</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2032</span>: {<span class="st">"adds"</span>: [], <span class="st">"builds_on"</span>: <span class="dv">2027</span>},  <span class="co"># placeholder: layer </span><span class="al">TBD</span><span class="co"> (Sarah/Hugh via Suzie)</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2055</span>: {<span class="st">"adds"</span>: [<span class="st">"at_line_projects"</span>, <span class="st">"at_point_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2032</span>},</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transit"</span>: {</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2027</span>: {<span class="st">"adds"</span>: [<span class="st">"uta_stops"</span>, <span class="st">"uta_routes"</span>], <span class="st">"builds_on"</span>: <span class="va">None</span>},</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2032</span>: {<span class="st">"adds"</span>: [], <span class="st">"builds_on"</span>: <span class="dv">2027</span>},  <span class="co"># placeholder: treat as unchanged from 2027</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># until LIN Stops (Suzie) arrives -- a deliberate interim choice, not a gap</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2055</span>: {<span class="st">"adds"</span>: [<span class="st">"transit_line_projects"</span>, <span class="st">"transit_point_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2032</span>},</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>SCENARIOS <span class="op">=</span> [</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"existing_2027"</span>, <span class="st">"se_year"</span>: <span class="dv">2027</span>, <span class="st">"gis_year"</span>: <span class="dv">2027</span>},</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"no_build_2055"</span>, <span class="st">"se_year"</span>: <span class="dv">2055</span>, <span class="st">"gis_year"</span>: <span class="dv">2032</span>},</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"rtp_2055"</span>, <span class="st">"se_year"</span>: <span class="dv">2055</span>, <span class="st">"gis_year"</span>: <span class="dv">2055</span>},</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="data-acquisition" class="level2">
+<h2 class="anchored" data-anchor-id="data-acquisition">Data Acquisition</h2>
+<p>Every REST layer any vintage needs gets fetched once, up front, by reading the keys straight out of <code>GIS_VINTAGES</code> – add a layer to a vintage and it’s automatically requested here too.</p>
+<div id="fetch-rest-layers" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rest_keys <span class="op">=</span> <span class="bu">sorted</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"wftcm_taz"</span>}</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> {layer <span class="cf">for</span> mode <span class="kw">in</span> GIS_VINTAGES.values() <span class="cf">for</span> v <span class="kw">in</span> mode.values() <span class="cf">for</span> layer <span class="kw">in</span> v[<span class="st">"adds"</span>]}</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>L <span class="op">=</span> ensure_layers(rest_keys)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fetched </span><span class="sc">{</span><span class="bu">len</span>(L)<span class="sc">}</span><span class="ss"> REST layers: </span><span class="sc">{</span>rest_keys<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Using cached file (0d old): at_lines.gpkg
+Using cached file (0d old): at_points.gpkg
+Using cached file (0d old): transit_lines.gpkg
+Using cached file (0d old): transit_points.gpkg
+Using cached file (0d old): uta_routes.gpkg
+Using cached file (0d old): uta_stops.gpkg
+Using cached file (0d old): utah_bikeways.gpkg
+Using cached file (0d old): wftdm_taz_v10.gpkg
+Fetched 8 REST layers: ['at_line_projects', 'at_point_projects', 'transit_line_projects', 'transit_point_projects', 'uta_routes', 'uta_stops', 'utah_bikeways', 'wftcm_taz']</code></pre>
+</div>
+</div>
+<div id="check-se-years" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>se_years_available <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">int</span>(p.stem.removeprefix(<span class="st">"SE_"</span>)) <span class="cf">for</span> p <span class="kw">in</span> PATHS[<span class="st">"se_dir"</span>].glob(<span class="st">"SE_*.csv"</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> se_years_available, <span class="ss">f"No SE files found under </span><span class="sc">{</span>PATHS[<span class="st">'se_dir'</span>]<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> scenario <span class="kw">in</span> SCENARIOS:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> scenario[<span class="st">"se_year"</span>] <span class="kw">in</span> se_years_available, (</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Scenario </span><span class="sc">{</span>scenario[<span class="st">'name'</span>]<span class="sc">!r}</span><span class="ss"> needs SE_</span><span class="sc">{</span>scenario[<span class="st">'se_year'</span>]<span class="sc">}</span><span class="ss">.csv -- not found"</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"SE years available: </span><span class="sc">{</span>se_years_available[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>se_years_available[<span class="op">-</span><span class="dv">1</span>]<span class="sc">}</span><span class="ss"> (</span><span class="sc">{</span><span class="bu">len</span>(se_years_available)<span class="sc">}</span><span class="ss"> files)"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"All scenario SE years present."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>SE years available: 2023-2065 (43 files)
+All scenario SE years present.</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Workshop-area geography is not reported yet
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The v9 pipeline summarized results by workshop area as well as region and county. No v10 boundary source has been identified for that geography level – it will be added to <code>GEOGRAPHY_LEVELS</code> in <a href="#sec-compute" class="quarto-xref">Section&nbsp;8</a> once one exists.</p>
+</div>
+</div>
+</section>
+<section id="sec-bike-geometry" class="level2">
+<h2 class="anchored" data-anchor-id="sec-bike-geometry">Build Facility Geometry — Bike</h2>
+<p>Bike facilities are line geometry, buffered directly: <code>utah_bikeways</code>’s <code>Facility1</code> field distinguishes facility type, and <code>"Not Available"</code> is the only value that means <em>no</em> bike facility, so everything else – on-street bike lanes and trails alike – is existing network. The 2055 vintage adds the RTP 2027 Preferred Scenario’s active-transportation projects as-is.</p>
+<div id="bike-raw-by-vintage" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>bike_raw <span class="op">=</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2027</span>: gpd.read_file(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        L[<span class="st">"utah_bikeways"</span>], where<span class="op">=</span><span class="st">"Facility1 IS NOT NULL AND Facility1 &lt;&gt; 'Not Available'"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    ).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2032</span>: gpd.GeoDataFrame(geometry<span class="op">=</span>[], crs<span class="op">=</span>CRS),  <span class="co"># placeholder: 2032 bike layer </span><span class="al">TBD</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2055</span>: gpd.GeoDataFrame(</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        pd.concat(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            [</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                gpd.read_file(L[<span class="st">"at_line_projects"</span>]).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                gpd.read_file(L[<span class="st">"at_point_projects"</span>]).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>            ignore_index<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        geometry<span class="op">=</span><span class="st">"geometry"</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        crs<span class="op">=</span>CRS,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, gdf <span class="kw">in</span> bike_raw.items():</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Bike </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> adds: </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bike 2027 adds: 17316 features
+Bike 2032 adds: 0 features
+Bike 2055 adds: 866 features</code></pre>
+</div>
+</div>
+<p>Each vintage’s cumulative network is its own <code>adds</code> plus everything the vintage it <code>builds_on</code> already had – so a vintage with nothing new yet (2032, for now) is simply identical to the vintage beneath it, not empty. Buffering and dissolving that cumulative network once per vintage gives the geometry every scenario needing that vintage can reuse.</p>
+<div id="bike-buffers-by-vintage" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>bike_cum <span class="op">=</span> {}</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> <span class="bu">sorted</span>(GIS_VINTAGES[<span class="st">"bike"</span>]):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    builds_on <span class="op">=</span> GIS_VINTAGES[<span class="st">"bike"</span>][year][<span class="st">"builds_on"</span>]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    parts <span class="op">=</span> [bike_raw[year]] <span class="cf">if</span> builds_on <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> [bike_cum[builds_on], bike_raw[year]]</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    bike_cum[year] <span class="op">=</span> gpd.GeoDataFrame(pd.concat(parts, ignore_index<span class="op">=</span><span class="va">True</span>), geometry<span class="op">=</span><span class="st">"geometry"</span>, crs<span class="op">=</span>CRS)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>bike_buffers <span class="op">=</span> {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    year: gpd.GeoDataFrame(geometry<span class="op">=</span>[cum.<span class="bu">buffer</span>(CONSTANTS[<span class="st">"buffer_m"</span>]).union_all()], crs<span class="op">=</span>CRS)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> year, cum <span class="kw">in</span> bike_cum.items()</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, cum <span class="kw">in</span> bike_cum.items():</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Bike </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> cumulative: </span><span class="sc">{</span><span class="bu">len</span>(cum)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Bike 2027 cumulative: 17316 features
+Bike 2032 cumulative: 17316 features
+Bike 2055 cumulative: 18182 features</code></pre>
+</div>
+</div>
+</section>
+<section id="sec-transit-geometry" class="level2">
+<h2 class="anchored" data-anchor-id="sec-transit-geometry">Build Facility Geometry — Transit</h2>
+<p>Transit works differently in a way that matters for the buffer, not just the source: it’s built from <strong>stop/station points</strong>, never from route linework, and only from a <em>subset</em> of stops –</p>
+<ol type="1">
+<li>LRT/CRT fixed-guideway stations, caught by <code>mode</code> containing <code>TRAX</code> or <code>FrontRunner</code>, and</li>
+<li><strong>frequent bus stops only</strong> – <code>uta_routes</code> filtered to the frequent/fixed-guideway service tiers, matched back to stops through the comma-separated <code>route</code> field.</li>
+</ol>
+<p>Every other bus stop is excluded. This two-part filter replaces v9’s hardcoded route list with something that updates itself as UTA’s service changes.</p>
+<div id="transit-2027-base" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>_HF_ROUTETYPES_SQL <span class="op">=</span> <span class="st">"'Frequent','BRT','Blue Line','Red Line','Green Line','S Line','FrontRunner'"</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>hf_route_abbrs <span class="op">=</span> <span class="bu">set</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    gpd.read_file(L[<span class="st">"uta_routes"</span>], where<span class="op">=</span><span class="ss">f"routetype IN (</span><span class="sc">{</span>_HF_ROUTETYPES_SQL<span class="sc">}</span><span class="ss">)"</span>)[<span class="st">"lineabbr"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>stops_raw <span class="op">=</span> gpd.read_file(L[<span class="st">"uta_stops"</span>]).to_crs(CRS)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>fixed_guideway <span class="op">=</span> stops_raw[stops_raw[<span class="st">"mode"</span>].<span class="bu">str</span>.contains(<span class="st">"TRAX|FrontRunner|BRT"</span>, na<span class="op">=</span><span class="va">False</span>)]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>hf_routes <span class="op">=</span> stops_raw[</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    stops_raw[<span class="st">"route"</span>].<span class="bu">apply</span>(</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="kw">lambda</span> r: <span class="va">False</span> <span class="cf">if</span> pd.isna(r) <span class="cf">else</span> <span class="bu">bool</span>({t.strip() <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">str</span>(r).split(<span class="st">","</span>)} <span class="op">&amp;</span> hf_route_abbrs)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>transit_2027 <span class="op">=</span> gpd.GeoDataFrame(</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    pd.concat([fixed_guideway[[<span class="st">"geometry"</span>]], hf_routes[[<span class="st">"geometry"</span>]]], ignore_index<span class="op">=</span><span class="va">True</span>).drop_duplicates(),</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    geometry<span class="op">=</span><span class="st">"geometry"</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    crs<span class="op">=</span>CRS,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fixed-guideway / BRT stops: </span><span class="sc">{</span><span class="bu">len</span>(fixed_guideway)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Frequent-route stops:      </span><span class="sc">{</span><span class="bu">len</span>(hf_routes)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Transit 2027 base (dedup): </span><span class="sc">{</span><span class="bu">len</span>(transit_2027)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Fixed-guideway / BRT stops: 205
+Frequent-route stops:      1219
+Transit 2027 base (dedup): 1417</code></pre>
+</div>
+</div>
+<p>The 2055 vintage adds the RTP’s transit projects, but a planned rail or BRT corridor arrives as a line, not a point – so each line project is reduced to its centroid here, keeping the whole transit buffer point-based rather than letting new corridors buffer like a continuous bike facility would.</p>
+<div id="transit-raw-by-vintage" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>transit_2055_lines <span class="op">=</span> gpd.read_file(L[<span class="st">"transit_line_projects"</span>]).to_crs(CRS)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>transit_2055_points <span class="op">=</span> gpd.read_file(L[<span class="st">"transit_point_projects"</span>]).to_crs(CRS)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>transit_raw <span class="op">=</span> {</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2027</span>: transit_2027,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2032</span>: gpd.GeoDataFrame(geometry<span class="op">=</span>[], crs<span class="op">=</span>CRS),  <span class="co"># placeholder: LIN Stops file from Suzie</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2055</span>: gpd.GeoDataFrame(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        pd.concat(</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>            [</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                transit_2055_points[[<span class="st">"geometry"</span>]],</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>                gpd.GeoDataFrame(geometry<span class="op">=</span>transit_2055_lines.centroid, crs<span class="op">=</span>CRS),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>            ],</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>            ignore_index<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        ),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        geometry<span class="op">=</span><span class="st">"geometry"</span>,</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>        crs<span class="op">=</span>CRS,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, gdf <span class="kw">in</span> transit_raw.items():</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Transit </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> adds: </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transit 2027 adds: 1417 features
+Transit 2032 adds: 0 features
+Transit 2055 adds: 104 features</code></pre>
+</div>
+</div>
+<div id="transit-buffers-by-vintage" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>transit_cum <span class="op">=</span> {}</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year <span class="kw">in</span> <span class="bu">sorted</span>(GIS_VINTAGES[<span class="st">"transit"</span>]):</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    builds_on <span class="op">=</span> GIS_VINTAGES[<span class="st">"transit"</span>][year][<span class="st">"builds_on"</span>]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    parts <span class="op">=</span> [transit_raw[year]] <span class="cf">if</span> builds_on <span class="kw">is</span> <span class="va">None</span> <span class="cf">else</span> [transit_cum[builds_on], transit_raw[year]]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    transit_cum[year] <span class="op">=</span> gpd.GeoDataFrame(pd.concat(parts, ignore_index<span class="op">=</span><span class="va">True</span>), geometry<span class="op">=</span><span class="st">"geometry"</span>, crs<span class="op">=</span>CRS)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>transit_buffers <span class="op">=</span> {</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    year: gpd.GeoDataFrame(geometry<span class="op">=</span>[cum.<span class="bu">buffer</span>(CONSTANTS[<span class="st">"buffer_m"</span>]).union_all()], crs<span class="op">=</span>CRS)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> year, cum <span class="kw">in</span> transit_cum.items()</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, cum <span class="kw">in</span> transit_cum.items():</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Transit </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> cumulative: </span><span class="sc">{</span><span class="bu">len</span>(cum)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Transit 2027 cumulative: 1417 features
+Transit 2032 cumulative: 1417 features
+Transit 2055 cumulative: 1521 features</code></pre>
+</div>
+</div>
+</section>
+<section id="prepare-taz-geography" class="level2">
+<h2 class="anchored" data-anchor-id="prepare-taz-geography">Prepare TAZ Geography</h2>
+<p>TAZ geometry itself doesn’t change across scenarios – only the population joined onto it does (that happens in <a href="#sec-compute" class="quarto-xref">Section&nbsp;8</a>, per scenario). So this runs once: filter to the four WFRC counties, and add the fields every downstream calculation needs – <code>Region</code> (a constant, for the region-level rollup), <code>CountyName</code>, and each TAZ’s total area in acres.</p>
+<div id="prepare-taz" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>taz_raw <span class="op">=</span> gpd.read_file(L[<span class="st">"wftcm_taz"</span>]).to_crs(CRS)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"TAZ columns: </span><span class="sc">{</span><span class="bu">list</span>(taz_raw.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>taz <span class="op">=</span> taz_raw[taz_raw[<span class="st">"CO_FIPS"</span>].isin(CONSTANTS[<span class="st">"wfrc_county_fips"</span>])].copy()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>taz[<span class="st">"Region"</span>] <span class="op">=</span> <span class="st">"WFRC"</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>taz[<span class="st">"CountyName"</span>] <span class="op">=</span> taz[<span class="st">"CO_NAME"</span>].<span class="bu">str</span>.title()</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>taz[<span class="st">"AcresTotal"</span>] <span class="op">=</span> taz.geometry.area <span class="op">/</span> <span class="fl">4046.8564224</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"TAZ after county filter: </span><span class="sc">{</span><span class="bu">len</span>(taz)<span class="sc">}</span><span class="ss"> (from </span><span class="sc">{</span><span class="bu">len</span>(taz_raw)<span class="sc">}</span><span class="ss">)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>TAZ columns: ['TAZID', 'SORT', 'CO_TAZID', 'SUBAREAID', 'EXTERNAL_', 'ACRES', 'DEVACRES', 'X', 'Y', 'ADJ_XY', 'CBD', 'TERMTIME', 'PRKCSTPERM', 'PRKCSTTEMP', 'WALK100', 'ECOEDPASS', 'FREEFARE', 'MPO', 'MPO_MSID', 'MODEL_SPC', 'MPO_MSID2', 'MODEL_SPC2', 'COUNTY', 'CO_FIPS', 'CO_NAME', 'CITY', 'CITY_FIPS', 'CITY_NAME', 'DISTLRG', 'DLRG_NAME', 'DISTMED', 'DMED_NAME', 'DISTSML', 'DSML_NAME', 'AIRSAGE', 'WF_AIRSAGE', 'SLC', 'NAAPM25', 'Shape__Area', 'Shape__Length', 'geometry']
+TAZ after county filter: 2216 (from 3546)</code></pre>
+</div>
+</div>
+</section>
+<section id="sec-compute" class="level2">
+<h2 class="anchored" data-anchor-id="sec-compute">Compute Compatible-Area % by Scenario</h2>
+<p>We don’t know how population is distributed <em>within</em> a TAZ, only its total – so where a facility buffer only partly covers a TAZ, we assume population spreads evenly across the TAZ’s area and credit that TAZ with the same share of its population: <code>HHPOPPiece = HHPOP * (piece area / total area)</code>. Summing <code>HHPOPPiece</code> over all pieces and dividing by total <code>HHPOP</code> for a geography gives the percent of its population within 1/4 mile of a facility – which is exactly <code>SCENARIOS × modes × geography levels</code> worth of one number each, so the result is a single tidy table rather than the nine separate CSVs the old per-scenario scripts produced.</p>
+<div id="cell-compute-tidy-results" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>GEOGRAPHY_LEVELS <span class="op">=</span> [<span class="st">"Region"</span>, <span class="st">"CountyName"</span>]  <span class="co"># add "SmallArea" once a workshop-area boundary exists</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>results <span class="op">=</span> []</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> scenario <span class="kw">in</span> SCENARIOS:</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    se_path <span class="op">=</span> PATHS[<span class="st">"se_dir"</span>] <span class="op">/</span> <span class="ss">f"SE_</span><span class="sc">{</span>scenario[<span class="st">'se_year'</span>]<span class="sc">}</span><span class="ss">.csv"</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> se_path.is_file(), <span class="ss">f"Missing SE file: </span><span class="sc">{</span>se_path<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    se <span class="op">=</span> pd.read_csv(se_path)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    se.columns <span class="op">=</span> se.columns.<span class="bu">str</span>.lstrip(<span class="st">";"</span>)  <span class="co"># v10 export has a stray leading ';' on the header row</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    taz_se <span class="op">=</span> taz.merge(se[[CONSTANTS[<span class="st">"se_join_field"</span>], <span class="st">"HHPOP"</span>]], on<span class="op">=</span>CONSTANTS[<span class="st">"se_join_field"</span>], how<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> mode, buffers <span class="kw">in</span> ((<span class="st">"bike"</span>, bike_buffers), (<span class="st">"transit"</span>, transit_buffers)):</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        pieces <span class="op">=</span> gpd.overlay(taz_se, buffers[scenario[<span class="st">"gis_year"</span>]], how<span class="op">=</span><span class="st">"intersection"</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>        pieces[<span class="st">"AcresPiece"</span>] <span class="op">=</span> pieces.geometry.area <span class="op">/</span> <span class="fl">4046.8564224</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>        pieces[<span class="st">"HHPOPPiece"</span>] <span class="op">=</span> pieces[<span class="st">"HHPOP"</span>] <span class="op">*</span> pieces[<span class="st">"AcresPiece"</span>] <span class="op">/</span> pieces[<span class="st">"AcresTotal"</span>]</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> level <span class="kw">in</span> GEOGRAPHY_LEVELS:</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>            totals <span class="op">=</span> taz_se.groupby(level)[<span class="st">"HHPOP"</span>].<span class="bu">sum</span>()</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>            piece_totals <span class="op">=</span> pieces.groupby(level)[<span class="st">"HHPOPPiece"</span>].<span class="bu">sum</span>().reindex(totals.index, fill_value<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>            pct <span class="op">=</span> piece_totals <span class="op">/</span> totals</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> geography_name, value <span class="kw">in</span> pct.items():</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>                results.append(</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>                    {</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"scenario"</span>: scenario[<span class="st">"name"</span>],</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"mode"</span>: mode,</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"se_year"</span>: scenario[<span class="st">"se_year"</span>],</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"gis_year"</span>: scenario[<span class="st">"gis_year"</span>],</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"geography_level"</span>: level,</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"geography_name"</span>: geography_name,</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>                        <span class="st">"pct_near_facility"</span>: value,</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>                    }</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>                )</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>tidy <span class="op">=</span> pd.DataFrame(results)</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Tidy results: </span><span class="sc">{</span><span class="bu">len</span>(tidy)<span class="sc">}</span><span class="ss"> rows"</span>)</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> tidy[<span class="st">"pct_near_facility"</span>].between(<span class="dv">0</span>, <span class="dv">1</span>).<span class="bu">all</span>(), <span class="st">"Percentage outside [0, 1] -- check overlay/weighting"</span></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>tidy.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tidy results: 30 rows</code></pre>
+</div>
+<div id="compute-tidy-results" class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">scenario</th>
+<th data-quarto-table-cell-role="th">mode</th>
+<th data-quarto-table-cell-role="th">se_year</th>
+<th data-quarto-table-cell-role="th">gis_year</th>
+<th data-quarto-table-cell-role="th">geography_level</th>
+<th data-quarto-table-cell-role="th">geography_name</th>
+<th data-quarto-table-cell-role="th">pct_near_facility</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>existing_2027</td>
+<td>bike</td>
+<td>2027</td>
+<td>2027</td>
+<td>Region</td>
+<td>WFRC</td>
+<td>0.875897</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>existing_2027</td>
+<td>bike</td>
+<td>2027</td>
+<td>2027</td>
+<td>CountyName</td>
+<td>Box Elder</td>
+<td>0.596304</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>existing_2027</td>
+<td>bike</td>
+<td>2027</td>
+<td>2027</td>
+<td>CountyName</td>
+<td>Davis</td>
+<td>0.846484</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>existing_2027</td>
+<td>bike</td>
+<td>2027</td>
+<td>2027</td>
+<td>CountyName</td>
+<td>Salt Lake</td>
+<td>0.917737</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>existing_2027</td>
+<td>bike</td>
+<td>2027</td>
+<td>2027</td>
+<td>CountyName</td>
+<td>Weber</td>
+<td>0.757591</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="outputs" class="level2">
+<h2 class="anchored" data-anchor-id="outputs">Outputs</h2>
+<p>One CSV per scenario, each long-format across modes and geography levels – easier for a planner to open and filter than nine narrow files, and named so each scenario’s file is unambiguous on its own.</p>
+<div id="write-outputs" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>PATHS[<span class="st">"output"</span>].mkdir(parents<span class="op">=</span><span class="va">True</span>, exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> scenario <span class="kw">in</span> SCENARIOS:</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    out_path <span class="op">=</span> PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="ss">f"transportation_choices_</span><span class="sc">{</span>scenario[<span class="st">'name'</span>]<span class="sc">}</span><span class="ss">.csv"</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    tidy[tidy[<span class="st">"scenario"</span>] <span class="op">==</span> scenario[<span class="st">"name"</span>]].to_csv(out_path, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Saved -&gt; </span><span class="sc">{</span>out_path<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Saved -&gt; output\transportation_choices_existing_2027.csv
+Saved -&gt; output\transportation_choices_no_build_2055.csv
+Saved -&gt; output\transportation_choices_rtp_2055.csv</code></pre>
+</div>
+</div>
+</section>
+<section id="visualization" class="level2">
+<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
+<p><a href="#fig-region-pct" class="quarto-xref">Figure&nbsp;1</a> compares all three scenarios at the region level. Reading left to right: the gap between Existing 2027 and No Build 2055 is pure population growth outpacing a frozen network; the gap between No Build 2055 and RTP 2055 is what building the plan actually buys.</p>
+<div id="cell-fig-region-pct" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> tidy[tidy[<span class="st">"geography_level"</span>] <span class="op">==</span> <span class="st">"Region"</span>].copy()</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>scenario_order <span class="op">=</span> [s[<span class="st">"name"</span>] <span class="cf">for</span> s <span class="kw">in</span> SCENARIOS]</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>region[<span class="st">"scenario"</span>] <span class="op">=</span> pd.Categorical(region[<span class="st">"scenario"</span>], categories<span class="op">=</span>scenario_order, ordered<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>region <span class="op">=</span> region.sort_values(<span class="st">"scenario"</span>)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>MODE_COLORS <span class="op">=</span> {<span class="st">"bike"</span>: <span class="st">"#1B7F79"</span>, <span class="st">"transit"</span>: <span class="st">"#8A5BC2"</span>}  <span class="co"># fixed categorical order, not cycled</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">5</span>))</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="fl">0.35</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> <span class="bu">range</span>(<span class="bu">len</span>(scenario_order))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, mode <span class="kw">in</span> <span class="bu">enumerate</span>((<span class="st">"bike"</span>, <span class="st">"transit"</span>)):</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    vals <span class="op">=</span> region[region[<span class="st">"mode"</span>] <span class="op">==</span> mode].set_index(<span class="st">"scenario"</span>)[<span class="st">"pct_near_facility"</span>].reindex(scenario_order)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    offset <span class="op">=</span> (i <span class="op">-</span> <span class="fl">0.5</span>) <span class="op">*</span> width</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    ax.bar([xi <span class="op">+</span> offset <span class="cf">for</span> xi <span class="kw">in</span> x], vals <span class="op">*</span> <span class="dv">100</span>, width<span class="op">=</span>width, label<span class="op">=</span>mode, color<span class="op">=</span>MODE_COLORS[mode])</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">list</span>(x))</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels(scenario_order)</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"</span><span class="sc">% o</span><span class="st">f population within 1/4 mile"</span>)</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>ax.legend(title<span class="op">=</span><span class="st">"Mode"</span>, frameon<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>ax.spines[[<span class="st">"top"</span>, <span class="st">"right"</span>]].set_visible(<span class="va">False</span>)</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>fig.savefig(PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="st">"region_pct.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor(), dpi<span class="op">=</span><span class="dv">150</span>)</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-region-pct" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Grouped bar chart comparing bike and transit percentages across three scenarios: Existing 2027, No Build 2055, and RTP 2055. Bike rises from about 88% to about 94%; transit rises only slightly from Existing to No Build before reaching about 21% under RTP 2055.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-region-pct-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Share of WFRC-region population within 1/4 mile of a bike or transit facility, by scenario."><img src="index_files/figure-html/fig-region-pct-output-1.png" alt="Grouped bar chart comparing bike and transit percentages across three scenarios: Existing 2027, No Build 2055, and RTP 2055. Bike rises from about 88% to about 94%; transit rises only slightly from Existing to No Build before reaching about 21% under RTP 2055." width="759" height="470" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Share of WFRC-region population within 1/4 mile of a bike or transit facility, by scenario.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/wfrcanalytics\.github\.io\/GIS-adhoc-analyses");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 <a href="https://wfrc.utah.gov/">Wasatch Front Regional Council</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>

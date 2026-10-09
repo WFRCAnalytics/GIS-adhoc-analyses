@@ -1,0 +1,11 @@
+scenario,mode,se_year,gis_year,geography_level,geography_name,pct_near_facility
+existing_2027,bike,2027,2027,Region,WFRC,0.8758967388990739
+existing_2027,bike,2027,2027,CountyName,Box Elder,0.5963041863714129
+existing_2027,bike,2027,2027,CountyName,Davis,0.8464844778470819
+existing_2027,bike,2027,2027,CountyName,Salt Lake,0.9177369654517401
+existing_2027,bike,2027,2027,CountyName,Weber,0.7575910710581639
+existing_2027,transit,2027,2027,Region,WFRC,0.18789699096905263
+existing_2027,transit,2027,2027,CountyName,Box Elder,0.0
+existing_2027,transit,2027,2027,CountyName,Davis,0.009269265728187571
+existing_2027,transit,2027,2027,CountyName,Salt Lake,0.25296192767774384
+existing_2027,transit,2027,2027,CountyName,Weber,0.16622708444466022

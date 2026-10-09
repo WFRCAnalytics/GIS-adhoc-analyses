@@ -234,3 +234,7 @@ projects/*/_data/processed/*
 # and manually provided (not REST-cached) -- exclude explicitly
 projects/center-buildout-capacity/_data/raw/remm/*
 !projects/center-buildout-capacity/_data/raw/remm/.gitkeep
+
+# transportation-choices: v9 reference scripts/data pulled in for research
+# only, superseded by the v10 pipeline in index.qmd -- not a deliverable
+projects/transportation-choices/_archive/
