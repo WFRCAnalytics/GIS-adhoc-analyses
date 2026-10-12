@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-10-09">
+<meta name="dcterms.date" content="2026-10-12">
 
 <title>Transportation Choices – Geospatial Analyses</title>
 <style>
@@ -364,7 +364,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">October 9, 2026</p>
+        <p class="date">October 12, 2026</p>
       </div>
     </div>
     
@@ -434,13 +434,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>No Build 2055</td>
 <td>2055</td>
 <td>2032</td>
-<td>2055’s population, with no further facilities built</td>
+<td>2055’s population, with only STIP-programmed projects built</td>
 </tr>
 <tr class="odd">
 <td>RTP (Build) 2055</td>
 <td>2055</td>
 <td>2055</td>
-<td>2055’s population, with the RTP’s planned facilities built</td>
+<td>2055’s population, with the RTP’s funded (phased) projects built</td>
 </tr>
 </tbody>
 </table>
@@ -451,11 +451,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>The 2032 GIS vintage is a placeholder, not real data
+<span class="screen-reader-only">Important</span>How the 2032 and 2055 vintages are defined from RTP projects
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Neither mode has a real 2032 facility layer yet – bike is waiting on a layer from Sarah/Hugh (via Suzie), transit on a LIN Stops file from Suzie. Until those arrive, 2032 is deliberately defined as “unchanged from 2027” (see <code>GIS_VINTAGES</code> below), so <strong>No Build 2055 currently only isolates the effect of population growth, not a true no-further-investment scenario.</strong> Re-run this page once the real 2032 data lands.</p>
+<p>Both future vintages come from the RTP 2027 Preferred Scenario project layers, filtered by funding status:</p>
+<ul>
+<li><strong>2032</strong> = the 2027 base plus RTP projects flagged <code>Field9_STIP = 1</code> – projects already programmed in the STIP, so expected on the ground by 2032.</li>
+<li><strong>2055</strong> = the 2032 network plus every remaining RTP project with <code>phase</code> 1-3. <code>phase = 0</code> projects are unfunded (needed but not financially constrained) and are excluded.</li>
+</ul>
+<p>Because vintages are cumulative, a STIP project stays in 2055 even if its <code>phase</code> is 0 (currently one AT line). For bike, this STIP-based 2032 vintage is final. For transit it’s interim: 2032 transit is still pending the TDM stops data from Suzie, and will switch to that once it arrives.</p>
 </div>
 </div>
 <p>GIS facility data is <em>incremental</em> by vintage year and mode: each vintage layers new facilities on top of the previous one rather than restating everything from scratch. That’s what makes the pipeline easy to extend – adding a scenario is one line in <code>SCENARIOS</code>, and adding a GIS vintage is one entry in <code>GIS_VINTAGES</code>.</p>
@@ -488,13 +493,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="even">
 <td>Bike</td>
 <td>2032</td>
-<td><em>(placeholder – not yet available)</em></td>
-<td>TBD, Sarah/Hugh via Suzie</td>
+<td>RTP 2027 Preferred Scenario AT line projects in the STIP (<code>Field9_STIP = 1</code>)</td>
+<td><code>at_line_projects</code></td>
 </tr>
 <tr class="odd">
 <td>Bike</td>
 <td>2055</td>
-<td>RTP 2027 Preferred Scenario AT projects, line facilities only</td>
+<td>Remaining funded RTP AT line projects (<code>phase</code> ≠ 0)</td>
 <td><code>at_line_projects</code></td>
 </tr>
 <tr class="even">
@@ -506,13 +511,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td>Transit</td>
 <td>2032</td>
-<td><em>(placeholder – unchanged from 2027)</em></td>
-<td>LIN Stops, not yet received from Suzie</td>
+<td><em>(interim)</em> RTP 2027 Preferred Scenario transit projects in the STIP (<code>Field9_STIP = 1</code>), same mode filter as 2055 – pending TDM stops data from Suzie</td>
+<td><code>transit_line_projects</code>, <code>transit_point_projects</code></td>
 </tr>
 <tr class="even">
 <td>Transit</td>
 <td>2055</td>
-<td>RTP 2027 Preferred Scenario transit projects, filtered to LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus)</td>
+<td>Remaining funded RTP transit projects (<code>phase</code> ≠ 0), filtered to LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus)</td>
 <td><code>transit_line_projects</code>, <code>transit_point_projects</code></td>
 </tr>
 </tbody>
@@ -548,22 +553,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>GIS_VINTAGES <span class="op">=</span> {</span>
 <span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"bike"</span>: {</span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2027</span>: {<span class="st">"adds"</span>: [<span class="st">"utah_bikeways"</span>], <span class="st">"builds_on"</span>: <span class="va">None</span>},</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2032</span>: {<span class="st">"adds"</span>: [], <span class="st">"builds_on"</span>: <span class="dv">2027</span>},  <span class="co"># placeholder: layer </span><span class="al">TBD</span><span class="co"> (Sarah/Hugh via Suzie)</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2055</span>: {<span class="st">"adds"</span>: [<span class="st">"at_line_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2032</span>},</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2032</span>: {<span class="st">"adds"</span>: [<span class="st">"at_line_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2027</span>},  <span class="co"># STIP projects only</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2055</span>: {<span class="st">"adds"</span>: [<span class="st">"at_line_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2032</span>},  <span class="co"># funded (phase != 0), non-STIP</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    },</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"transit"</span>: {</span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2027</span>: {<span class="st">"adds"</span>: [<span class="st">"uta_stops"</span>, <span class="st">"uta_routes"</span>], <span class="st">"builds_on"</span>: <span class="va">None</span>},</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2032</span>: {<span class="st">"adds"</span>: [], <span class="st">"builds_on"</span>: <span class="dv">2027</span>},  <span class="co"># placeholder: treat as unchanged from 2027</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="co"># until LIN Stops (Suzie) arrives -- a deliberate interim choice, not a gap</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2055</span>: {<span class="st">"adds"</span>: [<span class="st">"transit_line_projects"</span>, <span class="st">"transit_point_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2032</span>},</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>SCENARIOS <span class="op">=</span> [</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"existing_2027"</span>, <span class="st">"se_year"</span>: <span class="dv">2027</span>, <span class="st">"gis_year"</span>: <span class="dv">2027</span>},</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"no_build_2055"</span>, <span class="st">"se_year"</span>: <span class="dv">2055</span>, <span class="st">"gis_year"</span>: <span class="dv">2032</span>},</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"rtp_2055"</span>, <span class="st">"se_year"</span>: <span class="dv">2055</span>, <span class="st">"gis_year"</span>: <span class="dv">2055</span>},</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2032</span>: {<span class="st">"adds"</span>: [<span class="st">"transit_line_projects"</span>, <span class="st">"transit_point_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2027</span>},  <span class="co"># STIP; interim until TDM stops (Suzie)</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="dv">2055</span>: {<span class="st">"adds"</span>: [<span class="st">"transit_line_projects"</span>, <span class="st">"transit_point_projects"</span>], <span class="st">"builds_on"</span>: <span class="dv">2032</span>},  <span class="co"># phase != 0</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>SCENARIOS <span class="op">=</span> [</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"existing_2027"</span>, <span class="st">"se_year"</span>: <span class="dv">2027</span>, <span class="st">"gis_year"</span>: <span class="dv">2027</span>},</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"no_build_2055"</span>, <span class="st">"se_year"</span>: <span class="dv">2055</span>, <span class="st">"gis_year"</span>: <span class="dv">2032</span>},</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>    {<span class="st">"name"</span>: <span class="st">"rtp_2055"</span>, <span class="st">"se_year"</span>: <span class="dv">2055</span>, <span class="st">"gis_year"</span>: <span class="dv">2055</span>},</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -581,13 +585,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fetched </span><span class="sc">{</span><span class="bu">len</span>(L)<span class="sc">}</span><span class="ss"> REST layers: </span><span class="sc">{</span>rest_keys<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Using cached file (0d old): at_lines.gpkg
-Using cached file (0d old): transit_lines.gpkg
-Using cached file (0d old): transit_points.gpkg
-Using cached file (0d old): uta_routes.gpkg
-Using cached file (0d old): uta_stops.gpkg
-Using cached file (0d old): utah_bikeways.gpkg
-Using cached file (0d old): wftdm_taz_v10.gpkg
+<pre><code>Using cached file (3d old): at_lines.gpkg
+Using cached file (3d old): transit_lines.gpkg
+Using cached file (3d old): transit_points.gpkg
+Using cached file (3d old): uta_routes.gpkg
+Using cached file (3d old): uta_stops.gpkg
+Using cached file (3d old): utah_bikeways.gpkg
+Using cached file (2d old): wftdm_taz_v10.gpkg
 Fetched 7 REST layers: ['at_line_projects', 'transit_line_projects', 'transit_point_projects', 'uta_routes', 'uta_stops', 'utah_bikeways', 'wftcm_taz']</code></pre>
 </div>
 </div>
@@ -628,7 +632,7 @@ All scenario SE years present.</code></pre>
 </section>
 <section id="sec-bike-geometry" class="level2">
 <h2 class="anchored" data-anchor-id="sec-bike-geometry">Build Facility Geometry — Bike</h2>
-<p>Bike facilities are line geometry, buffered directly: <code>utah_bikeways</code>’s <code>Facility1</code> field distinguishes facility type, encoded with AGRC’s 1/2/3 bikeway class suffixes (1 = physically separated cycle track, 2 = bike lane, 3 = shared roadway/shoulder). <code>"Not Available"</code> means no bike facility at all, but the class-3 family (<code>"Other bike route, unspecified (3)"</code>, <code>"Shoulder bikeway (3A)"</code>, <code>"Marked shared roadway (3B)"</code>, <code>"Signed shared roadway (3C)"</code>) is excluded too – it’s just a stripe or sign on a road shared with traffic, not a dedicated facility, and the v9 <code>_archive/</code> script excluded the same codes (<code>bike_l</code>/<code>bike_r NOT IN ('3','3A','3B','3C')</code>). Everything else – bike lanes, buffered/protected cycle tracks, and trails – is existing network. The 2055 vintage adds the RTP 2027 Preferred Scenario’s active-transportation <strong>line</strong> projects as-is – every row in <code>at_line_projects</code> is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching <code>utah_bikeways</code>’s own facility categories. The companion point layer (<code>at_point_projects</code>) is pedestrian/bike crossings, not bike-path segments, so it’s excluded here – <code>WFRCAnalytics/GIS-RTP-Phasing-Criteria</code> treats those crossings as a separate network-connectivity attribute rather than part of the facility network.</p>
+<p>Bike facilities are line geometry, buffered directly: <code>utah_bikeways</code>’s <code>Facility1</code> field distinguishes facility type, encoded with AGRC’s 1/2/3 bikeway class suffixes (1 = physically separated cycle track, 2 = bike lane, 3 = shared roadway/shoulder). <code>"Not Available"</code> means no bike facility at all, but the class-3 family (<code>"Other bike route, unspecified (3)"</code>, <code>"Shoulder bikeway (3A)"</code>, <code>"Marked shared roadway (3B)"</code>, <code>"Signed shared roadway (3C)"</code>) is excluded too – it’s just a stripe or sign on a road shared with traffic, not a dedicated facility, and the v9 <code>_archive/</code> script excluded the same codes (<code>bike_l</code>/<code>bike_r NOT IN ('3','3A','3B','3C')</code>). Everything else – bike lanes, buffered/protected cycle tracks, and trails – is existing network. The 2032 vintage adds the STIP-programmed subset of the RTP 2027 Preferred Scenario’s active-transportation <strong>line</strong> projects (<code>Field9_STIP = 1</code>), and the 2055 vintage adds every other funded one (<code>phase</code> ≠ 0; <code>phase = 0</code> is unfunded) – every row in <code>at_line_projects</code> is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching <code>utah_bikeways</code>’s own facility categories. The companion point layer (<code>at_point_projects</code>) is pedestrian/bike crossings, not bike-path segments, so it’s excluded here – <code>WFRCAnalytics/GIS-RTP-Phasing-Criteria</code> treats those crossings as a separate network-connectivity attribute rather than part of the facility network.</p>
 <div id="bike-raw-by-vintage" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -640,24 +644,30 @@ All scenario SE years present.</code></pre>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"'Marked shared roadway (3B)','Signed shared roadway (3C)'"</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>bike_raw <span class="op">=</span> {</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2027</span>: gpd.read_file(</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        L[<span class="st">"utah_bikeways"</span>],</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        where<span class="op">=</span><span class="ss">f"Facility1 IS NOT NULL AND Facility1 NOT IN (</span><span class="sc">{</span>_BIKE_EXCLUDED_FACILITY1_SQL<span class="sc">}</span><span class="ss">)"</span>,</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    ).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2032</span>: gpd.GeoDataFrame(geometry<span class="op">=</span>[], crs<span class="op">=</span>CRS),  <span class="co"># placeholder: 2032 bike layer </span><span class="al">TBD</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2055</span>: gpd.read_file(L[<span class="st">"at_line_projects"</span>]).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, gdf <span class="kw">in</span> bike_raw.items():</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Bike </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> adds: </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># RTP project funding filters, shared by bike and transit. 2032 = STIP-programmed;</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># 2055 = every other funded project (phase 0 = unfunded). STIP projects aren't</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="co"># repeated in 2055's adds -- the cumulative build already carries them forward.</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>_RTP_2032_SQL <span class="op">=</span> <span class="st">"Field9_STIP = 1"</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>_RTP_2055_SQL <span class="op">=</span> <span class="st">"phase &lt;&gt; '0' AND Field9_STIP &lt;&gt; 1"</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>bike_raw <span class="op">=</span> {</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2027</span>: gpd.read_file(</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        L[<span class="st">"utah_bikeways"</span>],</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        where<span class="op">=</span><span class="ss">f"Facility1 IS NOT NULL AND Facility1 NOT IN (</span><span class="sc">{</span>_BIKE_EXCLUDED_FACILITY1_SQL<span class="sc">}</span><span class="ss">)"</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    ).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2032</span>: gpd.read_file(L[<span class="st">"at_line_projects"</span>], where<span class="op">=</span>_RTP_2032_SQL).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2055</span>: gpd.read_file(L[<span class="st">"at_line_projects"</span>], where<span class="op">=</span>_RTP_2055_SQL).to_crs(CRS)[[<span class="st">"geometry"</span>]],</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, gdf <span class="kw">in</span> bike_raw.items():</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Bike </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> adds: </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Bike 2027 adds: 12332 features
-Bike 2032 adds: 0 features
-Bike 2055 adds: 763 features</code></pre>
+Bike 2032 adds: 40 features
+Bike 2055 adds: 441 features</code></pre>
 </div>
 </div>
-<p>Each vintage’s cumulative network is its own <code>adds</code> plus everything the vintage it <code>builds_on</code> already had – so a vintage with nothing new yet (2032, for now) is simply identical to the vintage beneath it, not empty. Buffering and dissolving that cumulative network once per vintage gives the geometry every scenario needing that vintage can reuse.</p>
+<p>Each vintage’s cumulative network is its own <code>adds</code> plus everything the vintage it <code>builds_on</code> already had – so 2055 includes the 2032 STIP projects without listing them again, and a vintage with nothing new would simply be identical to the vintage beneath it, not empty. Buffering and dissolving that cumulative network once per vintage gives the geometry every scenario needing that vintage can reuse.</p>
 <div id="bike-buffers-by-vintage" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -678,8 +688,8 @@ Bike 2055 adds: 763 features</code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Bike 2027 cumulative: 12332 features
-Bike 2032 cumulative: 12332 features
-Bike 2055 cumulative: 13095 features</code></pre>
+Bike 2032 cumulative: 12372 features
+Bike 2055 cumulative: 12813 features</code></pre>
 </div>
 </div>
 </section>
@@ -728,7 +738,7 @@ Frequent-route stops:      1219
 Transit 2027 base (dedup): 1417</code></pre>
 </div>
 </div>
-<p>The 2055 vintage adds the RTP’s transit projects. A planned rail or BRT corridor arrives as a line, not a point, but reducing it to a single centroid badly undercounts its real catchment – a corridor has stations spaced along its whole length, not clustered at its midpoint. Reasonableness-checking against the v9 benchmark confirmed this: collapsing lines to centroids put RTP 2050-equivalent transit coverage around 20%, far under the v9 pipeline’s reported 33% for 2050 RTP. So line projects are buffered directly as corridors here, the same way bike line facilities already are, while point projects (new stations) stay point-buffered.</p>
+<p>The 2032 and 2055 vintages add the RTP’s transit projects, split by the same funding filters as bike: STIP-programmed (<code>Field9_STIP = 1</code>) in 2032, every other funded project (<code>phase</code> ≠ 0) in 2055. A planned rail or BRT corridor arrives as a line, not a point, but reducing it to a single centroid badly undercounts its real catchment – a corridor has stations spaced along its whole length, not clustered at its midpoint. Reasonableness-checking against the v9 benchmark confirmed this: collapsing lines to centroids put RTP 2050-equivalent transit coverage around 20%, far under the v9 pipeline’s reported 33% for 2050 RTP. So line projects are buffered directly as corridors here, the same way bike line facilities already are, while point projects (new stations) stay point-buffered.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -739,7 +749,7 @@ Transit 2027 base (dedup): 1417</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Buffering a corridor’s entire length overshoots too, in the other direction – it assumes a station is reachable from every point along the line, when real stations are discrete and spaced out (rail stops are often a mile or more apart), leaving real gaps that a full-line buffer doesn’t capture. Against the v9 benchmark this currently reads ~45% versus the reported 33% for 2050 RTP, roughly as far over as the centroid approach was under. The correct fix is what <code>WFRCAnalytics/GIS-RTP-Phasing-Criteria</code> already does: buffer each line, intersect with the real 2055 UF TDM model’s stop nodes to get actual station locations, then apply mode-specific buffer tiers (Rail 0.5 mi, BRT 0.35 mi, Core 0.25 mi). That needs the TDM network GDB, which isn’t available in this repo yet – full-line buffering is the deliberate placeholder until it is.</p>
+<p>Buffering a corridor’s entire length overshoots too, in the other direction – it assumes a station is reachable from every point along the line, when real stations are discrete and spaced out (rail stops are often a mile or more apart), leaving real gaps that a full-line buffer doesn’t capture. Before unfunded (<code>phase = 0</code>) projects were excluded, this read ~45% against the v9 benchmark’s reported 33% for 2050 RTP; with only funded projects it now reads ~28%, but that drop comes from the narrower project set, not from fixing the overshoot. The correct fix is what <code>WFRCAnalytics/GIS-RTP-Phasing-Criteria</code> already does: buffer each line, intersect with the real 2055 UF TDM model’s stop nodes to get actual station locations, then apply mode-specific buffer tiers (Rail 0.5 mi, BRT 0.35 mi, Core 0.25 mi). That needs the TDM network GDB, which isn’t available in this repo yet – full-line buffering is the deliberate placeholder until it is.</p>
 </div>
 </div>
 <p>Not every project qualifies, though: only LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) project types count toward this mode, mirroring the Rail/BRT buffer-tier grouping <code>WFRCAnalytics/GIS-RTP-Phasing-Criteria</code> uses (which buffers FrontRunner, TRAX, and the Sugar House Streetcar together as one fixed-guideway-equivalent tier, separate from core local bus). Exploratory corridors, corridor preservation, transit/mobility hubs, maintenance facilities, park &amp; rides, and gondolas are excluded – they aren’t LRT/CRT/high-frequency-bus stops themselves.</p>
@@ -752,31 +762,33 @@ Transit 2027 base (dedup): 1417</code></pre>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>_TRANSIT_LINE_TYPES_SQL <span class="op">=</span> <span class="st">"'Light Rail','Commuter Rail','Street Car','Bus Rapid Transit','Enhanced Bus'"</span></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>_TRANSIT_POINT_TYPES_SQL <span class="op">=</span> <span class="st">"'New Station'"</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>transit_2055_lines <span class="op">=</span> gpd.read_file(</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    L[<span class="st">"transit_line_projects"</span>], where<span class="op">=</span><span class="ss">f"improvement_type IN (</span><span class="sc">{</span>_TRANSIT_LINE_TYPES_SQL<span class="sc">}</span><span class="ss">)"</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>).to_crs(CRS)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>transit_2055_points <span class="op">=</span> gpd.read_file(</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    L[<span class="st">"transit_point_projects"</span>], where<span class="op">=</span><span class="ss">f"improvement_type IN (</span><span class="sc">{</span>_TRANSIT_POINT_TYPES_SQL<span class="sc">}</span><span class="ss">)"</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>).to_crs(CRS)</span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>transit_raw <span class="op">=</span> {</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2027</span>: transit_2027,</span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2032</span>: gpd.GeoDataFrame(geometry<span class="op">=</span>[], crs<span class="op">=</span>CRS),  <span class="co"># placeholder: LIN Stops file from Suzie</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2055</span>: gpd.GeoDataFrame(</span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        pd.concat(</span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>            [transit_2055_points[[<span class="st">"geometry"</span>]], transit_2055_lines[[<span class="st">"geometry"</span>]]],</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>            ignore_index<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        geometry<span class="op">=</span><span class="st">"geometry"</span>,</span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        crs<span class="op">=</span>CRS,</span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, gdf <span class="kw">in</span> transit_raw.items():</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Transit </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> adds: </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> read_transit_projects(funding_sql):</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""RTP transit point + line projects of a qualifying type, filtered by funding status."""</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    parts <span class="op">=</span> [</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>        gpd.read_file(L[key], where<span class="op">=</span><span class="ss">f"improvement_type IN (</span><span class="sc">{</span>types_sql<span class="sc">}</span><span class="ss">) AND </span><span class="sc">{</span>funding_sql<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>        .to_crs(CRS)[[<span class="st">"geometry"</span>]]</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> key, types_sql <span class="kw">in</span> (</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"transit_point_projects"</span>, _TRANSIT_POINT_TYPES_SQL),</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>            (<span class="st">"transit_line_projects"</span>, _TRANSIT_LINE_TYPES_SQL),</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> gpd.GeoDataFrame(pd.concat(parts, ignore_index<span class="op">=</span><span class="va">True</span>), geometry<span class="op">=</span><span class="st">"geometry"</span>, crs<span class="op">=</span>CRS)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>transit_raw <span class="op">=</span> {</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2027</span>: transit_2027,</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2032</span>: read_transit_projects(_RTP_2032_SQL),</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2055</span>: read_transit_projects(_RTP_2055_SQL),</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> year, gdf <span class="kw">in</span> transit_raw.items():</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Transit </span><span class="sc">{</span>year<span class="sc">}</span><span class="ss"> adds: </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> features"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Transit 2027 adds: 1417 features
-Transit 2032 adds: 0 features
-Transit 2055 adds: 58 features</code></pre>
+Transit 2032 adds: 7 features
+Transit 2055 adds: 10 features</code></pre>
 </div>
 </div>
 <div id="transit-buffers-by-vintage" class="cell" data-execution_count="8">
@@ -801,8 +813,8 @@ Transit 2055 adds: 58 features</code></pre>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Transit 2027 cumulative: 1417 features
-Transit 2032 cumulative: 1417 features
-Transit 2055 cumulative: 1475 features</code></pre>
+Transit 2032 cumulative: 1424 features
+Transit 2055 cumulative: 1434 features</code></pre>
 </div>
 </div>
 </section>
@@ -1021,14 +1033,14 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 <div class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb22" data-startfrom="405" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 404;"><span id="cb22-405"><a href="#cb22-405" aria-hidden="true" tabindex="-1"></a><span class="co">// Read client-side via FileAttachment rather than ojs_define() -- the</span></span>
-<span id="cb22-406"><a href="#cb22-406" aria-hidden="true" tabindex="-1"></a><span class="co">// combination of ojs_define's embedded &lt;script type="ojs-define"&gt; data with</span></span>
-<span id="cb22-407"><a href="#cb22-407" aria-hidden="true" tabindex="-1"></a><span class="co">// this page's panel-tabset layout left tc_data undefined at runtime for</span></span>
-<span id="cb22-408"><a href="#cb22-408" aria-hidden="true" tabindex="-1"></a><span class="co">// every dependent cell. WFRCAnalytics/TDM-VAL-SchoolCollegeEnrollment uses</span></span>
-<span id="cb22-409"><a href="#cb22-409" aria-hidden="true" tabindex="-1"></a><span class="co">// FileAttachment for all of its interactive pages, including ones with the</span></span>
-<span id="cb22-410"><a href="#cb22-410" aria-hidden="true" tabindex="-1"></a><span class="co">// same panel-tabset/panel-input layout, so this follows that precedent</span></span>
-<span id="cb22-411"><a href="#cb22-411" aria-hidden="true" tabindex="-1"></a><span class="co">// instead of re-diagnosing the ojs_define interaction further.</span></span>
-<span id="cb22-412"><a href="#cb22-412" aria-hidden="true" tabindex="-1"></a>tc_data <span class="op">=</span> <span class="fu">FileAttachment</span>(<span class="st">"output/transportation_choices_tidy.csv"</span>)<span class="op">.</span><span class="fu">csv</span>({<span class="dt">typed</span><span class="op">:</span> <span class="kw">true</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb22" data-startfrom="417" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 416;"><span id="cb22-417"><a href="#cb22-417" aria-hidden="true" tabindex="-1"></a><span class="co">// Read client-side via FileAttachment rather than ojs_define() -- the</span></span>
+<span id="cb22-418"><a href="#cb22-418" aria-hidden="true" tabindex="-1"></a><span class="co">// combination of ojs_define's embedded &lt;script type="ojs-define"&gt; data with</span></span>
+<span id="cb22-419"><a href="#cb22-419" aria-hidden="true" tabindex="-1"></a><span class="co">// this page's panel-tabset layout left tc_data undefined at runtime for</span></span>
+<span id="cb22-420"><a href="#cb22-420" aria-hidden="true" tabindex="-1"></a><span class="co">// every dependent cell. WFRCAnalytics/TDM-VAL-SchoolCollegeEnrollment uses</span></span>
+<span id="cb22-421"><a href="#cb22-421" aria-hidden="true" tabindex="-1"></a><span class="co">// FileAttachment for all of its interactive pages, including ones with the</span></span>
+<span id="cb22-422"><a href="#cb22-422" aria-hidden="true" tabindex="-1"></a><span class="co">// same panel-tabset/panel-input layout, so this follows that precedent</span></span>
+<span id="cb22-423"><a href="#cb22-423" aria-hidden="true" tabindex="-1"></a><span class="co">// instead of re-diagnosing the ojs_define interaction further.</span></span>
+<span id="cb22-424"><a href="#cb22-424" aria-hidden="true" tabindex="-1"></a>tc_data <span class="op">=</span> <span class="fu">FileAttachment</span>(<span class="st">"output/transportation_choices_tidy.csv"</span>)<span class="op">.</span><span class="fu">csv</span>({<span class="dt">typed</span><span class="op">:</span> <span class="kw">true</span>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="load-tidy-data" class="cell-output cell-output-display">
 <div id="ojs-cell-1" data-nodetype="declaration">
@@ -1039,45 +1051,45 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 <div id="ojs-setup" class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb23" data-startfrom="426" data-source-offset="-367"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 425;"><span id="cb23-426"><a href="#cb23-426" aria-hidden="true" tabindex="-1"></a>PATH_STYLE <span class="op">=</span> ({</span>
-<span id="cb23-427"><a href="#cb23-427" aria-hidden="true" tabindex="-1"></a>  <span class="st">"No Build"</span><span class="op">:</span> {<span class="dt">dash</span><span class="op">:</span> <span class="st">"5,4"</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"No Build 2055"</span>}<span class="op">,</span></span>
-<span id="cb23-428"><a href="#cb23-428" aria-hidden="true" tabindex="-1"></a>  <span class="st">"RTP"</span><span class="op">:</span> {<span class="dt">dash</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"RTP (Build) 2055"</span>}<span class="op">,</span></span>
-<span id="cb23-429"><a href="#cb23-429" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb23-430"><a href="#cb23-430" aria-hidden="true" tabindex="-1"></a>SCENARIO_OPTIONS <span class="op">=</span> <span class="bu">Object</span><span class="op">.</span><span class="fu">keys</span>(PATH_STYLE)</span>
-<span id="cb23-431"><a href="#cb23-431" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-432"><a href="#cb23-432" aria-hidden="true" tabindex="-1"></a>REGION_COLOR <span class="op">=</span> <span class="st">"#7f7a76"</span> <span class="co">// brand wfrc-gray -- dashed/solid reference lines, deliberately neutral</span></span>
-<span id="cb23-433"><a href="#cb23-433" aria-hidden="true" tabindex="-1"></a>INK <span class="op">=</span> <span class="st">"#023c5b"</span> <span class="co">// brand wfrc-blue</span></span>
-<span id="cb23-434"><a href="#cb23-434" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-435"><a href="#cb23-435" aria-hidden="true" tabindex="-1"></a><span class="co">// Brand colors (_extensions/.../brand.yml) validated for CVD-safe separation</span></span>
-<span id="cb23-436"><a href="#cb23-436" aria-hidden="true" tabindex="-1"></a><span class="co">// (scripts/validate_palette.js from the dataviz skill) cover a handful of</span></span>
-<span id="cb23-437"><a href="#cb23-437" aria-hidden="true" tabindex="-1"></a><span class="co">// entities cleanly; d3's Tableau10 extends the palette for geography levels</span></span>
-<span id="cb23-438"><a href="#cb23-438" aria-hidden="true" tabindex="-1"></a><span class="co">// with more selections (e.g. large districts) without hand-picking more</span></span>
-<span id="cb23-439"><a href="#cb23-439" aria-hidden="true" tabindex="-1"></a><span class="co">// brand colors.</span></span>
-<span id="cb23-440"><a href="#cb23-440" aria-hidden="true" tabindex="-1"></a>BRAND_PALETTE <span class="op">=</span> [<span class="st">"#3762ad"</span><span class="op">,</span> <span class="st">"#c98b3a"</span><span class="op">,</span> <span class="st">"#a3423c"</span><span class="op">,</span> <span class="st">"#799f4c"</span>]</span>
-<span id="cb23-441"><a href="#cb23-441" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">colorPalette</span>(n) {</span>
-<span id="cb23-442"><a href="#cb23-442" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> base <span class="op">=</span> [<span class="op">...</span>BRAND_PALETTE<span class="op">,</span> <span class="op">...</span>d3<span class="op">.</span><span class="at">schemeTableau10</span>]</span>
-<span id="cb23-443"><a href="#cb23-443" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> n}<span class="op">,</span> (_<span class="op">,</span> i) <span class="kw">=&gt;</span> base[i <span class="op">%</span> base<span class="op">.</span><span class="at">length</span>])</span>
-<span id="cb23-444"><a href="#cb23-444" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb23-445"><a href="#cb23-445" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-446"><a href="#cb23-446" aria-hidden="true" tabindex="-1"></a><span class="co">// Reshape {scenario, pct_near_facility} rows into {entity, path, year, value}</span></span>
-<span id="cb23-447"><a href="#cb23-447" aria-hidden="true" tabindex="-1"></a><span class="co">// fork segments: one "No Build" segment and one "RTP" segment per entity,</span></span>
-<span id="cb23-448"><a href="#cb23-448" aria-hidden="true" tabindex="-1"></a><span class="co">// both anchored at the same 2027 value.</span></span>
-<span id="cb23-449"><a href="#cb23-449" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> geoLevel<span class="op">,</span> namesFilter) {</span>
-<span id="cb23-450"><a href="#cb23-450" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> tc_data<span class="op">.</span><span class="fu">filter</span>(</span>
-<span id="cb23-451"><a href="#cb23-451" aria-hidden="true" tabindex="-1"></a>    (d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">mode</span> <span class="op">===</span> modeKey <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">geography_level</span> <span class="op">===</span> geoLevel <span class="op">&amp;&amp;</span> (<span class="op">!</span>namesFilter <span class="op">||</span> namesFilter<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">geography_name</span>))</span>
-<span id="cb23-452"><a href="#cb23-452" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb23-453"><a href="#cb23-453" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> existing <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>(rows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">scenario</span> <span class="op">===</span> <span class="st">"existing_2027"</span>)<span class="op">.</span><span class="fu">map</span>((d) <span class="kw">=&gt;</span> [d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> d<span class="op">.</span><span class="at">pct_near_facility</span>]))</span>
-<span id="cb23-454"><a href="#cb23-454" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> out <span class="op">=</span> []</span>
-<span id="cb23-455"><a href="#cb23-455" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> [scenarioKey<span class="op">,</span> path] <span class="kw">of</span> [[<span class="st">"no_build_2055"</span><span class="op">,</span> <span class="st">"No Build"</span>]<span class="op">,</span> [<span class="st">"rtp_2055"</span><span class="op">,</span> <span class="st">"RTP"</span>]]) {</span>
-<span id="cb23-456"><a href="#cb23-456" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> d <span class="kw">of</span> rows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">scenario</span> <span class="op">===</span> scenarioKey)) {</span>
-<span id="cb23-457"><a href="#cb23-457" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> start <span class="op">=</span> existing<span class="op">.</span><span class="fu">get</span>(d<span class="op">.</span><span class="at">geography_name</span>)</span>
-<span id="cb23-458"><a href="#cb23-458" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (start <span class="op">===</span> <span class="kw">undefined</span>) <span class="cf">continue</span></span>
-<span id="cb23-459"><a href="#cb23-459" aria-hidden="true" tabindex="-1"></a>      out<span class="op">.</span><span class="fu">push</span>({<span class="dt">entity</span><span class="op">:</span> d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> path<span class="op">,</span> <span class="dt">year</span><span class="op">:</span> <span class="dv">2027</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> start})</span>
-<span id="cb23-460"><a href="#cb23-460" aria-hidden="true" tabindex="-1"></a>      out<span class="op">.</span><span class="fu">push</span>({<span class="dt">entity</span><span class="op">:</span> d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> path<span class="op">,</span> <span class="dt">year</span><span class="op">:</span> <span class="dv">2055</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> d<span class="op">.</span><span class="at">pct_near_facility</span>})</span>
-<span id="cb23-461"><a href="#cb23-461" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb23-462"><a href="#cb23-462" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb23-463"><a href="#cb23-463" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out</span>
-<span id="cb23-464"><a href="#cb23-464" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb23" data-startfrom="438" data-source-offset="-367"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 437;"><span id="cb23-438"><a href="#cb23-438" aria-hidden="true" tabindex="-1"></a>PATH_STYLE <span class="op">=</span> ({</span>
+<span id="cb23-439"><a href="#cb23-439" aria-hidden="true" tabindex="-1"></a>  <span class="st">"No Build"</span><span class="op">:</span> {<span class="dt">dash</span><span class="op">:</span> <span class="st">"5,4"</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"No Build 2055"</span>}<span class="op">,</span></span>
+<span id="cb23-440"><a href="#cb23-440" aria-hidden="true" tabindex="-1"></a>  <span class="st">"RTP"</span><span class="op">:</span> {<span class="dt">dash</span><span class="op">:</span> <span class="kw">null</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"RTP (Build) 2055"</span>}<span class="op">,</span></span>
+<span id="cb23-441"><a href="#cb23-441" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb23-442"><a href="#cb23-442" aria-hidden="true" tabindex="-1"></a>SCENARIO_OPTIONS <span class="op">=</span> <span class="bu">Object</span><span class="op">.</span><span class="fu">keys</span>(PATH_STYLE)</span>
+<span id="cb23-443"><a href="#cb23-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-444"><a href="#cb23-444" aria-hidden="true" tabindex="-1"></a>REGION_COLOR <span class="op">=</span> <span class="st">"#7f7a76"</span> <span class="co">// brand wfrc-gray -- dashed/solid reference lines, deliberately neutral</span></span>
+<span id="cb23-445"><a href="#cb23-445" aria-hidden="true" tabindex="-1"></a>INK <span class="op">=</span> <span class="st">"#023c5b"</span> <span class="co">// brand wfrc-blue</span></span>
+<span id="cb23-446"><a href="#cb23-446" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-447"><a href="#cb23-447" aria-hidden="true" tabindex="-1"></a><span class="co">// Brand colors (_extensions/.../brand.yml) validated for CVD-safe separation</span></span>
+<span id="cb23-448"><a href="#cb23-448" aria-hidden="true" tabindex="-1"></a><span class="co">// (scripts/validate_palette.js from the dataviz skill) cover a handful of</span></span>
+<span id="cb23-449"><a href="#cb23-449" aria-hidden="true" tabindex="-1"></a><span class="co">// entities cleanly; d3's Tableau10 extends the palette for geography levels</span></span>
+<span id="cb23-450"><a href="#cb23-450" aria-hidden="true" tabindex="-1"></a><span class="co">// with more selections (e.g. large districts) without hand-picking more</span></span>
+<span id="cb23-451"><a href="#cb23-451" aria-hidden="true" tabindex="-1"></a><span class="co">// brand colors.</span></span>
+<span id="cb23-452"><a href="#cb23-452" aria-hidden="true" tabindex="-1"></a>BRAND_PALETTE <span class="op">=</span> [<span class="st">"#3762ad"</span><span class="op">,</span> <span class="st">"#c98b3a"</span><span class="op">,</span> <span class="st">"#a3423c"</span><span class="op">,</span> <span class="st">"#799f4c"</span>]</span>
+<span id="cb23-453"><a href="#cb23-453" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">colorPalette</span>(n) {</span>
+<span id="cb23-454"><a href="#cb23-454" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> base <span class="op">=</span> [<span class="op">...</span>BRAND_PALETTE<span class="op">,</span> <span class="op">...</span>d3<span class="op">.</span><span class="at">schemeTableau10</span>]</span>
+<span id="cb23-455"><a href="#cb23-455" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">Array</span><span class="op">.</span><span class="fu">from</span>({<span class="dt">length</span><span class="op">:</span> n}<span class="op">,</span> (_<span class="op">,</span> i) <span class="kw">=&gt;</span> base[i <span class="op">%</span> base<span class="op">.</span><span class="at">length</span>])</span>
+<span id="cb23-456"><a href="#cb23-456" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb23-457"><a href="#cb23-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-458"><a href="#cb23-458" aria-hidden="true" tabindex="-1"></a><span class="co">// Reshape {scenario, pct_near_facility} rows into {entity, path, year, value}</span></span>
+<span id="cb23-459"><a href="#cb23-459" aria-hidden="true" tabindex="-1"></a><span class="co">// fork segments: one "No Build" segment and one "RTP" segment per entity,</span></span>
+<span id="cb23-460"><a href="#cb23-460" aria-hidden="true" tabindex="-1"></a><span class="co">// both anchored at the same 2027 value.</span></span>
+<span id="cb23-461"><a href="#cb23-461" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> geoLevel<span class="op">,</span> namesFilter) {</span>
+<span id="cb23-462"><a href="#cb23-462" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> rows <span class="op">=</span> tc_data<span class="op">.</span><span class="fu">filter</span>(</span>
+<span id="cb23-463"><a href="#cb23-463" aria-hidden="true" tabindex="-1"></a>    (d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">mode</span> <span class="op">===</span> modeKey <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">geography_level</span> <span class="op">===</span> geoLevel <span class="op">&amp;&amp;</span> (<span class="op">!</span>namesFilter <span class="op">||</span> namesFilter<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">geography_name</span>))</span>
+<span id="cb23-464"><a href="#cb23-464" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-465"><a href="#cb23-465" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> existing <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>(rows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">scenario</span> <span class="op">===</span> <span class="st">"existing_2027"</span>)<span class="op">.</span><span class="fu">map</span>((d) <span class="kw">=&gt;</span> [d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> d<span class="op">.</span><span class="at">pct_near_facility</span>]))</span>
+<span id="cb23-466"><a href="#cb23-466" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> out <span class="op">=</span> []</span>
+<span id="cb23-467"><a href="#cb23-467" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (<span class="kw">const</span> [scenarioKey<span class="op">,</span> path] <span class="kw">of</span> [[<span class="st">"no_build_2055"</span><span class="op">,</span> <span class="st">"No Build"</span>]<span class="op">,</span> [<span class="st">"rtp_2055"</span><span class="op">,</span> <span class="st">"RTP"</span>]]) {</span>
+<span id="cb23-468"><a href="#cb23-468" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (<span class="kw">const</span> d <span class="kw">of</span> rows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">scenario</span> <span class="op">===</span> scenarioKey)) {</span>
+<span id="cb23-469"><a href="#cb23-469" aria-hidden="true" tabindex="-1"></a>      <span class="kw">const</span> start <span class="op">=</span> existing<span class="op">.</span><span class="fu">get</span>(d<span class="op">.</span><span class="at">geography_name</span>)</span>
+<span id="cb23-470"><a href="#cb23-470" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (start <span class="op">===</span> <span class="kw">undefined</span>) <span class="cf">continue</span></span>
+<span id="cb23-471"><a href="#cb23-471" aria-hidden="true" tabindex="-1"></a>      out<span class="op">.</span><span class="fu">push</span>({<span class="dt">entity</span><span class="op">:</span> d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> path<span class="op">,</span> <span class="dt">year</span><span class="op">:</span> <span class="dv">2027</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> start})</span>
+<span id="cb23-472"><a href="#cb23-472" aria-hidden="true" tabindex="-1"></a>      out<span class="op">.</span><span class="fu">push</span>({<span class="dt">entity</span><span class="op">:</span> d<span class="op">.</span><span class="at">geography_name</span><span class="op">,</span> path<span class="op">,</span> <span class="dt">year</span><span class="op">:</span> <span class="dv">2055</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> d<span class="op">.</span><span class="at">pct_near_facility</span>})</span>
+<span id="cb23-473"><a href="#cb23-473" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb23-474"><a href="#cb23-474" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-475"><a href="#cb23-475" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out</span>
+<span id="cb23-476"><a href="#cb23-476" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="ojs-setup-1">
@@ -1132,16 +1144,16 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 <div id="geo-level-source" class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb24" data-startfrom="471" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 470;"><span id="cb24-471"><a href="#cb24-471" aria-hidden="true" tabindex="-1"></a>GEO_LEVELS <span class="op">=</span> [<span class="st">"Region"</span><span class="op">,</span> <span class="st">"CountyName"</span><span class="op">,</span> <span class="st">"WorkshopArea"</span><span class="op">,</span> <span class="st">"CityName"</span><span class="op">,</span> <span class="st">"DistrictLarge"</span><span class="op">,</span> <span class="st">"DistrictMedium"</span><span class="op">,</span> <span class="st">"DistrictSmall"</span>]</span>
-<span id="cb24-472"><a href="#cb24-472" aria-hidden="true" tabindex="-1"></a>GEO_LEVEL_LABELS <span class="op">=</span> ({</span>
-<span id="cb24-473"><a href="#cb24-473" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Region</span><span class="op">:</span> <span class="st">"Region"</span><span class="op">,</span></span>
-<span id="cb24-474"><a href="#cb24-474" aria-hidden="true" tabindex="-1"></a>  <span class="dt">CountyName</span><span class="op">:</span> <span class="st">"County"</span><span class="op">,</span></span>
-<span id="cb24-475"><a href="#cb24-475" aria-hidden="true" tabindex="-1"></a>  <span class="dt">WorkshopArea</span><span class="op">:</span> <span class="st">"Workshop Area"</span><span class="op">,</span></span>
-<span id="cb24-476"><a href="#cb24-476" aria-hidden="true" tabindex="-1"></a>  <span class="dt">CityName</span><span class="op">:</span> <span class="st">"City"</span><span class="op">,</span></span>
-<span id="cb24-477"><a href="#cb24-477" aria-hidden="true" tabindex="-1"></a>  <span class="dt">DistrictLarge</span><span class="op">:</span> <span class="st">"Large District"</span><span class="op">,</span></span>
-<span id="cb24-478"><a href="#cb24-478" aria-hidden="true" tabindex="-1"></a>  <span class="dt">DistrictMedium</span><span class="op">:</span> <span class="st">"Medium District"</span><span class="op">,</span></span>
-<span id="cb24-479"><a href="#cb24-479" aria-hidden="true" tabindex="-1"></a>  <span class="dt">DistrictSmall</span><span class="op">:</span> <span class="st">"Small District"</span><span class="op">,</span></span>
-<span id="cb24-480"><a href="#cb24-480" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb24" data-startfrom="483" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 482;"><span id="cb24-483"><a href="#cb24-483" aria-hidden="true" tabindex="-1"></a>GEO_LEVELS <span class="op">=</span> [<span class="st">"Region"</span><span class="op">,</span> <span class="st">"CountyName"</span><span class="op">,</span> <span class="st">"WorkshopArea"</span><span class="op">,</span> <span class="st">"CityName"</span><span class="op">,</span> <span class="st">"DistrictLarge"</span><span class="op">,</span> <span class="st">"DistrictMedium"</span><span class="op">,</span> <span class="st">"DistrictSmall"</span>]</span>
+<span id="cb24-484"><a href="#cb24-484" aria-hidden="true" tabindex="-1"></a>GEO_LEVEL_LABELS <span class="op">=</span> ({</span>
+<span id="cb24-485"><a href="#cb24-485" aria-hidden="true" tabindex="-1"></a>  <span class="dt">Region</span><span class="op">:</span> <span class="st">"Region"</span><span class="op">,</span></span>
+<span id="cb24-486"><a href="#cb24-486" aria-hidden="true" tabindex="-1"></a>  <span class="dt">CountyName</span><span class="op">:</span> <span class="st">"County"</span><span class="op">,</span></span>
+<span id="cb24-487"><a href="#cb24-487" aria-hidden="true" tabindex="-1"></a>  <span class="dt">WorkshopArea</span><span class="op">:</span> <span class="st">"Workshop Area"</span><span class="op">,</span></span>
+<span id="cb24-488"><a href="#cb24-488" aria-hidden="true" tabindex="-1"></a>  <span class="dt">CityName</span><span class="op">:</span> <span class="st">"City"</span><span class="op">,</span></span>
+<span id="cb24-489"><a href="#cb24-489" aria-hidden="true" tabindex="-1"></a>  <span class="dt">DistrictLarge</span><span class="op">:</span> <span class="st">"Large District"</span><span class="op">,</span></span>
+<span id="cb24-490"><a href="#cb24-490" aria-hidden="true" tabindex="-1"></a>  <span class="dt">DistrictMedium</span><span class="op">:</span> <span class="st">"Medium District"</span><span class="op">,</span></span>
+<span id="cb24-491"><a href="#cb24-491" aria-hidden="true" tabindex="-1"></a>  <span class="dt">DistrictSmall</span><span class="op">:</span> <span class="st">"Small District"</span><span class="op">,</span></span>
+<span id="cb24-492"><a href="#cb24-492" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="geo-level-source-1">
@@ -1161,17 +1173,17 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 <div id="geo-names-source" class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb25" data-startfrom="487" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 486;"><span id="cb25-487"><a href="#cb25-487" aria-hidden="true" tabindex="-1"></a>geoNamesForLevel <span class="op">=</span> [<span class="op">...</span><span class="kw">new</span> <span class="bu">Set</span>(</span>
-<span id="cb25-488"><a href="#cb25-488" aria-hidden="true" tabindex="-1"></a>  tc_data</span>
-<span id="cb25-489"><a href="#cb25-489" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">geography_level</span> <span class="op">===</span> selectedGeoLevel <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">geography_name</span> <span class="op">!=</span> <span class="kw">null</span>)</span>
-<span id="cb25-490"><a href="#cb25-490" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">map</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">geography_name</span>)</span>
-<span id="cb25-491"><a href="#cb25-491" aria-hidden="true" tabindex="-1"></a>)]<span class="op">.</span><span class="fu">sort</span>()</span>
-<span id="cb25-492"><a href="#cb25-492" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-493"><a href="#cb25-493" aria-hidden="true" tabindex="-1"></a><span class="co">// Re-derived every time selectedGeoLevel changes, so this picker's default</span></span>
-<span id="cb25-494"><a href="#cb25-494" aria-hidden="true" tabindex="-1"></a><span class="co">// resets automatically. Small levels (region, county, workshop area) start</span></span>
-<span id="cb25-495"><a href="#cb25-495" aria-hidden="true" tabindex="-1"></a><span class="co">// fully selected like before; levels with dozens of districts start empty --</span></span>
-<span id="cb25-496"><a href="#cb25-496" aria-hidden="true" tabindex="-1"></a><span class="co">// showing 50+ lines at once isn't a readable chart, so the user opts in.</span></span>
-<span id="cb25-497"><a href="#cb25-497" aria-hidden="true" tabindex="-1"></a>geoNamesDefault <span class="op">=</span> geoNamesForLevel<span class="op">.</span><span class="at">length</span> <span class="op">&lt;=</span> <span class="dv">12</span> <span class="op">?</span> geoNamesForLevel <span class="op">:</span> []</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb25" data-startfrom="499" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 498;"><span id="cb25-499"><a href="#cb25-499" aria-hidden="true" tabindex="-1"></a>geoNamesForLevel <span class="op">=</span> [<span class="op">...</span><span class="kw">new</span> <span class="bu">Set</span>(</span>
+<span id="cb25-500"><a href="#cb25-500" aria-hidden="true" tabindex="-1"></a>  tc_data</span>
+<span id="cb25-501"><a href="#cb25-501" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">geography_level</span> <span class="op">===</span> selectedGeoLevel <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">geography_name</span> <span class="op">!=</span> <span class="kw">null</span>)</span>
+<span id="cb25-502"><a href="#cb25-502" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">map</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">geography_name</span>)</span>
+<span id="cb25-503"><a href="#cb25-503" aria-hidden="true" tabindex="-1"></a>)]<span class="op">.</span><span class="fu">sort</span>()</span>
+<span id="cb25-504"><a href="#cb25-504" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-505"><a href="#cb25-505" aria-hidden="true" tabindex="-1"></a><span class="co">// Re-derived every time selectedGeoLevel changes, so this picker's default</span></span>
+<span id="cb25-506"><a href="#cb25-506" aria-hidden="true" tabindex="-1"></a><span class="co">// resets automatically. Small levels (region, county, workshop area) start</span></span>
+<span id="cb25-507"><a href="#cb25-507" aria-hidden="true" tabindex="-1"></a><span class="co">// fully selected like before; levels with dozens of districts start empty --</span></span>
+<span id="cb25-508"><a href="#cb25-508" aria-hidden="true" tabindex="-1"></a><span class="co">// showing 50+ lines at once isn't a readable chart, so the user opts in.</span></span>
+<span id="cb25-509"><a href="#cb25-509" aria-hidden="true" tabindex="-1"></a>geoNamesDefault <span class="op">=</span> geoNamesForLevel<span class="op">.</span><span class="at">length</span> <span class="op">&lt;=</span> <span class="dv">12</span> <span class="op">?</span> geoNamesForLevel <span class="op">:</span> []</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-display">
 <div id="geo-names-source-1">
@@ -1190,23 +1202,23 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 </div>
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb26" data-startfrom="506" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 505;"><span id="cb26-506"><a href="#cb26-506" aria-hidden="true" tabindex="-1"></a>viewof selectedGeoLevel <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>(GEO_LEVELS<span class="op">,</span> {</span>
-<span id="cb26-507"><a href="#cb26-507" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Geography level"</span><span class="op">,</span></span>
-<span id="cb26-508"><a href="#cb26-508" aria-hidden="true" tabindex="-1"></a>  <span class="dt">format</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> GEO_LEVEL_LABELS[d]<span class="op">,</span></span>
-<span id="cb26-509"><a href="#cb26-509" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> <span class="st">"CountyName"</span><span class="op">,</span></span>
-<span id="cb26-510"><a href="#cb26-510" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb26-511"><a href="#cb26-511" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-512"><a href="#cb26-512" aria-hidden="true" tabindex="-1"></a>viewof selectedGeoNames <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>(geoNamesForLevel<span class="op">,</span> {</span>
-<span id="cb26-513"><a href="#cb26-513" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Geographies"</span><span class="op">,</span></span>
-<span id="cb26-514"><a href="#cb26-514" aria-hidden="true" tabindex="-1"></a>  <span class="dt">multiple</span><span class="op">:</span> <span class="dv">4</span><span class="op">,</span></span>
-<span id="cb26-515"><a href="#cb26-515" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> geoNamesDefault<span class="op">,</span></span>
-<span id="cb26-516"><a href="#cb26-516" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb26-517"><a href="#cb26-517" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-518"><a href="#cb26-518" aria-hidden="true" tabindex="-1"></a>viewof selectedPaths <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">checkbox</span>(SCENARIO_OPTIONS<span class="op">,</span> {</span>
-<span id="cb26-519"><a href="#cb26-519" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> SCENARIO_OPTIONS<span class="op">,</span></span>
-<span id="cb26-520"><a href="#cb26-520" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"2055 scenario"</span><span class="op">,</span></span>
-<span id="cb26-521"><a href="#cb26-521" aria-hidden="true" tabindex="-1"></a>  <span class="dt">format</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> PATH_STYLE[d]<span class="op">.</span><span class="at">label</span><span class="op">,</span></span>
-<span id="cb26-522"><a href="#cb26-522" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb26" data-startfrom="518" data-source-offset="-1"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 517;"><span id="cb26-518"><a href="#cb26-518" aria-hidden="true" tabindex="-1"></a>viewof selectedGeoLevel <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>(GEO_LEVELS<span class="op">,</span> {</span>
+<span id="cb26-519"><a href="#cb26-519" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Geography level"</span><span class="op">,</span></span>
+<span id="cb26-520"><a href="#cb26-520" aria-hidden="true" tabindex="-1"></a>  <span class="dt">format</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> GEO_LEVEL_LABELS[d]<span class="op">,</span></span>
+<span id="cb26-521"><a href="#cb26-521" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> <span class="st">"CountyName"</span><span class="op">,</span></span>
+<span id="cb26-522"><a href="#cb26-522" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb26-523"><a href="#cb26-523" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-524"><a href="#cb26-524" aria-hidden="true" tabindex="-1"></a>viewof selectedGeoNames <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">select</span>(geoNamesForLevel<span class="op">,</span> {</span>
+<span id="cb26-525"><a href="#cb26-525" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"Geographies"</span><span class="op">,</span></span>
+<span id="cb26-526"><a href="#cb26-526" aria-hidden="true" tabindex="-1"></a>  <span class="dt">multiple</span><span class="op">:</span> <span class="dv">4</span><span class="op">,</span></span>
+<span id="cb26-527"><a href="#cb26-527" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> geoNamesDefault<span class="op">,</span></span>
+<span id="cb26-528"><a href="#cb26-528" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb26-529"><a href="#cb26-529" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-530"><a href="#cb26-530" aria-hidden="true" tabindex="-1"></a>viewof selectedPaths <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">checkbox</span>(SCENARIO_OPTIONS<span class="op">,</span> {</span>
+<span id="cb26-531"><a href="#cb26-531" aria-hidden="true" tabindex="-1"></a>  <span class="dt">value</span><span class="op">:</span> SCENARIO_OPTIONS<span class="op">,</span></span>
+<span id="cb26-532"><a href="#cb26-532" aria-hidden="true" tabindex="-1"></a>  <span class="dt">label</span><span class="op">:</span> <span class="st">"2055 scenario"</span><span class="op">,</span></span>
+<span id="cb26-533"><a href="#cb26-533" aria-hidden="true" tabindex="-1"></a>  <span class="dt">format</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> PATH_STYLE[d]<span class="op">.</span><span class="at">label</span><span class="op">,</span></span>
+<span id="cb26-534"><a href="#cb26-534" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="controls-panel" class="cell panel-input card bg-light p-2 quarto-layout-panel" data-layout-ncol="3">
 <div class="quarto-layout-row">
@@ -1230,109 +1242,109 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 <div class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb27" data-startfrom="527" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 526;"><span id="cb27-527"><a href="#cb27-527" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">modeChart</span>(modeKey<span class="op">,</span> subtitle) {</span>
-<span id="cb27-528"><a href="#cb27-528" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> isRegionLevel <span class="op">=</span> selectedGeoLevel <span class="op">===</span> <span class="st">"Region"</span></span>
-<span id="cb27-529"><a href="#cb27-529" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> entityNames <span class="op">=</span> isRegionLevel <span class="op">?</span> [] <span class="op">:</span> selectedGeoNames</span>
-<span id="cb27-530"><a href="#cb27-530" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> palette <span class="op">=</span> <span class="fu">colorPalette</span>(entityNames<span class="op">.</span><span class="at">length</span>)</span>
-<span id="cb27-531"><a href="#cb27-531" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> entityColor <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>(entityNames<span class="op">.</span><span class="fu">map</span>((name<span class="op">,</span> i) <span class="kw">=&gt;</span> [name<span class="op">,</span> palette[i]]))</span>
-<span id="cb27-532"><a href="#cb27-532" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-533"><a href="#cb27-533" aria-hidden="true" tabindex="-1"></a>  <span class="co">// The gray WFRC reference line is always drawn; when Region itself is the</span></span>
-<span id="cb27-534"><a href="#cb27-534" aria-hidden="true" tabindex="-1"></a>  <span class="co">// selected level there's nothing else to plot, so entityRows is simply</span></span>
-<span id="cb27-535"><a href="#cb27-535" aria-hidden="true" tabindex="-1"></a>  <span class="co">// empty and the chart reduces to that one reference line.</span></span>
-<span id="cb27-536"><a href="#cb27-536" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> entityRows <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> selectedGeoLevel<span class="op">,</span> entityNames)<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">path</span>))</span>
-<span id="cb27-537"><a href="#cb27-537" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionRows <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> <span class="st">"Region"</span><span class="op">,</span> <span class="kw">null</span>)<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">path</span>))</span>
-<span id="cb27-538"><a href="#cb27-538" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-539"><a href="#cb27-539" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionAll <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> <span class="st">"Region"</span><span class="op">,</span> <span class="kw">null</span>)</span>
-<span id="cb27-540"><a href="#cb27-540" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionNoBuild2055 <span class="op">=</span> regionAll<span class="op">.</span><span class="fu">find</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"No Build"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">?.</span><span class="at">value</span></span>
-<span id="cb27-541"><a href="#cb27-541" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionRtp2055 <span class="op">=</span> regionAll<span class="op">.</span><span class="fu">find</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">?.</span><span class="at">value</span></span>
-<span id="cb27-542"><a href="#cb27-542" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> showDelta <span class="op">=</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"No Build"</span>) <span class="op">&amp;&amp;</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"RTP"</span>) <span class="op">&amp;&amp;</span> regionNoBuild2055 <span class="op">!==</span> <span class="kw">undefined</span> <span class="op">&amp;&amp;</span> regionRtp2055 <span class="op">!==</span> <span class="kw">undefined</span></span>
-<span id="cb27-543"><a href="#cb27-543" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> deltaPp <span class="op">=</span> showDelta <span class="op">?</span> (regionRtp2055 <span class="op">-</span> regionNoBuild2055) <span class="op">*</span> <span class="dv">100</span> <span class="op">:</span> <span class="kw">null</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb27" data-startfrom="539" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 538;"><span id="cb27-539"><a href="#cb27-539" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> <span class="fu">modeChart</span>(modeKey<span class="op">,</span> subtitle) {</span>
+<span id="cb27-540"><a href="#cb27-540" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> isRegionLevel <span class="op">=</span> selectedGeoLevel <span class="op">===</span> <span class="st">"Region"</span></span>
+<span id="cb27-541"><a href="#cb27-541" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> entityNames <span class="op">=</span> isRegionLevel <span class="op">?</span> [] <span class="op">:</span> selectedGeoNames</span>
+<span id="cb27-542"><a href="#cb27-542" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> palette <span class="op">=</span> <span class="fu">colorPalette</span>(entityNames<span class="op">.</span><span class="at">length</span>)</span>
+<span id="cb27-543"><a href="#cb27-543" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> entityColor <span class="op">=</span> <span class="kw">new</span> <span class="bu">Map</span>(entityNames<span class="op">.</span><span class="fu">map</span>((name<span class="op">,</span> i) <span class="kw">=&gt;</span> [name<span class="op">,</span> palette[i]]))</span>
 <span id="cb27-544"><a href="#cb27-544" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-545"><a href="#cb27-545" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> pathCaptions <span class="op">=</span> {</span>
-<span id="cb27-546"><a href="#cb27-546" aria-hidden="true" tabindex="-1"></a>    <span class="st">"No Build"</span><span class="op">:</span> <span class="st">"Dashed = No Build 2055"</span><span class="op">,</span></span>
-<span id="cb27-547"><a href="#cb27-547" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RTP"</span><span class="op">:</span> <span class="st">"Solid = RTP (Build) 2055"</span><span class="op">,</span></span>
-<span id="cb27-548"><a href="#cb27-548" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb27-549"><a href="#cb27-549" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> caption <span class="op">=</span> <span class="vs">`</span><span class="sc">${</span>selectedPaths<span class="op">.</span><span class="fu">map</span>((p) <span class="kw">=&gt;</span> pathCaptions[p])<span class="op">.</span><span class="fu">join</span>(<span class="st">" · "</span>)<span class="sc">}</span><span class="vs"> · both branch from the same 2027 baseline. Source: WFRC Transportation Choices (v10).`</span></span>
+<span id="cb27-545"><a href="#cb27-545" aria-hidden="true" tabindex="-1"></a>  <span class="co">// The gray WFRC reference line is always drawn; when Region itself is the</span></span>
+<span id="cb27-546"><a href="#cb27-546" aria-hidden="true" tabindex="-1"></a>  <span class="co">// selected level there's nothing else to plot, so entityRows is simply</span></span>
+<span id="cb27-547"><a href="#cb27-547" aria-hidden="true" tabindex="-1"></a>  <span class="co">// empty and the chart reduces to that one reference line.</span></span>
+<span id="cb27-548"><a href="#cb27-548" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> entityRows <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> selectedGeoLevel<span class="op">,</span> entityNames)<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">path</span>))</span>
+<span id="cb27-549"><a href="#cb27-549" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionRows <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> <span class="st">"Region"</span><span class="op">,</span> <span class="kw">null</span>)<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(d<span class="op">.</span><span class="at">path</span>))</span>
 <span id="cb27-550"><a href="#cb27-550" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-551"><a href="#cb27-551" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
-<span id="cb27-552"><a href="#cb27-552" aria-hidden="true" tabindex="-1"></a>    width<span class="op">,</span></span>
-<span id="cb27-553"><a href="#cb27-553" aria-hidden="true" tabindex="-1"></a>    <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span></span>
-<span id="cb27-554"><a href="#cb27-554" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marginRight</span><span class="op">:</span> <span class="dv">130</span><span class="op">,</span></span>
-<span id="cb27-555"><a href="#cb27-555" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">46</span><span class="op">,</span></span>
-<span id="cb27-556"><a href="#cb27-556" aria-hidden="true" tabindex="-1"></a>    <span class="dt">style</span><span class="op">:</span> {<span class="dt">background</span><span class="op">:</span> <span class="st">"#fbf9f4"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Poppins, sans-serif"</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> INK}<span class="op">,</span></span>
-<span id="cb27-557"><a href="#cb27-557" aria-hidden="true" tabindex="-1"></a>    subtitle<span class="op">,</span></span>
-<span id="cb27-558"><a href="#cb27-558" aria-hidden="true" tabindex="-1"></a>    caption<span class="op">,</span></span>
-<span id="cb27-559"><a href="#cb27-559" aria-hidden="true" tabindex="-1"></a>    <span class="dt">x</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> [<span class="dv">2026</span><span class="op">,</span> <span class="dv">2059</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> [<span class="dv">2027</span><span class="op">,</span> <span class="dv">2055</span>]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Year"</span><span class="op">,</span> <span class="dt">tickFormat</span><span class="op">:</span> <span class="st">"d"</span>}<span class="op">,</span></span>
-<span id="cb27-560"><a href="#cb27-560" aria-hidden="true" tabindex="-1"></a>    <span class="dt">y</span><span class="op">:</span> {<span class="dt">percent</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">nice</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"% within 1/4 mile ↑"</span>}<span class="op">,</span></span>
-<span id="cb27-561"><a href="#cb27-561" aria-hidden="true" tabindex="-1"></a>    <span class="dt">color</span><span class="op">:</span> entityNames<span class="op">.</span><span class="at">length</span> <span class="op">?</span> {<span class="dt">domain</span><span class="op">:</span> entityNames<span class="op">,</span> <span class="dt">range</span><span class="op">:</span> palette<span class="op">,</span> <span class="dt">legend</span><span class="op">:</span> <span class="kw">true</span>} <span class="op">:</span> <span class="kw">undefined</span><span class="op">,</span></span>
-<span id="cb27-562"><a href="#cb27-562" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marks</span><span class="op">:</span> [</span>
-<span id="cb27-563"><a href="#cb27-563" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#00000022"</span>})<span class="op">,</span></span>
-<span id="cb27-564"><a href="#cb27-564" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>selectedPaths<span class="op">.</span><span class="fu">flatMap</span>((path) <span class="kw">=&gt;</span> [</span>
-<span id="cb27-565"><a href="#cb27-565" aria-hidden="true" tabindex="-1"></a>        Plot<span class="op">.</span><span class="fu">line</span>(entityRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> path)<span class="op">,</span> {</span>
-<span id="cb27-566"><a href="#cb27-566" aria-hidden="true" tabindex="-1"></a>          <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-567"><a href="#cb27-567" aria-hidden="true" tabindex="-1"></a>          <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-568"><a href="#cb27-568" aria-hidden="true" tabindex="-1"></a>          <span class="dt">z</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
-<span id="cb27-569"><a href="#cb27-569" aria-hidden="true" tabindex="-1"></a>          <span class="dt">stroke</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
-<span id="cb27-570"><a href="#cb27-570" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeWidth</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="fl">2.5</span> <span class="op">:</span> <span class="dv">2</span><span class="op">,</span></span>
-<span id="cb27-571"><a href="#cb27-571" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeDasharray</span><span class="op">:</span> PATH_STYLE[path]<span class="op">.</span><span class="at">dash</span><span class="op">,</span></span>
-<span id="cb27-572"><a href="#cb27-572" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeOpacity</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="fl">0.8</span><span class="op">,</span></span>
-<span id="cb27-573"><a href="#cb27-573" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
-<span id="cb27-574"><a href="#cb27-574" aria-hidden="true" tabindex="-1"></a>        Plot<span class="op">.</span><span class="fu">line</span>(regionRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> path)<span class="op">,</span> {</span>
-<span id="cb27-575"><a href="#cb27-575" aria-hidden="true" tabindex="-1"></a>          <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-576"><a href="#cb27-576" aria-hidden="true" tabindex="-1"></a>          <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-577"><a href="#cb27-577" aria-hidden="true" tabindex="-1"></a>          <span class="dt">stroke</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
-<span id="cb27-578"><a href="#cb27-578" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeWidth</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="dv">3</span> <span class="op">:</span> <span class="fl">2.5</span><span class="op">,</span></span>
-<span id="cb27-579"><a href="#cb27-579" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeDasharray</span><span class="op">:</span> PATH_STYLE[path]<span class="op">.</span><span class="at">dash</span><span class="op">,</span></span>
-<span id="cb27-580"><a href="#cb27-580" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
-<span id="cb27-581"><a href="#cb27-581" aria-hidden="true" tabindex="-1"></a>      ])<span class="op">,</span></span>
-<span id="cb27-582"><a href="#cb27-582" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">dot</span>(entityRows<span class="op">,</span> {</span>
-<span id="cb27-583"><a href="#cb27-583" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-584"><a href="#cb27-584" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-585"><a href="#cb27-585" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
-<span id="cb27-586"><a href="#cb27-586" aria-hidden="true" tabindex="-1"></a>        <span class="dt">r</span><span class="op">:</span> <span class="fl">3.5</span><span class="op">,</span></span>
-<span id="cb27-587"><a href="#cb27-587" aria-hidden="true" tabindex="-1"></a>        <span class="dt">tip</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb27-588"><a href="#cb27-588" aria-hidden="true" tabindex="-1"></a>        <span class="dt">channels</span><span class="op">:</span> {<span class="dt">Geography</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span> <span class="dt">Scenario</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> (d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2027</span> <span class="op">?</span> <span class="st">"Existing 2027"</span> <span class="op">:</span> PATH_STYLE[d<span class="op">.</span><span class="at">path</span>]<span class="op">.</span><span class="at">label</span>)}<span class="op">,</span></span>
-<span id="cb27-589"><a href="#cb27-589" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
-<span id="cb27-590"><a href="#cb27-590" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">dot</span>(regionRows<span class="op">,</span> {</span>
-<span id="cb27-591"><a href="#cb27-591" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-592"><a href="#cb27-592" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-593"><a href="#cb27-593" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
-<span id="cb27-594"><a href="#cb27-594" aria-hidden="true" tabindex="-1"></a>        <span class="dt">r</span><span class="op">:</span> <span class="dv">4</span><span class="op">,</span></span>
-<span id="cb27-595"><a href="#cb27-595" aria-hidden="true" tabindex="-1"></a>        <span class="dt">tip</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
-<span id="cb27-596"><a href="#cb27-596" aria-hidden="true" tabindex="-1"></a>        <span class="dt">channels</span><span class="op">:</span> {<span class="dt">Geography</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="st">"WFRC region"</span><span class="op">,</span> <span class="dt">Scenario</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> (d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2027</span> <span class="op">?</span> <span class="st">"Existing 2027"</span> <span class="op">:</span> PATH_STYLE[d<span class="op">.</span><span class="at">path</span>]<span class="op">.</span><span class="at">label</span>)}<span class="op">,</span></span>
-<span id="cb27-597"><a href="#cb27-597" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
-<span id="cb27-598"><a href="#cb27-598" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(entityRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> (selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"RTP"</span>) <span class="op">?</span> <span class="st">"RTP"</span> <span class="op">:</span> selectedPaths[<span class="dv">0</span>]) <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">,</span> {</span>
-<span id="cb27-599"><a href="#cb27-599" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-600"><a href="#cb27-600" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-601"><a href="#cb27-601" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">entity</span><span class="op">,</span></span>
-<span id="cb27-602"><a href="#cb27-602" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
-<span id="cb27-603"><a href="#cb27-603" aria-hidden="true" tabindex="-1"></a>        <span class="dt">textAnchor</span><span class="op">:</span> <span class="st">"start"</span><span class="op">,</span></span>
-<span id="cb27-604"><a href="#cb27-604" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontWeight</span><span class="op">:</span> <span class="dv">600</span><span class="op">,</span></span>
-<span id="cb27-605"><a href="#cb27-605" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> entityColor<span class="op">.</span><span class="fu">get</span>(d<span class="op">.</span><span class="at">entity</span>)<span class="op">,</span></span>
-<span id="cb27-606"><a href="#cb27-606" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
-<span id="cb27-607"><a href="#cb27-607" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(regionRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> (selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"RTP"</span>) <span class="op">?</span> <span class="st">"RTP"</span> <span class="op">:</span> selectedPaths[<span class="dv">0</span>]) <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">,</span> {</span>
-<span id="cb27-608"><a href="#cb27-608" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-609"><a href="#cb27-609" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-610"><a href="#cb27-610" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="st">"WFRC region"</span><span class="op">,</span></span>
-<span id="cb27-611"><a href="#cb27-611" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
-<span id="cb27-612"><a href="#cb27-612" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dy</span><span class="op">:</span> <span class="dv">16</span><span class="op">,</span></span>
-<span id="cb27-613"><a href="#cb27-613" aria-hidden="true" tabindex="-1"></a>        <span class="dt">textAnchor</span><span class="op">:</span> <span class="st">"start"</span><span class="op">,</span></span>
-<span id="cb27-614"><a href="#cb27-614" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontStyle</span><span class="op">:</span> <span class="st">"italic"</span><span class="op">,</span></span>
-<span id="cb27-615"><a href="#cb27-615" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
-<span id="cb27-616"><a href="#cb27-616" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
-<span id="cb27-617"><a href="#cb27-617" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(deltaPp <span class="op">===</span> <span class="kw">null</span> <span class="op">?</span> [] <span class="op">:</span> [{<span class="dt">year</span><span class="op">:</span> <span class="dv">2055</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> (regionNoBuild2055 <span class="op">+</span> regionRtp2055) <span class="op">/</span> <span class="dv">2</span>}]<span class="op">,</span> {</span>
-<span id="cb27-618"><a href="#cb27-618" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
-<span id="cb27-619"><a href="#cb27-619" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
-<span id="cb27-620"><a href="#cb27-620" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
-<span id="cb27-621"><a href="#cb27-621" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dy</span><span class="op">:</span> <span class="op">-</span><span class="dv">28</span><span class="op">,</span></span>
-<span id="cb27-622"><a href="#cb27-622" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="vs">`</span><span class="sc">${</span>deltaPp <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"+"</span> <span class="op">:</span> <span class="st">""</span><span class="sc">}${</span>deltaPp<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="sc">}</span><span class="vs"> pp, RTP vs No Build`</span><span class="op">,</span></span>
-<span id="cb27-623"><a href="#cb27-623" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontWeight</span><span class="op">:</span> <span class="dv">700</span><span class="op">,</span></span>
-<span id="cb27-624"><a href="#cb27-624" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">12</span><span class="op">,</span></span>
-<span id="cb27-625"><a href="#cb27-625" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> INK<span class="op">,</span></span>
-<span id="cb27-626"><a href="#cb27-626" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
-<span id="cb27-627"><a href="#cb27-627" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
-<span id="cb27-628"><a href="#cb27-628" aria-hidden="true" tabindex="-1"></a>  })</span>
-<span id="cb27-629"><a href="#cb27-629" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb27-551"><a href="#cb27-551" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionAll <span class="op">=</span> <span class="fu">branchRows</span>(modeKey<span class="op">,</span> <span class="st">"Region"</span><span class="op">,</span> <span class="kw">null</span>)</span>
+<span id="cb27-552"><a href="#cb27-552" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionNoBuild2055 <span class="op">=</span> regionAll<span class="op">.</span><span class="fu">find</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"No Build"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">?.</span><span class="at">value</span></span>
+<span id="cb27-553"><a href="#cb27-553" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> regionRtp2055 <span class="op">=</span> regionAll<span class="op">.</span><span class="fu">find</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">?.</span><span class="at">value</span></span>
+<span id="cb27-554"><a href="#cb27-554" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> showDelta <span class="op">=</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"No Build"</span>) <span class="op">&amp;&amp;</span> selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"RTP"</span>) <span class="op">&amp;&amp;</span> regionNoBuild2055 <span class="op">!==</span> <span class="kw">undefined</span> <span class="op">&amp;&amp;</span> regionRtp2055 <span class="op">!==</span> <span class="kw">undefined</span></span>
+<span id="cb27-555"><a href="#cb27-555" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> deltaPp <span class="op">=</span> showDelta <span class="op">?</span> (regionRtp2055 <span class="op">-</span> regionNoBuild2055) <span class="op">*</span> <span class="dv">100</span> <span class="op">:</span> <span class="kw">null</span></span>
+<span id="cb27-556"><a href="#cb27-556" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-557"><a href="#cb27-557" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> pathCaptions <span class="op">=</span> {</span>
+<span id="cb27-558"><a href="#cb27-558" aria-hidden="true" tabindex="-1"></a>    <span class="st">"No Build"</span><span class="op">:</span> <span class="st">"Dashed = No Build 2055"</span><span class="op">,</span></span>
+<span id="cb27-559"><a href="#cb27-559" aria-hidden="true" tabindex="-1"></a>    <span class="st">"RTP"</span><span class="op">:</span> <span class="st">"Solid = RTP (Build) 2055"</span><span class="op">,</span></span>
+<span id="cb27-560"><a href="#cb27-560" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb27-561"><a href="#cb27-561" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> caption <span class="op">=</span> <span class="vs">`</span><span class="sc">${</span>selectedPaths<span class="op">.</span><span class="fu">map</span>((p) <span class="kw">=&gt;</span> pathCaptions[p])<span class="op">.</span><span class="fu">join</span>(<span class="st">" · "</span>)<span class="sc">}</span><span class="vs"> · both branch from the same 2027 baseline. Source: WFRC Transportation Choices (v10).`</span></span>
+<span id="cb27-562"><a href="#cb27-562" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-563"><a href="#cb27-563" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> Plot<span class="op">.</span><span class="fu">plot</span>({</span>
+<span id="cb27-564"><a href="#cb27-564" aria-hidden="true" tabindex="-1"></a>    width<span class="op">,</span></span>
+<span id="cb27-565"><a href="#cb27-565" aria-hidden="true" tabindex="-1"></a>    <span class="dt">height</span><span class="op">:</span> <span class="dv">380</span><span class="op">,</span></span>
+<span id="cb27-566"><a href="#cb27-566" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marginRight</span><span class="op">:</span> <span class="dv">130</span><span class="op">,</span></span>
+<span id="cb27-567"><a href="#cb27-567" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marginBottom</span><span class="op">:</span> <span class="dv">46</span><span class="op">,</span></span>
+<span id="cb27-568"><a href="#cb27-568" aria-hidden="true" tabindex="-1"></a>    <span class="dt">style</span><span class="op">:</span> {<span class="dt">background</span><span class="op">:</span> <span class="st">"#fbf9f4"</span><span class="op">,</span> <span class="dt">fontFamily</span><span class="op">:</span> <span class="st">"Poppins, sans-serif"</span><span class="op">,</span> <span class="dt">color</span><span class="op">:</span> INK}<span class="op">,</span></span>
+<span id="cb27-569"><a href="#cb27-569" aria-hidden="true" tabindex="-1"></a>    subtitle<span class="op">,</span></span>
+<span id="cb27-570"><a href="#cb27-570" aria-hidden="true" tabindex="-1"></a>    caption<span class="op">,</span></span>
+<span id="cb27-571"><a href="#cb27-571" aria-hidden="true" tabindex="-1"></a>    <span class="dt">x</span><span class="op">:</span> {<span class="dt">domain</span><span class="op">:</span> [<span class="dv">2026</span><span class="op">,</span> <span class="dv">2059</span>]<span class="op">,</span> <span class="dt">ticks</span><span class="op">:</span> [<span class="dv">2027</span><span class="op">,</span> <span class="dv">2055</span>]<span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"Year"</span><span class="op">,</span> <span class="dt">tickFormat</span><span class="op">:</span> <span class="st">"d"</span>}<span class="op">,</span></span>
+<span id="cb27-572"><a href="#cb27-572" aria-hidden="true" tabindex="-1"></a>    <span class="dt">y</span><span class="op">:</span> {<span class="dt">percent</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">grid</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">nice</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="dt">label</span><span class="op">:</span> <span class="st">"% within 1/4 mile ↑"</span>}<span class="op">,</span></span>
+<span id="cb27-573"><a href="#cb27-573" aria-hidden="true" tabindex="-1"></a>    <span class="dt">color</span><span class="op">:</span> entityNames<span class="op">.</span><span class="at">length</span> <span class="op">?</span> {<span class="dt">domain</span><span class="op">:</span> entityNames<span class="op">,</span> <span class="dt">range</span><span class="op">:</span> palette<span class="op">,</span> <span class="dt">legend</span><span class="op">:</span> <span class="kw">true</span>} <span class="op">:</span> <span class="kw">undefined</span><span class="op">,</span></span>
+<span id="cb27-574"><a href="#cb27-574" aria-hidden="true" tabindex="-1"></a>    <span class="dt">marks</span><span class="op">:</span> [</span>
+<span id="cb27-575"><a href="#cb27-575" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">ruleY</span>([<span class="dv">0</span>]<span class="op">,</span> {<span class="dt">stroke</span><span class="op">:</span> <span class="st">"#00000022"</span>})<span class="op">,</span></span>
+<span id="cb27-576"><a href="#cb27-576" aria-hidden="true" tabindex="-1"></a>      <span class="op">...</span>selectedPaths<span class="op">.</span><span class="fu">flatMap</span>((path) <span class="kw">=&gt;</span> [</span>
+<span id="cb27-577"><a href="#cb27-577" aria-hidden="true" tabindex="-1"></a>        Plot<span class="op">.</span><span class="fu">line</span>(entityRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> path)<span class="op">,</span> {</span>
+<span id="cb27-578"><a href="#cb27-578" aria-hidden="true" tabindex="-1"></a>          <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-579"><a href="#cb27-579" aria-hidden="true" tabindex="-1"></a>          <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-580"><a href="#cb27-580" aria-hidden="true" tabindex="-1"></a>          <span class="dt">z</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
+<span id="cb27-581"><a href="#cb27-581" aria-hidden="true" tabindex="-1"></a>          <span class="dt">stroke</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
+<span id="cb27-582"><a href="#cb27-582" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeWidth</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="fl">2.5</span> <span class="op">:</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb27-583"><a href="#cb27-583" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeDasharray</span><span class="op">:</span> PATH_STYLE[path]<span class="op">.</span><span class="at">dash</span><span class="op">,</span></span>
+<span id="cb27-584"><a href="#cb27-584" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeOpacity</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="dv">1</span> <span class="op">:</span> <span class="fl">0.8</span><span class="op">,</span></span>
+<span id="cb27-585"><a href="#cb27-585" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
+<span id="cb27-586"><a href="#cb27-586" aria-hidden="true" tabindex="-1"></a>        Plot<span class="op">.</span><span class="fu">line</span>(regionRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> path)<span class="op">,</span> {</span>
+<span id="cb27-587"><a href="#cb27-587" aria-hidden="true" tabindex="-1"></a>          <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-588"><a href="#cb27-588" aria-hidden="true" tabindex="-1"></a>          <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-589"><a href="#cb27-589" aria-hidden="true" tabindex="-1"></a>          <span class="dt">stroke</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
+<span id="cb27-590"><a href="#cb27-590" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeWidth</span><span class="op">:</span> path <span class="op">===</span> <span class="st">"RTP"</span> <span class="op">?</span> <span class="dv">3</span> <span class="op">:</span> <span class="fl">2.5</span><span class="op">,</span></span>
+<span id="cb27-591"><a href="#cb27-591" aria-hidden="true" tabindex="-1"></a>          <span class="dt">strokeDasharray</span><span class="op">:</span> PATH_STYLE[path]<span class="op">.</span><span class="at">dash</span><span class="op">,</span></span>
+<span id="cb27-592"><a href="#cb27-592" aria-hidden="true" tabindex="-1"></a>        })<span class="op">,</span></span>
+<span id="cb27-593"><a href="#cb27-593" aria-hidden="true" tabindex="-1"></a>      ])<span class="op">,</span></span>
+<span id="cb27-594"><a href="#cb27-594" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">dot</span>(entityRows<span class="op">,</span> {</span>
+<span id="cb27-595"><a href="#cb27-595" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-596"><a href="#cb27-596" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-597"><a href="#cb27-597" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span></span>
+<span id="cb27-598"><a href="#cb27-598" aria-hidden="true" tabindex="-1"></a>        <span class="dt">r</span><span class="op">:</span> <span class="fl">3.5</span><span class="op">,</span></span>
+<span id="cb27-599"><a href="#cb27-599" aria-hidden="true" tabindex="-1"></a>        <span class="dt">tip</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb27-600"><a href="#cb27-600" aria-hidden="true" tabindex="-1"></a>        <span class="dt">channels</span><span class="op">:</span> {<span class="dt">Geography</span><span class="op">:</span> <span class="st">"entity"</span><span class="op">,</span> <span class="dt">Scenario</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> (d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2027</span> <span class="op">?</span> <span class="st">"Existing 2027"</span> <span class="op">:</span> PATH_STYLE[d<span class="op">.</span><span class="at">path</span>]<span class="op">.</span><span class="at">label</span>)}<span class="op">,</span></span>
+<span id="cb27-601"><a href="#cb27-601" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb27-602"><a href="#cb27-602" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">dot</span>(regionRows<span class="op">,</span> {</span>
+<span id="cb27-603"><a href="#cb27-603" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-604"><a href="#cb27-604" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-605"><a href="#cb27-605" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
+<span id="cb27-606"><a href="#cb27-606" aria-hidden="true" tabindex="-1"></a>        <span class="dt">r</span><span class="op">:</span> <span class="dv">4</span><span class="op">,</span></span>
+<span id="cb27-607"><a href="#cb27-607" aria-hidden="true" tabindex="-1"></a>        <span class="dt">tip</span><span class="op">:</span> <span class="kw">true</span><span class="op">,</span></span>
+<span id="cb27-608"><a href="#cb27-608" aria-hidden="true" tabindex="-1"></a>        <span class="dt">channels</span><span class="op">:</span> {<span class="dt">Geography</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="st">"WFRC region"</span><span class="op">,</span> <span class="dt">Scenario</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> (d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2027</span> <span class="op">?</span> <span class="st">"Existing 2027"</span> <span class="op">:</span> PATH_STYLE[d<span class="op">.</span><span class="at">path</span>]<span class="op">.</span><span class="at">label</span>)}<span class="op">,</span></span>
+<span id="cb27-609"><a href="#cb27-609" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb27-610"><a href="#cb27-610" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(entityRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> (selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"RTP"</span>) <span class="op">?</span> <span class="st">"RTP"</span> <span class="op">:</span> selectedPaths[<span class="dv">0</span>]) <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">,</span> {</span>
+<span id="cb27-611"><a href="#cb27-611" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-612"><a href="#cb27-612" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-613"><a href="#cb27-613" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">entity</span><span class="op">,</span></span>
+<span id="cb27-614"><a href="#cb27-614" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
+<span id="cb27-615"><a href="#cb27-615" aria-hidden="true" tabindex="-1"></a>        <span class="dt">textAnchor</span><span class="op">:</span> <span class="st">"start"</span><span class="op">,</span></span>
+<span id="cb27-616"><a href="#cb27-616" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontWeight</span><span class="op">:</span> <span class="dv">600</span><span class="op">,</span></span>
+<span id="cb27-617"><a href="#cb27-617" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> (d) <span class="kw">=&gt;</span> entityColor<span class="op">.</span><span class="fu">get</span>(d<span class="op">.</span><span class="at">entity</span>)<span class="op">,</span></span>
+<span id="cb27-618"><a href="#cb27-618" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb27-619"><a href="#cb27-619" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(regionRows<span class="op">.</span><span class="fu">filter</span>((d) <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">path</span> <span class="op">===</span> (selectedPaths<span class="op">.</span><span class="fu">includes</span>(<span class="st">"RTP"</span>) <span class="op">?</span> <span class="st">"RTP"</span> <span class="op">:</span> selectedPaths[<span class="dv">0</span>]) <span class="op">&amp;&amp;</span> d<span class="op">.</span><span class="at">year</span> <span class="op">===</span> <span class="dv">2055</span>)<span class="op">,</span> {</span>
+<span id="cb27-620"><a href="#cb27-620" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-621"><a href="#cb27-621" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-622"><a href="#cb27-622" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="st">"WFRC region"</span><span class="op">,</span></span>
+<span id="cb27-623"><a href="#cb27-623" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
+<span id="cb27-624"><a href="#cb27-624" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dy</span><span class="op">:</span> <span class="dv">16</span><span class="op">,</span></span>
+<span id="cb27-625"><a href="#cb27-625" aria-hidden="true" tabindex="-1"></a>        <span class="dt">textAnchor</span><span class="op">:</span> <span class="st">"start"</span><span class="op">,</span></span>
+<span id="cb27-626"><a href="#cb27-626" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontStyle</span><span class="op">:</span> <span class="st">"italic"</span><span class="op">,</span></span>
+<span id="cb27-627"><a href="#cb27-627" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> REGION_COLOR<span class="op">,</span></span>
+<span id="cb27-628"><a href="#cb27-628" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb27-629"><a href="#cb27-629" aria-hidden="true" tabindex="-1"></a>      Plot<span class="op">.</span><span class="fu">text</span>(deltaPp <span class="op">===</span> <span class="kw">null</span> <span class="op">?</span> [] <span class="op">:</span> [{<span class="dt">year</span><span class="op">:</span> <span class="dv">2055</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> (regionNoBuild2055 <span class="op">+</span> regionRtp2055) <span class="op">/</span> <span class="dv">2</span>}]<span class="op">,</span> {</span>
+<span id="cb27-630"><a href="#cb27-630" aria-hidden="true" tabindex="-1"></a>        <span class="dt">x</span><span class="op">:</span> <span class="st">"year"</span><span class="op">,</span></span>
+<span id="cb27-631"><a href="#cb27-631" aria-hidden="true" tabindex="-1"></a>        <span class="dt">y</span><span class="op">:</span> <span class="st">"value"</span><span class="op">,</span></span>
+<span id="cb27-632"><a href="#cb27-632" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dx</span><span class="op">:</span> <span class="dv">10</span><span class="op">,</span></span>
+<span id="cb27-633"><a href="#cb27-633" aria-hidden="true" tabindex="-1"></a>        <span class="dt">dy</span><span class="op">:</span> <span class="op">-</span><span class="dv">28</span><span class="op">,</span></span>
+<span id="cb27-634"><a href="#cb27-634" aria-hidden="true" tabindex="-1"></a>        <span class="dt">text</span><span class="op">:</span> () <span class="kw">=&gt;</span> <span class="vs">`</span><span class="sc">${</span>deltaPp <span class="op">&gt;=</span> <span class="dv">0</span> <span class="op">?</span> <span class="st">"+"</span> <span class="op">:</span> <span class="st">""</span><span class="sc">}${</span>deltaPp<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>)<span class="sc">}</span><span class="vs"> pp, RTP vs No Build`</span><span class="op">,</span></span>
+<span id="cb27-635"><a href="#cb27-635" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontWeight</span><span class="op">:</span> <span class="dv">700</span><span class="op">,</span></span>
+<span id="cb27-636"><a href="#cb27-636" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fontSize</span><span class="op">:</span> <span class="dv">12</span><span class="op">,</span></span>
+<span id="cb27-637"><a href="#cb27-637" aria-hidden="true" tabindex="-1"></a>        <span class="dt">fill</span><span class="op">:</span> INK<span class="op">,</span></span>
+<span id="cb27-638"><a href="#cb27-638" aria-hidden="true" tabindex="-1"></a>      })<span class="op">,</span></span>
+<span id="cb27-639"><a href="#cb27-639" aria-hidden="true" tabindex="-1"></a>    ]<span class="op">,</span></span>
+<span id="cb27-640"><a href="#cb27-640" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb27-641"><a href="#cb27-641" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="chart-fn" class="cell-output cell-output-display">
 <div id="ojs-cell-6" data-nodetype="declaration">
@@ -1347,7 +1359,7 @@ Saved -&gt; output\transportation_choices_tidy.csv</code></pre>
 <div class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb28" data-startfrom="640" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 639;"><span id="cb28-640"><a href="#cb28-640" aria-hidden="true" tabindex="-1"></a><span class="fu">modeChart</span>(<span class="st">"bike"</span><span class="op">,</span> <span class="st">"Share of population within 1/4 mile of a dedicated bike facility"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb28" data-startfrom="652" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 651;"><span id="cb28-652"><a href="#cb28-652" aria-hidden="true" tabindex="-1"></a><span class="fu">modeChart</span>(<span class="st">"bike"</span><span class="op">,</span> <span class="st">"Share of population within 1/4 mile of a dedicated bike facility"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="fig-bike-interactive" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1367,7 +1379,7 @@ Figure&nbsp;1
 <div class="cell">
 <details class="code-fold hidden">
 <summary>Show the code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb29" data-startfrom="649" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 648;"><span id="cb29-649"><a href="#cb29-649" aria-hidden="true" tabindex="-1"></a><span class="fu">modeChart</span>(<span class="st">"transit"</span><span class="op">,</span> <span class="st">"Share of population within 1/4 mile of a frequent bus stop, station, or line"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code hidden" id="cb29" data-startfrom="661" data-source-offset="0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 660;"><span id="cb29-661"><a href="#cb29-661" aria-hidden="true" tabindex="-1"></a><span class="fu">modeChart</span>(<span class="st">"transit"</span><span class="op">,</span> <span class="st">"Share of population within 1/4 mile of a frequent bus stop, station, or line"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div id="fig-transit-interactive" class="cell-output cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1401,7 +1413,7 @@ Figure&nbsp;2
 <section id="at-a-glance" class="level3">
 <h3 class="anchored" data-anchor-id="at-a-glance">At a Glance</h3>
 <p>The region-level headline from the charts above, as a static summary – easier to screenshot, print, or drop into a slide than an interactive chart. Saved to <code>output/region_pct.png</code>, which the repo homepage also embeds directly, so it’s the same image in both places, not a separate one.</p>
-<div id="cell-fig-region-pct" class="cell" data-execution_count="12">
+<div id="region-pct-build" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Show the code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib</span>
@@ -1550,20 +1562,25 @@ Figure&nbsp;2
 <span id="cb30-144"><a href="#cb30-144" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb30-145"><a href="#cb30-145" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb30-146"><a href="#cb30-146" aria-hidden="true" tabindex="-1"></a>fig.savefig(PATHS[<span class="st">"output"</span>] <span class="op">/</span> <span class="st">"region_pct.png"</span>, facecolor<span class="op">=</span>fig.get_facecolor(), dpi<span class="op">=</span><span class="dv">150</span>)</span>
-<span id="cb30-147"><a href="#cb30-147" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb30-147"><a href="#cb30-147" aria-hidden="true" tabindex="-1"></a>plt.close(fig)</span>
+<span id="cb30-148"><a href="#cb30-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-149"><a href="#cb30-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-150"><a href="#cb30-150" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> region_pct(mode, scenario):</span>
+<span id="cb30-151"><a href="#cb30-151" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Region-level share for one mode/scenario, formatted for inline text (e.g. "66%")."""</span></span>
+<span id="cb30-152"><a href="#cb30-152" aria-hidden="true" tabindex="-1"></a>    value <span class="op">=</span> region.query(<span class="st">"mode == @mode and scenario == @scenario"</span>)[<span class="st">"pct_near_facility"</span>].iloc[<span class="dv">0</span>]</span>
+<span id="cb30-153"><a href="#cb30-153" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"</span><span class="sc">{</span>value<span class="sc">:.0%}</span><span class="ss">"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-display">
-<div id="fig-region-pct" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 66% in 2027, 63% under No Build, and 90% under RTP. Transit reaches 19% in 2027 and No Build, rising to 45% under RTP.">
+</div>
+<p>The figure is embedded as markdown rather than displayed from the chunk, so its alt text can pull the region numbers through inline code instead of hardcoding them.</p>
+<div id="fig-region-pct" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 66% in 2027, 65% under No Build, and 84% under RTP. Transit reaches 19% in 2027, 26% under No Build, and 28% under RTP.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<a href="index_files/figure-html/fig-region-pct-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."><img src="index_files/figure-html/fig-region-pct-output-1.png" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 66% in 2027, 63% under No Build, and 90% under RTP. Transit reaches 19% in 2027 and No Build, rising to 45% under RTP." width="786" height="509" class="figure-img"></a>
+<a href="output/region_pct.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."><img src="output/region_pct.png" class="img-fluid figure-img" alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 66% in 2027, 65% under No Build, and 84% under RTP. Transit reaches 19% in 2027, 26% under No Build, and 28% under RTP."></a>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-region-pct-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3: Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP.
 </figcaption>
 </figure>
-</div>
-</div>
 </div>
 
 

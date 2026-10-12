@@ -14,15 +14,20 @@ That number only means something next to a point of comparison, so we compute it
 | Scenario | SE year | GIS vintage | Reads as |
 |------------------|------------------|------------------|------------------|
 | Existing 2027 | 2027 | 2027 | today |
-| No Build 2055 | 2055 | 2032 | 2055's population, with no further facilities built |
-| RTP (Build) 2055 | 2055 | 2055 | 2055's population, with the RTP's planned facilities built |
+| No Build 2055 | 2055 | 2032 | 2055's population, with only STIP-programmed projects built |
+| RTP (Build) 2055 | 2055 | 2055 | 2055's population, with the RTP's funded (phased) projects built |
 
 Comparing No Build against RTP isolates the effect of *building the plan* -- same future population, different infrastructure. Comparing Existing against either 2055 scenario shows how much of that effect is just growth.
 
 ::: callout-important
-## The 2032 GIS vintage is a placeholder, not real data
+## How the 2032 and 2055 vintages are defined from RTP projects
 
-Neither mode has a real 2032 facility layer yet -- bike is waiting on a layer from Sarah/Hugh (via Suzie), transit on a LIN Stops file from Suzie. Until those arrive, 2032 is deliberately defined as "unchanged from 2027" (see `GIS_VINTAGES` below), so **No Build 2055 currently only isolates the effect of population growth, not a true no-further-investment scenario.** Re-run this page once the real 2032 data lands.
+Both future vintages come from the RTP 2027 Preferred Scenario project layers, filtered by funding status:
+
+-   **2032** = the 2027 base plus RTP projects flagged `Field9_STIP = 1` -- projects already programmed in the STIP, so expected on the ground by 2032.
+-   **2055** = the 2032 network plus every remaining RTP project with `phase` 1-3. `phase = 0` projects are unfunded (needed but not financially constrained) and are excluded.
+
+Because vintages are cumulative, a STIP project stays in 2055 even if its `phase` is 0 (currently one AT line). For bike, this STIP-based 2032 vintage is final. For transit it's interim: 2032 transit is still pending the TDM stops data from Suzie, and will switch to that once it arrives.
 :::
 
 GIS facility data is *incremental* by vintage year and mode: each vintage layers new facilities on top of the previous one rather than restating everything from scratch. That's what makes the pipeline easy to extend -- adding a scenario is one line in `SCENARIOS`, and adding a GIS vintage is one entry in `GIS_VINTAGES`.
@@ -34,11 +39,11 @@ This replaces the `_archive/` v9 arcpy scripts (01-08), which bundled SE and fac
 | Mode | Vintage | What's added | Source |
 |------------------|------------------|------------------|------------------|
 | Bike | 2027 (base) | On-street bike facilities + trails | `utah_bikeways`, filtered to `Facility1` excluding "Not Available" and the class-3 shared-roadway/shoulder family |
-| Bike | 2032 | *(placeholder -- not yet available)* | TBD, Sarah/Hugh via Suzie |
-| Bike | 2055 | RTP 2027 Preferred Scenario AT projects, line facilities only | `at_line_projects` |
+| Bike | 2032 | RTP 2027 Preferred Scenario AT line projects in the STIP (`Field9_STIP = 1`) | `at_line_projects` |
+| Bike | 2055 | Remaining funded RTP AT line projects (`phase` ≠ 0) | `at_line_projects` |
 | Transit | 2027 (base) | Fixed-guideway stations + frequent bus stops | `uta_stops` + `uta_routes` |
-| Transit | 2032 | *(placeholder -- unchanged from 2027)* | LIN Stops, not yet received from Suzie |
-| Transit | 2055 | RTP 2027 Preferred Scenario transit projects, filtered to LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) | `transit_line_projects`, `transit_point_projects` |
+| Transit | 2032 | *(interim)* RTP 2027 Preferred Scenario transit projects in the STIP (`Field9_STIP = 1`), same mode filter as 2055 -- pending TDM stops data from Suzie | `transit_line_projects`, `transit_point_projects` |
+| Transit | 2055 | Remaining funded RTP transit projects (`phase` ≠ 0), filtered to LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) | `transit_line_projects`, `transit_point_projects` |
 
 Socioeconomic data is WFRC's v10 forecast, one CSV per year (2023-2065) under `_data/raw/SE_v10_20260921/`. TAZ geometry comes from the `WasatchFrontTAZ` REST service (`wftcm_taz`).
 
@@ -72,14 +77,13 @@ CONSTANTS = {
 GIS_VINTAGES = {
     "bike": {
         2027: {"adds": ["utah_bikeways"], "builds_on": None},
-        2032: {"adds": [], "builds_on": 2027},  # placeholder: layer TBD (Sarah/Hugh via Suzie)
-        2055: {"adds": ["at_line_projects"], "builds_on": 2032},
+        2032: {"adds": ["at_line_projects"], "builds_on": 2027},  # STIP projects only
+        2055: {"adds": ["at_line_projects"], "builds_on": 2032},  # funded (phase != 0), non-STIP
     },
     "transit": {
         2027: {"adds": ["uta_stops", "uta_routes"], "builds_on": None},
-        2032: {"adds": [], "builds_on": 2027},  # placeholder: treat as unchanged from 2027
-        # until LIN Stops (Suzie) arrives -- a deliberate interim choice, not a gap
-        2055: {"adds": ["transit_line_projects", "transit_point_projects"], "builds_on": 2032},
+        2032: {"adds": ["transit_line_projects", "transit_point_projects"], "builds_on": 2027},  # STIP; interim until TDM stops (Suzie)
+        2055: {"adds": ["transit_line_projects", "transit_point_projects"], "builds_on": 2032},  # phase != 0
     },
 }
 
@@ -130,7 +134,7 @@ The v9 pipeline summarized results by workshop area as well as region and county
 
 ## Build Facility Geometry — Bike {#sec-bike-geometry}
 
-Bike facilities are line geometry, buffered directly: `utah_bikeways`'s `Facility1` field distinguishes facility type, encoded with AGRC's 1/2/3 bikeway class suffixes (1 = physically separated cycle track, 2 = bike lane, 3 = shared roadway/shoulder). `"Not Available"` means no bike facility at all, but the class-3 family (`"Other bike route, unspecified (3)"`, `"Shoulder bikeway (3A)"`, `"Marked shared roadway (3B)"`, `"Signed shared roadway (3C)"`) is excluded too -- it's just a stripe or sign on a road shared with traffic, not a dedicated facility, and the v9 `_archive/` script excluded the same codes (`bike_l`/`bike_r NOT IN ('3','3A','3B','3C')`). Everything else -- bike lanes, buffered/protected cycle tracks, and trails -- is existing network. The 2055 vintage adds the RTP 2027 Preferred Scenario's active-transportation **line** projects as-is -- every row in `at_line_projects` is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching `utah_bikeways`'s own facility categories. The companion point layer (`at_point_projects`) is pedestrian/bike crossings, not bike-path segments, so it's excluded here -- `WFRCAnalytics/GIS-RTP-Phasing-Criteria` treats those crossings as a separate network-connectivity attribute rather than part of the facility network.
+Bike facilities are line geometry, buffered directly: `utah_bikeways`'s `Facility1` field distinguishes facility type, encoded with AGRC's 1/2/3 bikeway class suffixes (1 = physically separated cycle track, 2 = bike lane, 3 = shared roadway/shoulder). `"Not Available"` means no bike facility at all, but the class-3 family (`"Other bike route, unspecified (3)"`, `"Shoulder bikeway (3A)"`, `"Marked shared roadway (3B)"`, `"Signed shared roadway (3C)"`) is excluded too -- it's just a stripe or sign on a road shared with traffic, not a dedicated facility, and the v9 `_archive/` script excluded the same codes (`bike_l`/`bike_r NOT IN ('3','3A','3B','3C')`). Everything else -- bike lanes, buffered/protected cycle tracks, and trails -- is existing network. The 2032 vintage adds the STIP-programmed subset of the RTP 2027 Preferred Scenario's active-transportation **line** projects (`Field9_STIP = 1`), and the 2055 vintage adds every other funded one (`phase` ≠ 0; `phase = 0` is unfunded) -- every row in `at_line_projects` is already a bike path facility type (shared-use path, trail, bike lane, sidepath, etc.), matching `utah_bikeways`'s own facility categories. The companion point layer (`at_point_projects`) is pedestrian/bike crossings, not bike-path segments, so it's excluded here -- `WFRCAnalytics/GIS-RTP-Phasing-Criteria` treats those crossings as a separate network-connectivity attribute rather than part of the facility network.
 
 ```{python}
 #| label: bike-raw-by-vintage
@@ -143,19 +147,25 @@ _BIKE_EXCLUDED_FACILITY1_SQL = (
     "'Marked shared roadway (3B)','Signed shared roadway (3C)'"
 )
 
+# RTP project funding filters, shared by bike and transit. 2032 = STIP-programmed;
+# 2055 = every other funded project (phase 0 = unfunded). STIP projects aren't
+# repeated in 2055's adds -- the cumulative build already carries them forward.
+_RTP_2032_SQL = "Field9_STIP = 1"
+_RTP_2055_SQL = "phase <> '0' AND Field9_STIP <> 1"
+
 bike_raw = {
     2027: gpd.read_file(
         L["utah_bikeways"],
         where=f"Facility1 IS NOT NULL AND Facility1 NOT IN ({_BIKE_EXCLUDED_FACILITY1_SQL})",
     ).to_crs(CRS)[["geometry"]],
-    2032: gpd.GeoDataFrame(geometry=[], crs=CRS),  # placeholder: 2032 bike layer TBD
-    2055: gpd.read_file(L["at_line_projects"]).to_crs(CRS)[["geometry"]],
+    2032: gpd.read_file(L["at_line_projects"], where=_RTP_2032_SQL).to_crs(CRS)[["geometry"]],
+    2055: gpd.read_file(L["at_line_projects"], where=_RTP_2055_SQL).to_crs(CRS)[["geometry"]],
 }
 for year, gdf in bike_raw.items():
     print(f"Bike {year} adds: {len(gdf)} features")
 ```
 
-Each vintage's cumulative network is its own `adds` plus everything the vintage it `builds_on` already had -- so a vintage with nothing new yet (2032, for now) is simply identical to the vintage beneath it, not empty. Buffering and dissolving that cumulative network once per vintage gives the geometry every scenario needing that vintage can reuse.
+Each vintage's cumulative network is its own `adds` plus everything the vintage it `builds_on` already had -- so 2055 includes the 2032 STIP projects without listing them again, and a vintage with nothing new would simply be identical to the vintage beneath it, not empty. Buffering and dissolving that cumulative network once per vintage gives the geometry every scenario needing that vintage can reuse.
 
 ```{python}
 #| label: bike-buffers-by-vintage
@@ -218,12 +228,12 @@ print(f"Frequent-route stops:      {len(hf_routes)}")
 print(f"Transit 2027 base (dedup): {len(transit_2027)}")
 ```
 
-The 2055 vintage adds the RTP's transit projects. A planned rail or BRT corridor arrives as a line, not a point, but reducing it to a single centroid badly undercounts its real catchment -- a corridor has stations spaced along its whole length, not clustered at its midpoint. Reasonableness-checking against the v9 benchmark confirmed this: collapsing lines to centroids put RTP 2050-equivalent transit coverage around 20%, far under the v9 pipeline's reported 33% for 2050 RTP. So line projects are buffered directly as corridors here, the same way bike line facilities already are, while point projects (new stations) stay point-buffered.
+The 2032 and 2055 vintages add the RTP's transit projects, split by the same funding filters as bike: STIP-programmed (`Field9_STIP = 1`) in 2032, every other funded project (`phase` ≠ 0) in 2055. A planned rail or BRT corridor arrives as a line, not a point, but reducing it to a single centroid badly undercounts its real catchment -- a corridor has stations spaced along its whole length, not clustered at its midpoint. Reasonableness-checking against the v9 benchmark confirmed this: collapsing lines to centroids put RTP 2050-equivalent transit coverage around 20%, far under the v9 pipeline's reported 33% for 2050 RTP. So line projects are buffered directly as corridors here, the same way bike line facilities already are, while point projects (new stations) stay point-buffered.
 
 ::: callout-note
 ## Full-line buffering is an interim choice, not the final answer
 
-Buffering a corridor's entire length overshoots too, in the other direction -- it assumes a station is reachable from every point along the line, when real stations are discrete and spaced out (rail stops are often a mile or more apart), leaving real gaps that a full-line buffer doesn't capture. Against the v9 benchmark this currently reads ~45% versus the reported 33% for 2050 RTP, roughly as far over as the centroid approach was under. The correct fix is what `WFRCAnalytics/GIS-RTP-Phasing-Criteria` already does: buffer each line, intersect with the real 2055 UF TDM model's stop nodes to get actual station locations, then apply mode-specific buffer tiers (Rail 0.5 mi, BRT 0.35 mi, Core 0.25 mi). That needs the TDM network GDB, which isn't available in this repo yet -- full-line buffering is the deliberate placeholder until it is.
+Buffering a corridor's entire length overshoots too, in the other direction -- it assumes a station is reachable from every point along the line, when real stations are discrete and spaced out (rail stops are often a mile or more apart), leaving real gaps that a full-line buffer doesn't capture. Before unfunded (`phase = 0`) projects were excluded, this read ~45% against the v9 benchmark's reported 33% for 2050 RTP; with only funded projects it now reads ~28%, but that drop comes from the narrower project set, not from fixing the overshoot. The correct fix is what `WFRCAnalytics/GIS-RTP-Phasing-Criteria` already does: buffer each line, intersect with the real 2055 UF TDM model's stop nodes to get actual station locations, then apply mode-specific buffer tiers (Rail 0.5 mi, BRT 0.35 mi, Core 0.25 mi). That needs the TDM network GDB, which isn't available in this repo yet -- full-line buffering is the deliberate placeholder until it is.
 :::
 
 Not every project qualifies, though: only LRT/CRT/streetcar rail and high-frequency bus (BRT, Enhanced Bus) project types count toward this mode, mirroring the Rail/BRT buffer-tier grouping `WFRCAnalytics/GIS-RTP-Phasing-Criteria` uses (which buffers FrontRunner, TRAX, and the Sugar House Streetcar together as one fixed-guideway-equivalent tier, separate from core local bus). Exploratory corridors, corridor preservation, transit/mobility hubs, maintenance facilities, park & rides, and gondolas are excluded -- they aren't LRT/CRT/high-frequency-bus stops themselves.
@@ -237,23 +247,25 @@ Not every project qualifies, though: only LRT/CRT/streetcar rail and high-freque
 _TRANSIT_LINE_TYPES_SQL = "'Light Rail','Commuter Rail','Street Car','Bus Rapid Transit','Enhanced Bus'"
 _TRANSIT_POINT_TYPES_SQL = "'New Station'"
 
-transit_2055_lines = gpd.read_file(
-    L["transit_line_projects"], where=f"improvement_type IN ({_TRANSIT_LINE_TYPES_SQL})"
-).to_crs(CRS)
-transit_2055_points = gpd.read_file(
-    L["transit_point_projects"], where=f"improvement_type IN ({_TRANSIT_POINT_TYPES_SQL})"
-).to_crs(CRS)
+
+
+def read_transit_projects(funding_sql):
+    """RTP transit point + line projects of a qualifying type, filtered by funding status."""
+    parts = [
+        gpd.read_file(L[key], where=f"improvement_type IN ({types_sql}) AND {funding_sql}")
+        .to_crs(CRS)[["geometry"]]
+        for key, types_sql in (
+            ("transit_point_projects", _TRANSIT_POINT_TYPES_SQL),
+            ("transit_line_projects", _TRANSIT_LINE_TYPES_SQL),
+        )
+    ]
+    return gpd.GeoDataFrame(pd.concat(parts, ignore_index=True), geometry="geometry", crs=CRS)
+
+
 transit_raw = {
     2027: transit_2027,
-    2032: gpd.GeoDataFrame(geometry=[], crs=CRS),  # placeholder: LIN Stops file from Suzie
-    2055: gpd.GeoDataFrame(
-        pd.concat(
-            [transit_2055_points[["geometry"]], transit_2055_lines[["geometry"]]],
-            ignore_index=True,
-        ),
-        geometry="geometry",
-        crs=CRS,
-    ),
+    2032: read_transit_projects(_RTP_2032_SQL),
+    2055: read_transit_projects(_RTP_2055_SQL),
 }
 for year, gdf in transit_raw.items():
     print(f"Transit {year} adds: {len(gdf)} features")
@@ -664,9 +676,7 @@ This is a first pass, not a final design: colors are tuned for light mode only (
 The region-level headline from the charts above, as a static summary -- easier to screenshot, print, or drop into a slide than an interactive chart. Saved to `output/region_pct.png`, which the repo homepage also embeds directly, so it's the same image in both places, not a separate one.
 
 ```{python}
-#| label: fig-region-pct
-#| fig-cap: "Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP."
-#| fig-alt: "Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches 66% in 2027, 63% under No Build, and 90% under RTP. Transit reaches 19% in 2027 and No Build, rising to 45% under RTP."
+#| label: region-pct-build
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -814,5 +824,15 @@ fig.text(
 )
 
 fig.savefig(PATHS["output"] / "region_pct.png", facecolor=fig.get_facecolor(), dpi=150)
-plt.show()
+plt.close(fig)
+
+
+def region_pct(mode, scenario):
+    """Region-level share for one mode/scenario, formatted for inline text (e.g. "66%")."""
+    value = region.query("mode == @mode and scenario == @scenario")["pct_near_facility"].iloc[0]
+    return f"{value:.0%}"
 ```
+
+The figure is embedded as markdown rather than displayed from the chunk, so its alt text can pull the region numbers through inline code instead of hardcoding them.
+
+![Share of WFRC-region population within 1/4 mile of a bike or transit facility: Existing 2027 versus the two alternative 2055 futures, No Build and RTP.](output/region_pct.png){#fig-region-pct fig-alt="Bar chart with Existing 2027 set apart on the left and No Build 2055 / RTP 2055 grouped together on the right under a bracket reading '2055 -- two alternative futures'. Bike reaches `{python} region_pct('bike', 'existing_2027')` in 2027, `{python} region_pct('bike', 'no_build_2055')` under No Build, and `{python} region_pct('bike', 'rtp_2055')` under RTP. Transit reaches `{python} region_pct('transit', 'existing_2027')` in 2027, `{python} region_pct('transit', 'no_build_2055')` under No Build, and `{python} region_pct('transit', 'rtp_2055')` under RTP."}
