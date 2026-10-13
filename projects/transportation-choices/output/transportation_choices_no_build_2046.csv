@@ -1,0 +1,471 @@
+scenario,path,year,mode,se_year,gis_year,geography_level,geography_name,pct_near_facility
+no_build_2046,No Build,2046,bike,2046,2032,Region,WFRC,0.6634973822709352
+no_build_2046,No Build,2046,bike,2046,2032,CountyName,Box Elder,0.4226686421081355
+no_build_2046,No Build,2046,bike,2046,2032,CountyName,Davis,0.591942530939937
+no_build_2046,No Build,2046,bike,2046,2032,CountyName,Salt Lake,0.7473730394468255
+no_build_2046,No Build,2046,bike,2046,2032,CountyName,Weber,0.4217499758852107
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Box Elder County,0.44896727407324627
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Northern Davis County,0.5511547411517757
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Northern Salt Lake County,0.8137870781480548
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Northern Weber County,0.1651237720416353
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Southeast Salt Lake County,0.6432925537077876
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Southern Davis County,0.656692250009779
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Southern Weber County,0.5568682341314731
+no_build_2046,No Build,2046,bike,2046,2032,WorkshopArea,Southwest Salt Lake County,0.747756254013928
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Alta,0.0
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Balance of BOX ELDER,0.0
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Bluffdale,0.9355105781470662
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Bountiful,0.378158724567723
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Box Elder County North,3.1492462473830895e-05
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Box Elder County South,0.001126826454586307
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Brigham City,0.6150846591598986
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Brighton,0.19010848776864228
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Centerville,0.6838192467170622
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Clearfield,0.6869714170525957
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Clinton,0.5874041505827141
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Copperton,0.3393459892587698
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Cottonwood Heights,0.7939047654260516
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Davis County,0.00440172458499285
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Draper,0.7496344605148946
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Emigration Canyon,0.42729546726771317
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Farmington,0.7834408752573324
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Farr West,0.14164926054536633
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Fruit Heights,0.5275689120042368
+no_build_2046,No Build,2046,bike,2046,2032,CityName,HAFB,0.37001509446321473
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Harrisville,0.1876290284414067
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Herriman,0.8629101416976717
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Holladay,0.40985526645229
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Hooper,0.32390254632051924
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Kaysville,0.7555915692837805
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Kearns,0.6061896350365849
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Layton,0.5713423999122883
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Magna,0.6236540057100168
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Mantua,0.0
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Marriott-Slaterville,0.10080240621051861
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Midvale,0.5695400539061822
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Millcreek,0.6311578579417748
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Murray,0.5923420898129851
+no_build_2046,No Build,2046,bike,2046,2032,CityName,North Ogden,0.3345615332404897
+no_build_2046,No Build,2046,bike,2046,2032,CityName,North Salt Lake,0.8836534644108828
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Ogden,0.6851009048251928
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Perry,0.23273268858730675
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Plain City,0.08232597505392819
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Pleasant View,0.24422225577417098
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Riverdale,0.7834855281532535
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Riverton,0.8594506754531837
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Roy,0.4788396319066041
+no_build_2046,No Build,2046,bike,2046,2032,CityName,SL County East Cyns,0.009334207641939514
+no_build_2046,No Build,2046,bike,2046,2032,CityName,SL County East Cyns - BCC,0.0016007007530934138
+no_build_2046,No Build,2046,bike,2046,2032,CityName,SL County East Cyns - LCC,0.3320200283816972
+no_build_2046,No Build,2046,bike,2046,2032,CityName,SL County East Cyns - MCC,0.7313550792338697
+no_build_2046,No Build,2046,bike,2046,2032,CityName,SL County East Cyns - Parleys,0.010902429996372557
+no_build_2046,No Build,2046,bike,2046,2032,CityName,SL County West,0.4377682390170837
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Salt Lake City,0.9381957855203902
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Sandy,0.6461092680059731
+no_build_2046,No Build,2046,bike,2046,2032,CityName,South Jordan,0.907388345370877
+no_build_2046,No Build,2046,bike,2046,2032,CityName,South Ogden,0.32410894385856337
+no_build_2046,No Build,2046,bike,2046,2032,CityName,South Salt Lake,0.970902092094905
+no_build_2046,No Build,2046,bike,2046,2032,CityName,South Weber,0.288116356173564
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Sunset,0.6284310356142714
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Syracuse,0.6740056801639113
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Taylorsville,0.552437918165677
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Uintah,0.46071004213355987
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Washington Terrace,0.16615823102867525
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Weber County,0.019433054712826525
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Weber County East Mountains,0.5510435976214058
+no_build_2046,No Build,2046,bike,2046,2032,CityName,West Bountiful,0.5883679017356779
+no_build_2046,No Build,2046,bike,2046,2032,CityName,West Haven,0.5576543309553758
+no_build_2046,No Build,2046,bike,2046,2032,CityName,West Jordan,0.6539304703049771
+no_build_2046,No Build,2046,bike,2046,2032,CityName,West Point,0.33083668020480217
+no_build_2046,No Build,2046,bike,2046,2032,CityName,West Valley City,0.6704415442106308
+no_build_2046,No Build,2046,bike,2046,2032,CityName,White City,0.8876426719972068
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Willard,0.05227282039162142
+no_build_2046,No Build,2046,bike,2046,2032,CityName,Woods Cross,0.6880679179589722
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Box Elder County - WFRC,0.449134683167079
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Box Elder County - not WFRC,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Davis County - East Mountains,0.00440172458499285
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Davis County - Great Salt Lake,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Davis County - North,0.5694097659820223
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Davis County - South,0.6423001098686322
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - CBD,1.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - North Central,0.7267036674792225
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - Northeast,0.7641182506030335
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - Northwest,0.6057142742153665
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - South Central,0.8054657399667938
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - Southeast,0.6840663122163488
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - Southwest,0.6932153168926368
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Salt Lake County - Wasatch Canyons,0.1258061594293074
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Weber County - East Mountains,0.5510435976214058
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Weber County - Great Slat Lake,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Weber County - North and West,0.32609271945404816
+no_build_2046,No Build,2046,bike,2046,2032,DistrictLarge,Weber County - Ogden Area,0.6274194058480077
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Airport - Rose Park,0.9044309591089171
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Antelope Island,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Big Cottonwood Canyon,0.17374459746886484
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Box Elder County - Southeast Mountains,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Brigham City - North Perry,0.5453360938391824
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Brigham City Area - W of I-15,0.0015729250560936091
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Clinton - West Point - Clearfield,0.5473995671087906
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Davis County - East Mountains,0.00440172458499285
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Davis County - Great Salt Lake,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Draper,0.792269118314847
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Emigration Canyon - Northeast Mountains,0.4266867590208506
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Ex-West Weber,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Farmington - Centerville,0.7603994738763415
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,HAFB Area,0.32200869158592155
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Hooper - Roy - West Haven,0.44917434160132214
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,I-15 to MVC - I-80 to 20,0.9390799605312926
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Kaysville - Syracuse,0.6199285350846018
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Layton - Fruit Heights,0.6113735846892219
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Little Cottonwood Canyon,0.08757275452747053
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,MVC - Magna - ATK,0.6057933660857432
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,MVC to Tailings,0.09490996679082551
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Mantua - East Mountains,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Midvale - Cottonwood Heights - N Sandy,0.6456804801977711
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Millcreek - Holladay,0.5778542616137416
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Millcreek Canyon,0.11989794901022537
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,North Ogden,0.36752547460793844
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,North of Brigham City,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Northwest Quadrant - International Center,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Ogden Canyon - Northeast Mountains,0.7211904953607321
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Ogden Core,0.7551494225860853
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Plain City - Farr West - Marriott - Slaterville,0.055720890817718804
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Riverton - I-15 to MVC,0.8427164301838219
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,S Ogden - Riverdale - Uintah,0.4833115664545859
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,SLC CBD,1.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,SLC East of I-15,0.9395537124587823
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Salt Flats - U-111 at 62nd,0.3227815344966926
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Salt Lake County - Great Salt Lake,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Salt Lake County - West Mountains,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Sandy,0.6967182430196394
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,South Jordan - I-15 to MVC,0.8977798235711332
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,South Perry - Willard,0.033935027813133616
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,South Salt Lake - Murray,0.6860953301262657
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,W Daybreak - Herriman,0.7440424640478611
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Weber County - Great Slat Lake,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Weber County - Southeast Mountains,0.007730852383475446
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,West Jordan - I-15 to MVC,0.6823043321636497
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,West Jordan - West of MVC,0.5893562453643585
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,West Valley - Taylorsille,0.6583976357585556
+no_build_2046,No Build,2046,bike,2046,2032,DistrictMedium,Woods Cross - Bountiful - North Salt Lake,0.5716131812505834
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 1,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 10,0.055720890817718804
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 11,0.22431204374144167
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 12,0.4945755853211063
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 124,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 127,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 128,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 129,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 13,0.5785466779655445
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 130,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 14,0.28496778652190285
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 15,0.681926709295585
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 16,0.8106495812463048
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 17,0.46375644215304956
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 18,0.4732827451528309
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 19,0.9999999999999997
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 2,0.0015729250560936091
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 20,0.7211904953607321
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 21,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 22,0.663118694157337
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 23,0.4757095225408144
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 24,0.2500625746433142
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 25,0.7639696138019239
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 26,0.5332618605571585
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 27,0.680615682265611
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 28,0.7413223047438098
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 29,0.49624804268791495
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 3,0.188071719548419
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 30,0.7860642646429182
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 31,0.7141194158198321
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 32,0.49304604872735525
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 33,0.7324171479384107
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 34,0.00440172458499285
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 35,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 36,0.09490996679082551
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 37,0.6057933660857432
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 38,0.7786825799099238
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 39,0.906083044370841
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 4,0.7013698796158927
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 40,0.6018072582998816
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 41,0.9418614228164047
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 42,0.5487030942133144
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 43,0.7861120779260764
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 44,0.6943798629434235
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 45,1.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 46,1.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 47,0.9968674011851055
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 48,0.777469961221539
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 49,0.9167622125906151
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 5,0.033935027813133616
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 50,0.9340096776517459
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 51,0.9959836468749584
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 52,0.9910866915527224
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 53,0.9999999999999999
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 54,0.9999999999999994
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 55,
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 56,0.6860953301262657
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 57,0.6868434474489625
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 58,0.4480477765786983
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 59,0.42729546726771317
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 6,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 60,0.016192557133513075
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 61,0.3227815344966926
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 62,0.5893562453643585
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 63,0.7440424640478611
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 64,0.6326662711849411
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 65,0.7175507328170085
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 66,0.8988345022210609
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 67,0.8615833201929053
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 68,0.9087635611561928
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 69,0.9434882740731124
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 7,0.007730852383475446
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 70,0.7795608275316009
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 71,0.7673401689109077
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 72,0.8591695064782965
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 73,0.9754356687037812
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 74,0.6257793244497936
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 75,0.6797224603600639
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 76,0.8137824702360575
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 77,0.5073642321756692
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 78,0.792269118314847
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 79,0.11989794901022537
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 8,0.0
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 80,0.17374459746886484
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 81,0.08757275452747053
+no_build_2046,No Build,2046,bike,2046,2032,DistrictSmall,Small District 9,0.0
+no_build_2046,No Build,2046,transit,2046,2032,Region,WFRC,0.18158450175947224
+no_build_2046,No Build,2046,transit,2046,2032,CountyName,Box Elder,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CountyName,Davis,0.008564579158423574
+no_build_2046,No Build,2046,transit,2046,2032,CountyName,Salt Lake,0.253528620125455
+no_build_2046,No Build,2046,transit,2046,2032,CountyName,Weber,0.13817864106678548
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Box Elder County,0.0
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Northern Davis County,0.008887075456034524
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Northern Salt Lake County,0.48327321702111586
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Northern Weber County,0.07853514060728069
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Southeast Salt Lake County,0.10982922850317035
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Southern Davis County,0.008067014629296688
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Southern Weber County,0.16966898980559006
+no_build_2046,No Build,2046,transit,2046,2032,WorkshopArea,Southwest Salt Lake County,0.08637771460143728
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Alta,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Balance of BOX ELDER,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Bluffdale,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Bountiful,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Box Elder County North,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Box Elder County South,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Brigham City,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Brighton,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Centerville,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Clearfield,0.024844878089240834
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Clinton,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Copperton,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Cottonwood Heights,0.0005752197345919564
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Davis County,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Draper,0.042496488821999266
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Emigration Canyon,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Farmington,0.02414935291497079
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Farr West,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Fruit Heights,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,HAFB,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Harrisville,0.08978559802452664
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Herriman,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Holladay,0.057490245920301046
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Hooper,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Kaysville,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Kearns,0.124204756111699
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Layton,0.017044705244613337
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Magna,0.3154642069158789
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Mantua,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Marriott-Slaterville,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Midvale,0.11961586703564904
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Millcreek,0.43431291700374053
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Murray,0.38355449045944884
+no_build_2046,No Build,2046,transit,2046,2032,CityName,North Ogden,0.2878536813121759
+no_build_2046,No Build,2046,transit,2046,2032,CityName,North Salt Lake,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Ogden,0.2894458246798785
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Perry,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Plain City,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Pleasant View,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Riverdale,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Riverton,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Roy,0.023632763184526902
+no_build_2046,No Build,2046,transit,2046,2032,CityName,SL County East Cyns,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,SL County East Cyns - BCC,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,SL County East Cyns - LCC,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,SL County East Cyns - MCC,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,SL County East Cyns - Parleys,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,SL County West,0.00010771930636047544
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Salt Lake City,0.5858528059944982
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Sandy,0.04491888093646664
+no_build_2046,No Build,2046,transit,2046,2032,CityName,South Jordan,0.044150591322454795
+no_build_2046,No Build,2046,transit,2046,2032,CityName,South Ogden,0.18067476248766853
+no_build_2046,No Build,2046,transit,2046,2032,CityName,South Salt Lake,0.659638815733754
+no_build_2046,No Build,2046,transit,2046,2032,CityName,South Weber,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Sunset,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Syracuse,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Taylorsville,0.32006678263254773
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Uintah,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Washington Terrace,0.44203335372181013
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Weber County,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Weber County East Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,West Bountiful,0.001175240690104837
+no_build_2046,No Build,2046,transit,2046,2032,CityName,West Haven,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,West Jordan,0.11298210469201349
+no_build_2046,No Build,2046,transit,2046,2032,CityName,West Point,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,West Valley City,0.3091666268324389
+no_build_2046,No Build,2046,transit,2046,2032,CityName,White City,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Willard,0.0
+no_build_2046,No Build,2046,transit,2046,2032,CityName,Woods Cross,0.041769927060128303
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Box Elder County - WFRC,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Box Elder County - not WFRC,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Davis County - East Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Davis County - Great Salt Lake,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Davis County - North,0.00790085830017134
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Davis County - South,0.01003605434440075
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - CBD,0.7718047827029171
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - North Central,0.3757077077622416
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - Northeast,0.48010043066928015
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - Northwest,0.25632268504303096
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - South Central,0.06697518363340997
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - Southeast,0.052252141944200386
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - Southwest,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Salt Lake County - Wasatch Canyons,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Weber County - East Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Weber County - Great Slat Lake,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Weber County - North and West,0.0714123427837888
+no_build_2046,No Build,2046,transit,2046,2032,DistrictLarge,Weber County - Ogden Area,0.2819743968418162
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Airport - Rose Park,0.5635318497591726
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Antelope Island,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Big Cottonwood Canyon,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Box Elder County - Southeast Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Brigham City - North Perry,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Brigham City Area - W of I-15,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Clinton - West Point - Clearfield,0.006605729967350329
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Davis County - East Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Davis County - Great Salt Lake,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Draper,0.016981835502833772
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Emigration Canyon - Northeast Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Ex-West Weber,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Farmington - Centerville,0.015283683267586003
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,HAFB Area,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Hooper - Roy - West Haven,0.00998043991212044
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,I-15 to MVC - I-80 to 20,0.28821392425649767
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Kaysville - Syracuse,0.01803667122390271
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Layton - Fruit Heights,0.0002072055071185189
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Little Cottonwood Canyon,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,MVC - Magna - ATK,0.2563623735113648
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,MVC to Tailings,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Mantua - East Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Midvale - Cottonwood Heights - N Sandy,0.04502918321288748
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Millcreek - Holladay,0.27716905379128853
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Millcreek Canyon,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,North Ogden,0.177524518536793
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,North of Brigham City,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Northwest Quadrant - International Center,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Ogden Canyon - Northeast Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Ogden Core,0.36460571577446094
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Plain City - Farr West - Marriott - Slaterville,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Riverton - I-15 to MVC,0.004793329359543424
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,S Ogden - Riverdale - Uintah,0.18874790911630143
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,SLC CBD,0.7718047827029171
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,SLC East of I-15,0.6188721870577321
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Salt Flats - U-111 at 62nd,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Salt Lake County - Great Salt Lake,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Salt Lake County - West Mountains,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Sandy,0.07615771996569032
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,South Jordan - I-15 to MVC,0.060456305694345056
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,South Perry - Willard,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,South Salt Lake - Murray,0.49364309836516346
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,W Daybreak - Herriman,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Weber County - Great Slat Lake,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Weber County - Southeast Mountains,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,West Jordan - I-15 to MVC,0.13222493932051316
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,West Jordan - West of MVC,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,West Valley - Taylorsille,0.33553611976797393
+no_build_2046,No Build,2046,transit,2046,2032,DistrictMedium,Woods Cross - Bountiful - North Salt Lake,0.006895150291073331
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 1,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 10,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 11,0.14507296426790062
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 12,0.20631353321042772
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 124,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 127,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 128,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 129,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 13,0.017843663330632954
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 130,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 14,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 15,0.47120272775128447
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 16,0.2838090502104907
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 17,0.22695860845499963
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 18,0.12356564640759152
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 19,0.3195232512176824
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 2,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 20,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 21,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 22,0.017268428113888557
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 23,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 24,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 25,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 26,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 27,0.0306666022462803
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 28,0.00044109009927972376
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 29,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 3,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 30,0.023759310777090675
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 31,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 32,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 33,0.021007508501238576
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 34,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 35,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 36,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 37,0.2563623735113648
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 38,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 39,0.5709355448965752
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 4,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 40,0.12982293488546692
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 41,0.2895201626811385
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 42,0.1687386549433187
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 43,0.22277373066367853
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 44,0.5483659173080283
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 45,0.7134639828795228
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 46,0.7718047827029171
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 47,0.7278401419873538
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 48,0.2773758802059527
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 49,0.5237304555087794
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 5,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 50,0.05951169932863249
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 51,0.5947706668817261
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 52,0.8341725748570539
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 53,0.7881786743762641
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 54,0.9442587826777442
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 55,
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 56,0.49364309836516346
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 57,0.4306279602525932
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 58,0.09439898268368206
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 59,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 6,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 60,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 61,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 62,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 63,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 64,0.09029178019043431
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 65,0.1620003354221814
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 66,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 67,0.03588129560347486
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 68,0.09580819268934626
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 69,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 7,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 70,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 71,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 72,0.027535400442563814
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 73,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 74,0.07135352698054258
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 75,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 76,0.12324066579087414
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 77,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 78,0.016981835502833772
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 79,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 8,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 80,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 81,0.0
+no_build_2046,No Build,2046,transit,2046,2032,DistrictSmall,Small District 9,0.0
