@@ -1,11 +1,13 @@
 project:
   type: website
   output-dir: docs
+  brand: _extensions/WFRCAnalytics/wfrc-brand/brand.yml
   render:
     - "**/*.qmd"
     - "!_templates/**"
 
-brand: _extensions/WFRCAnalytics/wfrc-brand/brand.yml
+metadata-files:
+  - _extensions/WFRCAnalytics/wfrc-brand/wfrc-shared.yml
 
 website:
   title: "Geospatial Analyses"
@@ -16,13 +18,8 @@ website:
   favicon: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_color_transparent.png"
 
   page-navigation: false
-  back-to-top-navigation: true
 
   navbar:
-    logo:
-      light: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_color_transparent.png"
-      dark: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_white_transparent.png"
-    logo-alt: "Wasatch Front Regional Council"
     left:
       - text: "Home"
         href: index.qmd
@@ -30,13 +27,6 @@ website:
         href: projects/center-buildout-capacity/index.qmd
       - text: "Transportation Choices"
         href: projects/transportation-choices/index.qmd
-    right:
-      - icon: github
-        href: https://github.com/WFRCAnalytics/GIS-adhoc-analyses
-        aria-label: "GitHub repository"
-
-  page-footer:
-    left: "© 2026 [Wasatch Front Regional Council](https://wfrc.utah.gov/)"
 
 execute:
   eval: true
@@ -47,26 +37,8 @@ jupyter: python3
 
 format:
   html:
-    theme:
-      light:
-        - cosmo
-        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc.scss
-        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc-light.scss
-      dark:
-        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc.scss
-        - _extensions/WFRCAnalytics/wfrc-brand/assets/theme/wfrc-dark.scss
-    respect-user-color-scheme: true
-    highlight-style:
-      light: github
-      dark: dracula
-    toc: true
     code-fold: true
     code-summary: "Show the code"
     lightbox: auto
 
 title-block-banner: true
-citation: false
-
-# freeze computational output
-# (see https://quarto.org/docs/projects/code-execution.html#freeze)
-freeze: auto
