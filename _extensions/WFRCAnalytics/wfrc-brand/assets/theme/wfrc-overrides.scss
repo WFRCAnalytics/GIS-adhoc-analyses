@@ -74,6 +74,21 @@ $wfrc-scroll-thumb: mix($wfrc-ink-2, $wfrc-bg, 55%);
   * { scrollbar-width: thin; scrollbar-color: #{$wfrc-scroll-thumb} transparent; }
 }
 
+// Smooth scrolling for in-page links (contents, anchors, Back to top) in plain CSS, and only for people
+// who have not asked for reduced motion. Quarto's `smooth-scroll` option loads zenscroll instead, a UMD
+// script that throws "Mismatched anonymous define() module" on any page where RequireJS is present
+// (Plotly figures, notebook widgets), so wfrc-shared.yml leaves that option off.
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+// Where a link lands: a small gap above the heading (zenscroll left 9px). Visitors who asked for reduced
+// motion jump instantly, and after an upward jump Quarto's headroom navbar pins itself over the top of
+// the page, so they get room for it.
+:target { scroll-margin-top: 0.55rem; }
+@media (prefers-reduced-motion: reduce) {
+  :target { scroll-margin-top: 4.5rem; }
+}
+
 // ── 2  Typography ────────────────────────────────────────────────────────────
 h1, .h1, .title { color: $wfrc-h1; }
 h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 { color: $wfrc-h2; }
@@ -842,5 +857,21 @@ $wfrc-inner: max(20px, calc((100vw - 1100px) / 2));
     &-left { order: 3 !important; flex-basis: 100%; text-align: center; }
   }
   .navbar-title { font-size: 0.85rem; }
-  .navbar .quarto-navbar-tools { font-size: 1.2rem; text-align: left; }
+
+  // The collapsed navbar is ONE row: menu button, logo and title, then the tools. Quarto lets the row
+  // wrap, so with the GitHub menu, the mode toggle and search the tools dropped to a second row and
+  // the logo's link shrank until the logo was clipped ("WFR"). The logo and the tools never shrink;
+  // only the title does, and it ends in an ellipsis.
+  .navbar > .navbar-container { flex-wrap: nowrap; }
+  .navbar-brand-container { min-width: 0; }
+  .navbar-brand-container > a.navbar-brand-logo { flex: none; overflow: visible; }
+  .navbar-brand-container .navbar-logo { max-height: 30px; width: auto; }
+  .navbar-brand-container > a.navbar-brand:not(.navbar-brand-logo) { min-width: 0; margin-right: 0; overflow: hidden; }
+  .navbar-brand-container .navbar-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .navbar .quarto-navbar-tools { flex: none; white-space: nowrap; font-size: 1.2rem; text-align: left; }
+  .navbar #quarto-search { flex: none; }
+}
+// Phones: a little tighter type so more of a long site title fits.
+@media screen and (max-width: 480px) {
+  .navbar-title { font-size: 0.78rem; letter-spacing: 0.04em; }
 }

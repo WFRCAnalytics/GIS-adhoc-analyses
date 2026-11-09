@@ -13,11 +13,18 @@ website:
   # Paths in this file must include the _extensions folder path
   # favicon: "_extensions/WFRCAnalytics/wfrc-brand/assets/logo/abbreviated/WFRC_logo_abbreviated_color_transparent.png"
 
+  # Social cards use one fixed WFRC image. Left to itself, Quarto picks the first figure on the page
+  # and, when that figure's alt text contains a "%", warns `Invalid URI '...' in attribute 'alt'`
+  # (a Quarto bug). A page can still set its own `image:` in its front matter.
   twitter-card:
     creator: "@wasatchcouncil"
     site: "@wasatchcouncil"
     card-style: summary_large_image
-  open-graph: true
+    image: _extensions/WFRCAnalytics/wfrc-brand/assets/social/wfrc-card.png
+    image-alt: "Wasatch Front Regional Council"
+  open-graph:
+    image: _extensions/WFRCAnalytics/wfrc-brand/assets/social/wfrc-card.png
+    image-alt: "Wasatch Front Regional Council"
   cookie-consent: false
 
   # No default announcement is shipped -- add one per-project directly in
@@ -149,7 +156,9 @@ format:
     page-layout: full
     toc: true
     toc-expand: 2
-    smooth-scroll: true
+    # smooth-scroll is not set: Quarto's option loads zenscroll, which throws "Mismatched anonymous
+    # define() module" on pages where RequireJS is present (Plotly, notebook widgets). The theme
+    # smooth-scrolls with CSS instead (wfrc-overrides.scss).
     grid:
       sidebar-width: 350px
 
