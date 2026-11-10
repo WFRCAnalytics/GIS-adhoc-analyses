@@ -87,9 +87,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script id="quarto-axe-checker-options" type="text/plain">dHJ1ZQ==</script>
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-cc930c3f8ca53132f66ce89249938367.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../../site_libs/bootstrap/bootstrap-dark-bef55715f0729f143234ac1ef117bdf5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
-<link href="../../site_libs/bootstrap/bootstrap-cc930c3f8ca53132f66ce89249938367.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-037588347e6c9b638878bbe259ea3e76.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-b97d910aff66f2024c61e2e34e712f74.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-037588347e6c9b638878bbe259ea3e76.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
 <link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
 <link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
@@ -2649,133 +2649,69 @@ Important
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script>
-
 // Accessibility fixes for things Quarto and its libraries render but cannot configure.
-
 // Included on every page through wfrc-shared.yml (format.html.include-after-body).
-
 (function () {
-
   function fix(root) {
-
     // Listing banners are decorative; Quarto drops an empty `image-alt`.
-
     root.querySelectorAll('img.thumbnail-image:not([alt])').forEach(function (img) {
-
       img.setAttribute('alt', '');
-
     });
-
     // Quarto only sets `title` on the color-scheme toggle: add an accessible name and a clearer tooltip.
-
     root.querySelectorAll('.quarto-color-scheme-toggle:not([aria-label])').forEach(function (a) {
-
       a.setAttribute('aria-label', 'Toggle light and dark mode');
-
       a.setAttribute('title', 'Toggle light / dark');
-
     });
-
     // Collapsible callouts put aria-expanded on a plain div: make it a real, keyboard-operable button.
-
     root.querySelectorAll('.callout-header[aria-expanded]:not([role])').forEach(function (h) {
-
       h.setAttribute('role', 'button');
-
       h.setAttribute('tabindex', '0');
-
       h.addEventListener('keydown', function (e) {
-
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h.click(); }
-
       });
-
     });
-
     // The announcement's dismiss control is a bare <i> with a click handler: give it a role, a name
-
     // and keyboard operation (Enter and Space).
-
     root.querySelectorAll('#quarto-announcement .quarto-announcement-action:not([role])').forEach(function (i) {
-
       i.setAttribute('role', 'button');
-
       i.setAttribute('tabindex', '0');
-
       i.setAttribute('aria-label', 'Dismiss announcement');
-
       i.addEventListener('keydown', function (e) {
-
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); i.click(); }
-
       });
-
     });
-
     // Quarto's "Back to top" is an <a role="button"> without an href, so the keyboard cannot reach it.
-
     root.querySelectorAll('#quarto-back-to-top:not([tabindex])').forEach(function (a) {
-
       a.setAttribute('tabindex', '0');
-
       a.addEventListener('keydown', function (e) {
-
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.scrollTo(0, 0); }
-
       });
-
     });
-
     // Observable Plot labels bare <g> marks; aria-label is not allowed on a role-less element.
-
     root.querySelectorAll('[class^="plot-"] g[aria-label]:not([role])').forEach(function (g) {
-
       g.removeAttribute('aria-label');
-
     });
-
     // Scrollable regions must be reachable by keyboard.
-
     root.querySelectorAll('pre, div.sourceCode, .card, .card-body, .table-striped, table, .cell-output-display').forEach(function (el) {
-
       if (el.hasAttribute('tabindex') || el.matches('a, button, input, select, textarea')) return;
-
       var o = getComputedStyle(el);
-
       var scrolls = /(auto|scroll)/.test(o.overflowX + o.overflowY) &&
-
         (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1);
-
       if (scrolls) el.setAttribute('tabindex', '0');
-
     });
-
   }
-
   var queued = false;
-
   function schedule() {
-
     if (queued) return;
-
     queued = true;
-
     requestAnimationFrame(function () { queued = false; fix(document); });
-
   }
-
   fix(document);
-
   new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
-
   window.addEventListener('resize', schedule);
-
   window.addEventListener('load', function () { setTimeout(schedule, 800); setTimeout(schedule, 2500); });
-
 })();
-
 </script>
-
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
