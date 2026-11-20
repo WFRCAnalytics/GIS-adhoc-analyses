@@ -66,13 +66,13 @@ plt.rcParams.update({
 })
 MODE_COLOR = dict(zip(["Local Bus", "Express Bus", "Bus Rapid", "Light Rail", "Commuter Rail"],
                       wfrc.palette(5)))
-MODE_COLOR |= {"Microtransit": brand["pink"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
+MODE_COLOR |= {"Streetcar": brand["orange"], "Microtransit": brand["pink"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
 SOURCE = "Source: UTA GTFS via Mobility Database (WFRC analysis)"
 ```
 
 ## Route-to-mode lookup
 
-Modes follow the analyst-supplied UTA lookup by `route_short_name`. Core route 35M (COR in the lookup) is folded into Local Bus; Microtransit (MT, on-demand) is reported separately since it was not one of the five requested modes. **Four routes were added to Bus Rapid (BRT)**: OGX and UVX (the supplied lookup's comment names them as the BRT routes but they were missing from its list), and 50X and MVX (the Midvalley Express, UTA's third BRT line, which opened April 12, 2026 and is published under both names). **CS1, CS2 and CS3 are UTA's seasonal canyon ski buses** (to Alta, Snowbird and Brighton), neither local nor express, so they are reported separately as Ski Bus. Any other route not in the lookup is reported as **Unmapped** rather than guessed (except rail: GTFS `route_type` 0 is Light Rail, 2 is Commuter Rail).
+Modes follow the analyst-supplied UTA lookup by `route_short_name`. Core route 35M (COR in the lookup) is folded into Local Bus; **The S-Line streetcar (route 720) is reported as its own Streetcar mode**, not Light Rail. Microtransit (MT, on-demand) is reported separately since it was not one of the five requested modes. **Four routes were added to Bus Rapid (BRT)**: OGX and UVX (the supplied lookup's comment names them as the BRT routes but they were missing from its list), and 50X and MVX (the Midvalley Express, UTA's third BRT line, which opened April 12, 2026 and is published under both names). **CS1, CS2 and CS3 are UTA's seasonal canyon ski buses** (to Alta, Snowbird and Brighton), neither local nor express, so they are reported separately as Ski Bus. Any other route not in the lookup is reported as **Unmapped** rather than guessed (except rail: GTFS `route_type` 0 is Light Rail, 2 is Commuter Rail).
 
 ```{python}
 MODE_ROUTES = {  # reporting mode -> route_short_names
@@ -92,7 +92,8 @@ MODE_ROUTES = {  # reporting mode -> route_short_names
     ],
     "Express Bus": ["451", "472", "473", "513", "551", "805", "806", "807", "822"],
     "Bus Rapid": ["2AX", "2BX", "2X", "500X", "603X", "830X", "OGX", "UVX", "50X", "MVX"],  # last four added (see text)
-    "Light Rail": ["701", "703", "704", "720"],
+    "Light Rail": ["701", "703", "704"],
+    "Streetcar": ["720"],  # S-Line
     "Commuter Rail": ["750"],
     "Microtransit": ["SLC", "TOO", "SD", "SSLC"],
     "Ski Bus": ["CS1", "CS2", "CS3"],  # seasonal canyon ski service (Alta, Snowbird, Brighton)
