@@ -241,3 +241,7 @@ projects/transportation-choices/_archive/
 
 # Quarto site output (deployed to gh-pages via `quarto publish gh-pages`)
 docs/
+
+# maz-numbering: interactive QC map is regenerated on every render (folium writes random element
+# IDs, so it never diffs cleanly) -- keep it in output/ for local use but don't track it
+projects/maz-numbering/output/*_qc_map.html

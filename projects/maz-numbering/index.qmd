@@ -4,6 +4,7 @@ subtitle: "Assigning consecutive MAZIDs, TAZ by TAZ, north to south then west to
 author: "Pukar Bhandari"
 date: 2026-11-19
 date-modified: 2026-11-20
+image: output/sort_methods_considered.png
 ---
 
 ## Goal
@@ -282,7 +283,7 @@ OPTIONS = {
 # Layout is built in absolute inches from the TAZ's own shape, so titles never collide with
 # the figure header and wide or tall TAZs both fit without empty gaps.
 minx, miny, maxx, maxy = sub.total_bounds
-W, pw = 8.5, 3.9                      # figure width, panel width (inches)
+W, pw = 9.5, 4.0                      # figure width, panel width (inches)
 ph = pw * (maxy - miny) / (maxx - minx)  # panel height from the TAZ's aspect ratio
 header, title_block, gap = 0.95, 0.8, 0.15
 H = header + 2 * (title_block + ph) + gap + 0.15
@@ -313,8 +314,14 @@ fig.text(0.5, 1 - 0.6 / H, f"TAZ {big}, {len(sub)} MAZs (number = order within t
          ha="center", va="center", fontsize=8.5, color=TEXT_MUTED)
 
 PATHS["out"].mkdir(parents=True, exist_ok=True)
-fig.savefig(PATHS["out"] / "sort_methods_considered.png", dpi=200)
-plt.show()
+png = PATHS["out"] / "sort_methods_considered.png"
+fig.savefig(png, dpi=200)
+plt.close(fig)
+
+# Show the saved image at its full canvas width (the notebook's own inline output crops the
+# side whitespace, which made the figure narrower than the page column)
+from IPython.display import Image, display
+display(Image(filename=str(png), width=int(W * 100)))
 ```
 
 ## 5. Sort and number
@@ -373,6 +380,8 @@ m1
 
 ## 6. QC
 
+### Checks
+
 ```{python}
 n = len(df)
 checks = pd.Series({
@@ -393,6 +402,8 @@ checks.to_frame()
 assert checks.all(), "QC failed, see table above"
 ```
 
+### Old versus new IDs
+
 How far did IDs move? A quick look at old versus new.
 
 ```{python}
@@ -403,7 +414,7 @@ ax.set_ylabel("MAZID (new)")
 plt.show()
 ```
 
-## 7. QC map
+### Map
 
 MAZ colored by new `MAZID`. A smooth ramp across each TAZ and a stepwise change between TAZs means the order worked. The map is reprojected to EPSG:4326 for display only.
 
@@ -440,7 +451,7 @@ folium.LayerControl().add_to(m)
 m
 ```
 
-## 8. Save
+## 7. Save
 
 `MAZID_OLD` served its purpose in the QC above, so it is dropped here, along with the helper coordinates, just before export. Shapefile field names are limited to 10 characters, so the names used here are safe.
 
