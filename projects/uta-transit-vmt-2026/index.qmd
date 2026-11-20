@@ -66,7 +66,7 @@ plt.rcParams.update({
 })
 MODE_COLOR = dict(zip(["Local Bus", "Express Bus", "Bus Rapid", "Light Rail", "Commuter Rail"],
                       wfrc.palette(5)))
-MODE_COLOR |= {"Streetcar": brand["orange"], "Microtransit": brand["pink"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
+MODE_COLOR |= {"Streetcar": brand["pink"], "Microtransit": brand["orange"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
 SOURCE = "Source: UTA GTFS via Mobility Database (WFRC analysis)"
 ```
 
@@ -366,7 +366,6 @@ fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Annual revenue vehicle miles in 
 fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
 plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
 OUT_DIR.mkdir(exist_ok=True)
-fig.savefig(OUT_DIR / "annual_vmt_by_mode.png", facecolor=fig.get_facecolor(), dpi=150)
 ```
 
 ### Monthly VMT by mode
@@ -434,6 +433,7 @@ fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "7-day average, thousand miles pe
          ha="left", va="top")
 fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
 plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+fig.savefig(OUT_DIR / "daily_vmt_by_mode.png", facecolor=fig.get_facecolor(), dpi=150)
 ```
 
 ### Typical day by day of week
