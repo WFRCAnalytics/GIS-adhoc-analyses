@@ -31,10 +31,10 @@ uv run quarto preview                              # whole site
 
 ## Publishing
 
-`uv run quarto render` builds the whole site into `docs/`, which is tracked
-in git. Commit and push `docs/` to publish -- GitHub Pages serves it
-directly from `main`/`docs` with no CI/build step. Enable it once under repo
-Settings -> Pages -> Source: `main` branch, `/docs` folder.
+`uv run quarto render` builds the whole site into `docs/` (gitignored, local
+preview only). `uv run quarto publish gh-pages` renders and deploys it to the
+`gh-pages` branch, which GitHub Pages serves (Settings -> Pages -> Source:
+`gh-pages` branch, `/` root). No CI/build step.
 
 ## Downloading ArcGIS REST data
 

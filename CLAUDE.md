@@ -87,11 +87,11 @@ Per project, under `projects/<name>/_data/`:
 
 Single root-level website (`_quarto.yml`) aggregates every project's
 `index.qmd` as a page, styled via the `WFRCAnalytics/wfrc-brand` extension
-(`_extensions/WFRCAnalytics/wfrc-brand/`). Renders to `docs/` (tracked in
-git, not gitignored) so GitHub Pages can serve it directly from `main` with
-no CI/build step -- enable it in repo Settings -> Pages -> Source: `main`
-branch, `/docs` folder. Run `uv run quarto render` and commit `docs/` before
-pushing to publish. `freeze: auto` caches execution output; `_freeze/` stays
+(`_extensions/WFRCAnalytics/wfrc-brand/`). Renders to `docs/` (gitignored, local preview only). The
+live site is deployed to the `gh-pages` branch with `uv run quarto publish
+gh-pages` (renders, then pushes the output; no CI/build step). Pages source is
+`gh-pages` branch, `/` root. Nothing needs committing to publish -- push
+source changes to `main` separately. `freeze: auto` caches execution output; `_freeze/` stays
 gitignored for now since renders happen locally with live data access, not
 in CI -- see `WFRCAnalytics/GIS-RTP-Phasing-Criteria` if a CI-based rebuild
 (needing committed `_freeze/`) is ever needed instead.

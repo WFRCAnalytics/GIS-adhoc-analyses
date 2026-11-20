@@ -238,3 +238,6 @@ projects/center-buildout-capacity/_data/raw/remm/*
 # transportation-choices: v9 reference scripts/data pulled in for research
 # only, superseded by the v10 pipeline in index.qmd -- not a deliverable
 projects/transportation-choices/_archive/
+
+# Quarto site output (deployed to gh-pages via `quarto publish gh-pages`)
+docs/
