@@ -19,18 +19,22 @@ website:
 
   page-navigation: false
 
-  navbar:
-    left:
+  sidebar:
+    style: docked
+    search: true
+    contents:
       - text: "Home"
         href: index.qmd
-      - text: "Center Buildout Capacity"
-        href: projects/center-buildout-capacity/index.qmd
-      - text: "Transportation Choices"
-        href: projects/transportation-choices/index.qmd
-      - text: "UTA Transit VMT 2026"
-        href: projects/uta-transit-vmt-2026/index.qmd
-      - text: "MAZ Numbering"
-        href: projects/maz-numbering/index.qmd
+      - section: "2026"
+        contents:
+          - text: "MAZ Numbering"
+            href: projects/maz-numbering/index.qmd
+          - text: "UTA Transit VMT 2026"
+            href: projects/uta-transit-vmt-2026/index.qmd
+          - text: "Transportation Choices"
+            href: projects/transportation-choices/index.qmd
+          - text: "Center Buildout Capacity"
+            href: projects/center-buildout-capacity/index.qmd
 
 execute:
   eval: true
@@ -44,5 +48,7 @@ format:
     code-fold: true
     code-summary: "Show the code"
     lightbox: auto
+    grid:
+      sidebar-width: 260px  # left navigation; the brand default (350px) is too wide for it
 
 title-block-banner: true
