@@ -7,7 +7,7 @@ page-layout: full
 
 ## Purpose
 
-How many vehicle miles of travel (VMT) does UTA transit service run in a calendar year, and how does that split across Local Bus, Express Bus, Bus Rapid, Light Rail, Streetcar, and Commuter Rail?
+How many vehicle miles of travel (VMT) does UTA transit service run in a calendar year, and how does that split across Local Bus, Express Bus, Bus Rapid, Light Rail, Streetcar, Flex, Commuter Rail, and Ski Bus?
 
 This analysis answers that for **2026** from the *actual* published schedules, not an annualization of one sample week. GTFS feeds change several times a year (service changes, detours, holiday schedules), so every service date is assigned to the feed snapshot that was in effect that day, and the miles of every scheduled trip are added up.
 
@@ -15,6 +15,8 @@ This analysis answers that for **2026** from the *actual* published schedules, n
 ## What "VMT" means here
 
 Scheduled **in-service (revenue) vehicle miles**: the distance of each trip scheduled in GTFS, from its first to its last stop. It does **not** include deadhead (garage pull-out/pull-in and repositioning), nor actual operations (missed trips, detours, extra service). Expect it to run somewhat below UTA's reported NTD vehicle revenue miles plus deadhead.
+
+It covers **fixed-schedule service only**, whatever UTA publishes as scheduled trips in GTFS. **On-demand service (UTA On Demand microtransit) is not included**: none appears in any of the 2026 feeds. UTA's scheduled *Flex* routes (the `F`-prefixed route-deviation routes) *are* in GTFS with fixed trips, so they are counted, reported as their own Flex mode.
 :::
 
 ## Data Sources
@@ -66,28 +68,26 @@ plt.rcParams.update({
 })
 MODE_COLOR = dict(zip(["Local Bus", "Express Bus", "Bus Rapid", "Light Rail", "Commuter Rail"],
                       wfrc.palette(5)))
-MODE_COLOR |= {"Streetcar": brand["pink"], "Microtransit": brand["orange"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
+MODE_COLOR |= {"Streetcar": brand["pink"], "Flex": brand["wfrc-taupe"], "Microtransit": brand["indigo"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
 SOURCE = "Source: UTA GTFS via Mobility Database (WFRC analysis)"
 ```
 
 ## Route-to-mode lookup
 
-Modes follow the analyst-supplied UTA lookup by `route_short_name`. Core route 35M (COR in the lookup) is folded into Local Bus; **The S-Line streetcar (route 720) is reported as its own Streetcar mode**, not Light Rail. Microtransit (MT, on-demand) is reported separately since it was not one of the five requested modes. **Four routes were added to Bus Rapid (BRT)**: OGX and UVX (the supplied lookup's comment names them as the BRT routes but they were missing from its list), and 50X and MVX (the Midvalley Express, UTA's third BRT line, which opened April 12, 2026 and is published under both names). **CS1, CS2 and CS3 are UTA's seasonal canyon ski buses** (to Alta, Snowbird and Brighton), neither local nor express, so they are reported separately as Ski Bus. Any other route not in the lookup is reported as **Unmapped** rather than guessed (except rail: GTFS `route_type` 0 is Light Rail, 2 is Commuter Rail).
+Modes follow the analyst-supplied UTA lookup by `route_short_name`. Core route 35M (COR in the lookup) is folded into Local Bus; **The S-Line streetcar (route 720) is reported as its own Streetcar mode**, not Light Rail. **Flex routes** (the `F`-prefixed route-deviation routes, e.g. F11 and F94) are split out of Local Bus into their own Flex mode. Microtransit (on-demand) has its own category in the lookup, but no such routes exist in the feeds, so it reports zero. **Four routes were added to Bus Rapid (BRT)**: OGX and UVX (the supplied lookup's comment names them as the BRT routes but they were missing from its list), and 50X and MVX (the Midvalley Express, UTA's third BRT line, which opened April 12, 2026 and is published under both names). **CS1, CS2 and CS3 are UTA's seasonal canyon ski buses** (to Alta, Snowbird and Brighton), neither local nor express, so they are reported separately as Ski Bus. Any other route not in the lookup is reported as **Unmapped** rather than guessed (except rail: GTFS `route_type` 0 is Light Rail, 2 is Commuter Rail).
 
 ```{python}
 MODE_ROUTES = {  # reporting mode -> route_short_names
     "Local Bus": [
         "1", "2", "2A", "2B", "3", "4", "6", "9", "11", "17", "21", "33", "35", "39", "41",
-        "45", "47", "54", "62", "72", "126", "200", "201", "205", "209", "213", "217", "218",
-        "219", "220", "223", "227", "228", "232", "240", "248", "307", "313", "320", "354",
-        "417", "453", "454", "455", "456", "460", "461", "462", "463", "470", "471", "500",
-        "509", "516", "519", "520", "525", "526", "601", "602", "603", "604", "606", "608",
-        "612", "613", "616", "625", "626", "627", "628", "630", "640", "645", "650", "667",
-        "674", "675", "677", "710", "809", "811", "821", "823", "831", "833", "834", "841",
-        "850", "862", "863", "864", "871", "880", "901", "902", "919", "920", "953", "972",
-        "994", "F11", "F94", "F94Xtra", "F202", "F202pln", "F232", "F400", "F401", "F402",
-        "F504", "F514a", "F514b", "F518", "F522", "F534", "F546", "F547", "F453", "F514",
-        "F525", "F556", "F570", "F578", "F590", "F618", "F605", "F620", "F638",
+        "45", "47", "54", "62", "72", "126", "200", "201", "205", "209", "213", "217",
+        "218", "219", "220", "223", "227", "228", "232", "240", "248", "307", "313", "320",
+        "354", "417", "453", "454", "455", "456", "460", "461", "462", "463", "470", "471",
+        "500", "509", "516", "519", "520", "525", "526", "601", "602", "603", "604", "606",
+        "608", "612", "613", "616", "625", "626", "627", "628", "630", "640", "645", "650",
+        "667", "674", "675", "677", "710", "809", "811", "821", "823", "831", "833", "834",
+        "841", "850", "862", "863", "864", "871", "880", "901", "902", "919", "920", "953",
+        "972", "994",
         "35M",  # Core route, folded into Local Bus
     ],
     "Express Bus": ["451", "472", "473", "513", "551", "805", "806", "807", "822"],
@@ -95,6 +95,11 @@ MODE_ROUTES = {  # reporting mode -> route_short_names
     "Light Rail": ["701", "703", "704"],
     "Streetcar": ["720"],  # S-Line
     "Commuter Rail": ["750"],
+    "Flex": [  # scheduled route-deviation ("F") routes
+        "F11", "F94", "F94Xtra", "F202", "F202pln", "F232", "F400", "F401", "F402", "F504",
+        "F514a", "F514b", "F518", "F522", "F534", "F546", "F547", "F453", "F514", "F525",
+        "F556", "F570", "F578", "F590", "F618", "F605", "F620", "F638",
+    ],
     "Microtransit": ["SLC", "TOO", "SD", "SSLC"],
     "Ski Bus": ["CS1", "CS2", "CS3"],  # seasonal canyon ski service (Alta, Snowbird, Brighton)
 }
@@ -412,7 +417,9 @@ by_day = daily.pivot_table(index="date", columns="mode", values="miles", aggfunc
                            observed=True).fillna(0)  # no service that day = 0 miles
 modes_shown = [md for md in MODE_ORDER if md in by_day.columns and by_day[md].sum() > 0]
 smooth = by_day.rolling(7, center=True).mean()  # removes the weekly cycle; first/last 3 days dropped (partial window)
-fig, axes = plt.subplots(2, 3, figsize=(11, 5.4), sharex=True)
+ncols = 4
+nrows = -(-len(modes_shown) // ncols)
+fig, axes = plt.subplots(nrows, ncols, figsize=(13, 2.7 * nrows), sharex=True)
 for ax, md in zip(axes.flat, modes_shown):
     ax.plot(smooth.index, smooth[md] / 1e3, color=MODE_COLOR[md], linewidth=2)
     ax.axvspan(pd.Timestamp(last_published) + pd.Timedelta(days=1), by_day.index.max(),
@@ -425,8 +432,8 @@ for ax, md in zip(axes.flat, modes_shown):
     ax.tick_params(length=0)
 for ax in axes.flat[len(modes_shown):]:
     ax.set_visible(False)
-axes[0, 0].set_ylabel("Thousand miles / day")
-axes[1, 0].set_ylabel("Thousand miles / day")
+for ax in axes[:, 0]:
+    ax.set_ylabel("Thousand miles / day")
 fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "Daily scheduled vehicle miles by mode", ha="left", va="top", fontsize=14,
          fontfamily="Poppins SemiBold", color=INK)
 fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "7-day average, thousand miles per day; gray band = projected", fontsize=9.5, color=INK2,
@@ -521,7 +528,7 @@ tot.to_csv(OUT_DIR / "uta_vmt_2026_by_mode.csv", index=False)
 ## Limitations
 
 -   **Scheduled, not operated.** Based on published GTFS: no deadhead, missed trips, detours, or unscheduled extra service.
--   **Microtransit / on-demand** miles are only as good as what UTA publishes in GTFS; demand-response service typically has no scheduled trips, so Microtransit may be absent or understated.
+-   **Microtransit / on-demand** miles are only as good as what UTA publishes in GTFS; on-demand (demand-response) service has no scheduled trips and is absent from the 2026 feeds, so it is excluded entirely.
 -   **Mode lookup** is by route short name as supplied; routes added or renumbered since are flagged under *Unmapped*.
 -   **Shape-based distance** is straight-line between shape vertices, so slightly shorter than odometer miles on very sparse shapes.
 -   **Projected days** assume the last published schedule continues; a December service change would shift them.
