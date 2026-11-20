@@ -18,4 +18,4 @@ status, and who to contact when a source goes stale.
 | Dataset | Cache path | Source | Vintage | Status | Contact / Action |
 |---|---|---|---|---|---|
 | WFTDM Transportation Analysis Zones | `_data/remote/wftdm_taz.gpkg` | `WasatchFrontTAZ` REST service (key `wftdm_taz`) | Live REST | ✅ | |
-| Cleaned microzones (MAZ) | `_data/raw/Microzones_Clean_20261120.zip` | Zipped shapefile provided directly by Josh (not REST) | Received 2026-11-20 (supersedes the 2026-11-13 file: 14,165 MAZs vs 14,199, `DEVACRES`/`DEVPBLEPCT` fields dropped) | ✅ | Output of the (out-of-scope) geometry cleanup. To refresh, replace the zip and update the path in `index.qmd` |
+| Cleaned microzones (MAZ) | `_data/raw/Microzones_Clean_20261120.zip` | Zipped shapefile provided directly by Josh (not REST) | Received 2026-11-20, revised same day (supersedes the 2026-11-13 file: 14,164 MAZs vs 14,199, `DEVACRES`/`DEVPBLEPCT` fields dropped) | ✅ | Output of the (out-of-scope) geometry cleanup. To refresh, replace the zip and update the path in `index.qmd` |
