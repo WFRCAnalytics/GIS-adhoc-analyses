@@ -10,8 +10,8 @@ Give every microzone (MAZ) a new `MAZID` from 1 to N with no gaps.
 - Locate each MAZ by its **representative point** (always inside the polygon).
 - Find its TAZ with a **point-in-polygon** join.
 - Number TAZ by TAZ in ascending `TAZID`.
-- Inside a TAZ, go **north to south, then west to east**.
-- Keep the old ID in `MAZID_OLD`.
+- Inside a TAZ, go **north to south, then west to east** (by representative point; see [how the sort order was decided](#how-the-sort-order-was-decided) for the alternatives that were considered).
+- Keep the old ID in `MAZID_OLD` for comparison and QC; it is dropped just before the shapefile is exported.
 
 Geometry cleaning (gaps, slivers, TAZ crossovers) is done upstream and is out of scope here; the input MAZ layer is assumed already cleaned.
 
@@ -27,7 +27,7 @@ from pathlib import Path
 from gis_adhoc_analyses.layer_cache import ensure_layers
 
 PATHS = {
-    "maz": "/vsizip/_data/raw/Microzones_Clean.zip/Microzones_Clean.shp",  # read in place via GDAL vsizip, no extraction
+    "maz": "/vsizip/_data/raw/Microzones_Clean_20261120.zip/Microzones_Clean.shp",  # read in place via GDAL vsizip, no extraction
     "out": Path("output"),
 }
 CRS = "EPSG:26912"  # UTM 12N, meters -- all analysis happens here
@@ -164,39 +164,37 @@ print("MAZ per TAZ:")
 df.groupby("TAZID").size().describe().round(1)
 ```
 
-## 4. Compare sort methods
+## 4. How the sort order was decided
 
-The old rule sorts on the representative point alone. Its weakness: that point sits at an arbitrary spot inside each polygon, so MAZs in the same row of blocks can come out in a scrambled left-to-right order. Four candidate sort keys are compared here. Every one is applied **inside each TAZ**, so the TAZ-by-TAZ order is never affected.
+Sorting on the representative point alone has one weakness: the point sits at an arbitrary spot inside each polygon, so MAZs in the same row of blocks can come out in a slightly scrambled left-to-right order. Four ways to order MAZs **inside each TAZ** were compared (the TAZ-by-TAZ order is the same for all of them) and put to a vote. **Option A won**, and it is the rule used in the numbering below.
 
-| Method | Key (ascending) |
-| --- | --- |
-| `rep_point` | representative point: Y descending, then X ascending |
-| `bbox_ul` | top-left corner of the bounding box (`maxy`, `minx`) |
-| `blend` | midpoint of the bounding-box top-left corner and the representative point |
-| `hilbert` | position along a Hilbert space-filling curve fitted to each TAZ, starting in its north-west corner |
+| Option | Method | Key (ascending) |
+| --- | --- | --- |
+| A (chosen) | Representative point | Y descending, then X ascending |
+| B | Bounding-box top-left | top-left corner of the bounding box (`maxy`, `minx`) |
+| C | Blend | midpoint of the bounding-box top-left corner and the representative point |
+| D | Space-filling curve | position along a Hilbert curve fitted to each TAZ, starting in its north-west corner |
 
-The Hilbert curve stands in for Esri's "Peano" option: both are space-filling curves that finish one neighborhood before moving to the next. It keeps neighbors numbered close together, but it has no strict north-to-south reading order.
-
-Every method is stored as two ascending sort columns, `<method>_1` and `<method>_2`.
+The Hilbert curve stands in for Esri's "Peano" sort option: both are space-filling curves that finish one neighborhood before moving to the next. It keeps neighbors numbered close together, but it has no strict north-to-south reading order.
 
 ```{python}
-b = maz.bounds
-df["bbox_x"], df["bbox_y"] = b["minx"], b["maxy"]
-
-coord = {
-    "rep_point": (df["rep_x"], df["rep_y"]),
-    "bbox_ul": (df["bbox_x"], df["bbox_y"]),
-    "blend": ((df["bbox_x"] + df["rep_x"]) / 2, (df["bbox_y"] + df["rep_y"]) / 2),
-}
-for name, (x, y) in coord.items():
-    df[f"{name}_1"] = -y   # north to south
-    df[f"{name}_2"] = x    # west to east
-```
-
-The Hilbert key is computed per TAZ. Coordinates are scaled into a 65,536 x 65,536 grid using that TAZ's own extent (same scale in X and Y), with Y flipped so the curve starts in the north-west corner.
-
-```{python}
+#| code-summary: "Compute the alternative sort keys"
 import numpy as np
+
+cmp = df[["TAZID", "rep_x", "rep_y", "geometry"]].copy()
+bounds = cmp.bounds
+bbox_x, bbox_y = bounds["minx"], bounds["maxy"]
+
+# Every method is two ascending sort columns, <method>_1 and <method>_2
+coords = {
+    "rep_point": (cmp["rep_x"], cmp["rep_y"]),
+    "bbox_ul": (bbox_x, bbox_y),
+    "blend": ((bbox_x + cmp["rep_x"]) / 2, (bbox_y + cmp["rep_y"]) / 2),
+}
+for name, (x, y) in coords.items():
+    cmp[f"{name}_1"] = -y  # north to south
+    cmp[f"{name}_2"] = x   # west to east
+
 
 def hilbert_index(x, y, n=2**16):
     """Distance along the Hilbert curve for integer grid cells (x, y) in an n x n grid."""
@@ -214,29 +212,32 @@ def hilbert_index(x, y, n=2**16):
         s //= 2
     return d
 
-df["hilbert_1"] = 0
-for taz_id, g in df.groupby("TAZID"):
+
+# Hilbert key per TAZ: scale into a 65,536 grid using that TAZ's own extent (same scale in
+# X and Y), Y flipped so the curve starts in the north-west corner
+cmp["hilbert_1"] = 0
+for _, g in cmp.groupby("TAZID"):
     x0, y1 = g["rep_x"].min(), g["rep_y"].max()
     span = max(g["rep_x"].max() - x0, y1 - g["rep_y"].min(), 1e-9)
     gx = ((g["rep_x"] - x0) / span * (2**16 - 1)).round().to_numpy()
     gy = ((y1 - g["rep_y"]) / span * (2**16 - 1)).round().to_numpy()
-    df.loc[g.index, "hilbert_1"] = hilbert_index(gx, gy)
-df["hilbert_2"] = 0
+    cmp.loc[g.index, "hilbert_1"] = hilbert_index(gx, gy)
+cmp["hilbert_2"] = 0
 
 METHODS = ["rep_point", "bbox_ul", "blend", "hilbert"]
 for m in METHODS:
-    df[f"{m}_rank"] = (
-        df.sort_values(["TAZID", f"{m}_1", f"{m}_2"], kind="stable")
-          .groupby("TAZID").cumcount().reindex(df.index) + 1
+    cmp[f"{m}_rank"] = (
+        cmp.sort_values(["TAZID", f"{m}_1", f"{m}_2"], kind="stable")
+           .groupby("TAZID").cumcount().reindex(cmp.index) + 1
     )
 ```
 
-How much does each method differ from the current `rep_point` order? Rank is the position inside the MAZ's own TAZ.
+How far does each alternative move MAZs relative to Option A? Rank is the position inside the MAZ's own TAZ.
 
 ```{python}
 rows = {}
 for m in METHODS[1:]:
-    shift = (df[f"{m}_rank"] - df["rep_point_rank"]).abs()
+    shift = (cmp[f"{m}_rank"] - cmp["rep_point_rank"]).abs()
     rows[m] = {
         "MAZ with a different rank": f"{(shift > 0).mean():.0%}",
         "median shift": shift[shift > 0].median(),
@@ -246,16 +247,19 @@ for m in METHODS[1:]:
 pd.DataFrame(rows).T
 ```
 
-One image per method, all for the same TAZ: the largest TAZ with more than 10 MAZs. Each MAZ is colored and labelled by its position in the sequence (dark = first, bright = last), so a good order reads as a clean sweep and a bad one looks scrambled. The images are saved to `output/` so they can be shared for a vote.
+All four options on the same TAZ: the largest TAZ with more than 10 MAZs. Each MAZ is colored and labelled by its position in the sequence (dark = first, bright = last), so a good order reads as a clean sweep and a bad one looks scrambled.
 
 ```{python}
-counts = df["TAZID"].value_counts()
+#| code-summary: "Plot the four options side by side"
+#| out-width: 100%
+import textwrap
+
+counts = cmp["TAZID"].value_counts()
 big = counts[counts > 10].idxmax()
-sub = df[df["TAZID"] == big]
-print(f"TAZ {big}: {len(sub)} MAZ")
+sub = cmp[cmp["TAZID"] == big]
 
 OPTIONS = {
-    "rep_point": ("Option A: Representative point",
+    "rep_point": ("Option A: Representative point (chosen)",
                   "North to south, then west to east, by a point guaranteed inside each polygon"),
     "bbox_ul": ("Option B: Bounding-box top-left",
                 "North to south, then west to east, by the top-left corner of each polygon's bounding box"),
@@ -265,48 +269,53 @@ OPTIONS = {
                 "Follows a Hilbert curve across the TAZ from its north-west corner, keeping neighbors together"),
 }
 
-import textwrap
+# Layout is built in absolute inches from the TAZ's own shape, so titles never collide with
+# the figure header and wide or tall TAZs both fit without empty gaps.
+minx, miny, maxx, maxy = sub.total_bounds
+W, pw = 8.5, 3.9                      # figure width, panel width (inches)
+ph = pw * (maxy - miny) / (maxx - minx)  # panel height from the TAZ's aspect ratio
+header, title_block, gap = 0.95, 0.8, 0.15
+H = header + 2 * (title_block + ph) + gap + 0.15
 
-PATHS["out"].mkdir(parents=True, exist_ok=True)
-for m, (title, subtitle) in OPTIONS.items():
-    # Fixed canvas and fixed margins (no bbox_inches="tight"), so every image is the same size
-    fig, ax = plt.subplots(figsize=(8, 9.5))
-    fig.subplots_adjust(left=0.03, right=0.97, bottom=0.02, top=0.84)
+fig = plt.figure(figsize=(W, H))
+for i, (m, (title, subtitle)) in enumerate(OPTIONS.items()):
+    row, col = divmod(i, 2)
+    left = W * (0.25 + 0.5 * col) - pw / 2
+    top = H - header - row * (title_block + ph + gap) - title_block
+    ax = fig.add_axes([left / W, (top - ph) / H, pw / W, ph / H])
     sub.plot(column=f"{m}_rank", cmap="viridis", edgecolor="#333333", linewidth=0.4, ax=ax)
     for x, y, r in zip(sub["rep_x"], sub["rep_y"], sub[f"{m}_rank"]):
         ax.annotate(
-            str(r), (x, y), ha="center", va="center", fontsize=8, fontfamily="Poppins SemiBold",
+            str(r), (x, y), ha="center", va="center", fontsize=6.5, fontfamily="Poppins SemiBold",
             color="white", path_effects=[pe.withStroke(linewidth=2, foreground="black")],
         )
     ax.set_axis_off()
-    fig.text(0.5, 0.955, title, ha="center", va="top", fontsize=17, color=TEXT_PRIMARY,
-             fontfamily="Poppins SemiBold")
-    wrapped = "\n".join(textwrap.wrap(subtitle, 75))
-    fig.text(0.5, 0.905, f"{wrapped}\nTAZ {big}, {len(sub)} MAZs (number = order within the TAZ)",
-             ha="center", va="top", fontsize=9.5, color=TEXT_MUTED, linespacing=1.5)
-    fig.savefig(PATHS["out"] / f"sort_option_{m}.png", dpi=200)
-    plt.show()
-```
+    # Titles are offset from the axes top in points, so they never depend on the map's shape
+    ax.annotate("\n".join(textwrap.wrap(subtitle, 62)), (0.5, 1), xycoords="axes fraction",
+                xytext=(0, 6), textcoords="offset points", ha="center", va="bottom",
+                fontsize=7, color=TEXT_MUTED, linespacing=1.4)
+    ax.annotate(title, (0.5, 1), xycoords="axes fraction", xytext=(0, 34),
+                textcoords="offset points", ha="center", va="bottom", fontsize=9.5,
+                color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+fig.text(0.5, 1 - 0.3 / H, "Sort methods considered for MAZ numbering", ha="center", va="center",
+         fontsize=14, color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+fig.text(0.5, 1 - 0.6 / H, f"TAZ {big}, {len(sub)} MAZs (number = order within the TAZ)",
+         ha="center", va="center", fontsize=8.5, color=TEXT_MUTED)
 
-### Choose the method
-
-Set `SORT_METHOD` to one of the methods above. It defaults to `rep_point`, the original rule from the source project, until a method is approved.
-
-```{python}
-SORT_METHOD = "rep_point"
-assert SORT_METHOD in METHODS
-print("Numbering with:", SORT_METHOD)
+PATHS["out"].mkdir(parents=True, exist_ok=True)
+fig.savefig(PATHS["out"] / "sort_methods_considered.png", dpi=200)
+plt.show()
 ```
 
 ## 5. Sort and number
 
-Strict sort with no tolerance: `TAZID` ascending, then the two sort columns of the chosen `SORT_METHOD` (for the coordinate methods: Y descending, then X ascending).
+Strict sort with no tolerance: `TAZID` ascending, `rep_y` descending (north to south), `rep_x` ascending (west to east). This is Option A from the methods compared in [section 4](#how-the-sort-order-was-decided).
 
 ```{python}
 df = df.rename(columns={"MAZID": "MAZID_OLD"})
 
 df = (
-    df.sort_values(["TAZID", f"{SORT_METHOD}_1", f"{SORT_METHOD}_2"], kind="stable")
+    df.sort_values(["TAZID", "rep_y", "rep_x"], ascending=[True, False, True], kind="stable")
       .reset_index(drop=True)
 )
 df["MAZID"] = df.index + 1
@@ -363,7 +372,7 @@ checks = pd.Series({
     "MAZID is exactly 1..N": df["MAZID"].tolist() == list(range(1, n + 1)),
     "Every MAZ has a TAZID": df["TAZID"].notna().all(),
     "TAZID never decreases as MAZID grows": df["TAZID"].is_monotonic_increasing,
-    "Within each TAZ, primary sort key never decreases": (df.groupby("TAZID")[f"{SORT_METHOD}_1"].diff().dropna() >= 0).all(),
+    "Within each TAZ, Y never increases": (df.groupby("TAZID")["rep_y"].diff().dropna() <= 0).all(),
     "MAZID_OLD preserved (same set of values)": sorted(df["MAZID_OLD"]) == sorted(maz["MAZID"]),
     "CRS is EPSG:26912": df.crs.to_epsg() == 26912,
 }, name="pass")
@@ -423,14 +432,13 @@ m
 
 ## 8. Save
 
-Shapefile field names are limited to 10 characters, so the names used here are safe.
+`MAZID_OLD` served its purpose in the QC above, so it is dropped here, along with the helper coordinates, just before export. Shapefile field names are limited to 10 characters, so the names used here are safe.
 
 ```{python}
 PATHS["out"].mkdir(parents=True, exist_ok=True)
 out_shp = PATHS["out"] / "WFv1000_MAZ.shp"
 qc_map = PATHS["out"] / "WFv1000_MAZ_qc_map.html"
-helper_cols = [c for c in df.columns if c.startswith(tuple(METHODS)) or c in ("rep_x", "rep_y", "bbox_x", "bbox_y")]
-df.drop(columns=helper_cols).to_file(out_shp)
+df.drop(columns=["rep_x", "rep_y", "MAZID_OLD"]).to_file(out_shp)
 m.save(qc_map)
 
 print("Saved:", out_shp)
