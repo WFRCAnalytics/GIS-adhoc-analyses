@@ -1,6 +1,9 @@
 ---
 title: "Center Buildout Capacity"
 subtitle: "How much room is left to grow in six Wasatch Choice Vision centers"
+author: "Pukar Bhandari"
+date: 2026-07-22
+date-modified: 2026-07-28
 ---
 
 ## Overview

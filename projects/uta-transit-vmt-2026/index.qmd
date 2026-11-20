@@ -1,7 +1,9 @@
 ---
 title: "UTA Transit Vehicle Miles of Travel, 2026"
 subtitle: "Scheduled annual revenue vehicle miles by mode, built from archived GTFS feeds"
-date: today
+author: "Pukar Bhandari"
+date: 2026-11-19
+date-modified: 2026-11-20
 page-layout: full
 ---
 

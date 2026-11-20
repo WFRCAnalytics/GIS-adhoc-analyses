@@ -1,6 +1,9 @@
 ---
 title: "MAZ Numbering"
 subtitle: "Assigning consecutive MAZIDs, TAZ by TAZ, north to south then west to east"
+author: "Pukar Bhandari"
+date: 2026-11-19
+date-modified: 2026-11-20
 ---
 
 ## Goal
@@ -14,6 +17,13 @@ Give every microzone (MAZ) a new `MAZID` from 1 to N with no gaps.
 - Keep the old ID in `MAZID_OLD` for comparison and QC; it is dropped just before the shapefile is exported.
 
 Geometry cleaning (gaps, slivers, TAZ crossovers) is done upstream and is out of scope here; the input MAZ layer is assumed already cleaned.
+
+```{=html}
+<style>
+/* Plot images keep their pixel size on wide screens but shrink to the column on narrow ones */
+.cell-output-display img { max-width: 100%; height: auto; }
+</style>
+```
 
 ```{python}
 import folium

@@ -1,7 +1,9 @@
 ---
 title: "Transportation Choices"
 subtitle: "Share of population within 1/4 mile of a bike or transit facility, by scenario"
-date: today
+author: "Pukar Bhandari"
+date: 2026-10-08
+date-modified: 2026-10-13
 page-layout: full
 ---
 
