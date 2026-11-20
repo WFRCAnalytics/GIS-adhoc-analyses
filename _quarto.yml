@@ -27,6 +27,8 @@ website:
         href: projects/center-buildout-capacity/index.qmd
       - text: "Transportation Choices"
         href: projects/transportation-choices/index.qmd
+      - text: "MAZ Numbering"
+        href: projects/maz-numbering/index.qmd
 
 execute:
   eval: true

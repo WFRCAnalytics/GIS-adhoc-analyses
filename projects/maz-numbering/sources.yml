@@ -1,0 +1,12 @@
+# sources.yml
+# Registry of ArcGIS REST data sources used by this analysis only.
+# See projects/_template/sources.yml for the full schema.
+#
+# To re-download: ensure_layers(["wftdm_taz"], force=["wftdm_taz"])
+
+layers:
+
+  wftdm_taz:
+    url: https://services1.arcgis.com/taguadKoI1XFwivx/ArcGIS/rest/services/WasatchFrontTAZ/FeatureServer/0
+    cache: _data/remote/wftdm_taz.gpkg
+    description: WFTDM Transportation Analysis Zones
