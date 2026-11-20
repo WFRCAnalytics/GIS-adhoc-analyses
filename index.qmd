@@ -22,3 +22,9 @@ REMM's 2025 estimate, its 2055 forecast, and full buildout capacity for six Wasa
 Percent of the WFRC-region population within 1/4 mile of a dedicated bike facility, or a frequent bus route / transit stop / station, across seven scenarios: Existing 2027, plus No Build and RTP (Build) in each of 2036, 2046, and 2055.
 
 ![Share of population within 1/4 mile of a bike or transit facility, by scenario. Click to enlarge.](projects/transportation-choices/output/region_pct.png){.lightbox group="transportation-choices"}
+
+## [UTA Transit VMT 2026](projects/uta-transit-vmt-2026/index.qmd)
+
+Scheduled annual transit vehicle miles of travel for UTA in 2026 -- about 21.8 million revenue miles -- split by Local Bus, Express Bus, Bus Rapid, Light Rail, and Commuter Rail (plus Ski Bus), built trip by trip from the GTFS schedules in effect on each day of the year.
+
+![Annual scheduled vehicle miles by mode, 2026. Click to enlarge.](projects/uta-transit-vmt-2026/output/annual_vmt_by_mode.png){.lightbox group="uta-transit-vmt-2026"}

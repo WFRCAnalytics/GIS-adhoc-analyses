@@ -364,6 +364,8 @@ fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Annual revenue vehicle miles in 
          ha="left", va="top")
 fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
 plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+OUT_DIR.mkdir(exist_ok=True)
+fig.savefig(OUT_DIR / "annual_vmt_by_mode.png", facecolor=fig.get_facecolor(), dpi=150)
 ```
 
 ### Monthly VMT by mode

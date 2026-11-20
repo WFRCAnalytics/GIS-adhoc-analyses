@@ -34,8 +34,10 @@ Python environment and one set of downloader utilities.
 cp -r projects/_template projects/<name>
 ```
 
-Then fill in `sources.yml`/`sources.md`, write `index.qmd`, and add a navbar
-entry in the root `_quarto.yml`.
+Then fill in `sources.yml`/`sources.md`, write `index.qmd`, and register the
+project in both places on the root site: a navbar entry in `_quarto.yml`, and a
+section in the root `index.qmd` (linked heading, one-paragraph summary, and a
+lightbox preview image saved to the project's `output/`).
 
 ## ArcGIS REST data (`sources.yml` + `gis_adhoc_analyses`)
 
