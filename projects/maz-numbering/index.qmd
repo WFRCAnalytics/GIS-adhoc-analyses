@@ -1,0 +1,446 @@
+---
+title: "MAZ Numbering"
+subtitle: "Assigning consecutive MAZIDs, TAZ by TAZ, north to south then west to east"
+---
+
+## Goal
+
+Give every microzone (MAZ) a new `MAZID` from 1 to N with no gaps.
+
+- Locate each MAZ by its **representative point** (always inside the polygon).
+- Find its TAZ with a **point-in-polygon** join.
+- Number TAZ by TAZ in ascending `TAZID`.
+- Inside a TAZ, go **north to south, then west to east** (by representative point; see [how the sort order was decided](#how-the-sort-order-was-decided) for the alternatives that were considered).
+- Keep the old ID in `MAZID_OLD` for comparison and QC; it is dropped just before the shapefile is exported.
+
+Geometry cleaning (gaps, slivers, TAZ crossovers) is done upstream and is out of scope here; the input MAZ layer is assumed already cleaned.
+
+```{python}
+import folium
+import branca.colormap as cm
+import geopandas as gpd
+import matplotlib.patheffects as pe
+import matplotlib.pyplot as plt
+import pandas as pd
+from pathlib import Path
+
+from gis_adhoc_analyses.layer_cache import ensure_layers
+
+PATHS = {
+    "maz": "/vsizip/_data/raw/Microzones_Clean_20261120.zip/Microzones_Clean.shp",  # read in place via GDAL vsizip, no extraction
+    "out": Path("output"),
+}
+CRS = "EPSG:26912"  # UTM 12N, meters -- all analysis happens here
+
+# Esri basemaps: no API key, work from saved/local HTML. First one is the default.
+_ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/{}/MapServer/tile/{{z}}/{{y}}/{{x}}"
+BASEMAPS = {
+    "Esri Light Gray Canvas": _ESRI.format("Canvas/World_Light_Gray_Base"),
+    "Esri World Street Map": _ESRI.format("World_Street_Map"),
+    "Esri World Imagery": _ESRI.format("World_Imagery"),
+}
+
+
+def new_map():
+    """Leaflet map with the Esri basemaps as switchable base layers."""
+    fmap = folium.Map(tiles=None, control_scale=True)
+    for i, (name, url) in enumerate(BASEMAPS.items()):
+        folium.TileLayer(tiles=url, attr="Tiles &copy; Esri", name=name, show=(i == 0)).add_to(fmap)
+    return fmap
+
+pd.set_option("display.max_columns", 30)
+plt.rcParams["font.family"] = "Poppins"  # WFRC brand typeface, same as the other projects
+TEXT_PRIMARY, TEXT_MUTED = "#151515", "#7f7a76"
+```
+
+## 1. Load the data
+
+The TAZ layer is downloaded once from the WFRC REST service and cached (see `sources.yml`); delete the cached `.gpkg` to refresh. The cleaned MAZ layer is a manual zipped shapefile in `_data/raw/` (read in place via GDAL `/vsizip/`, never extracted).
+
+```{python}
+L = ensure_layers(["wftdm_taz"])
+taz = gpd.read_file(L["wftdm_taz"]).to_crs(CRS)
+taz["TAZID"] = taz["TAZID"].astype(int)
+maz = gpd.read_file(PATHS["maz"]).to_crs(CRS)
+
+print(f"MAZ: {len(maz):,} rows | TAZ: {len(taz):,} rows | CRS: {maz.crs.to_string()}")
+```
+
+## 2. Look at the inputs
+
+Before numbering anything, check what we are working with.
+
+```{python}
+maz.drop(columns="geometry").head()
+```
+
+```{python}
+summary = pd.DataFrame({
+    "dtype": maz.drop(columns="geometry").dtypes.astype(str),
+    "nulls": maz.drop(columns="geometry").isna().sum(),
+    "unique": maz.drop(columns="geometry").nunique(),
+})
+summary
+```
+
+```{python}
+print("Geometry types:\n", maz.geom_type.value_counts(), "\n")
+print("Invalid geometries:", (~maz.is_valid).sum())
+print("Empty geometries:  ", maz.is_empty.sum())
+print("Same CRS as TAZ:   ", maz.crs == taz.crs)
+```
+
+How does the existing `MAZID` look? Duplicates or zeros would be worth knowing about.
+
+```{python}
+old = maz["MAZID"]
+print("Null:", old.isna().sum(), "| zero:", (old == 0).sum(), "| duplicated:", old.duplicated().sum())
+print("Range:", old.min(), "to", old.max())
+```
+
+A quick Leaflet look at both layers. The MAZ are simplified here only to keep the page light. Use the layer control to toggle them.
+
+```{python}
+taz_ll = taz[["TAZID", "geometry"]].to_crs(4326)
+maz_ll = maz[["MAZID", "geometry"]].copy()
+maz_ll["geometry"] = maz_ll.simplify(3)          # 3 m, display only
+maz_ll = maz_ll.to_crs(4326)
+
+minx, miny, maxx, maxy = taz_ll.total_bounds
+m0 = new_map()
+m0.fit_bounds([[miny, minx], [maxy, maxx]])
+
+folium.GeoJson(
+    taz_ll, name="TAZ",
+    style_function=lambda f: {"fillOpacity": 0.05, "color": "#d62728", "weight": 1},
+    tooltip=folium.GeoJsonTooltip(fields=["TAZID"]),
+).add_to(m0)
+folium.GeoJson(
+    maz_ll, name="MAZ",
+    style_function=lambda f: {"fillOpacity": 0.1, "color": "#1f77b4", "weight": 0.4},
+    tooltip=folium.GeoJsonTooltip(fields=["MAZID"]),
+).add_to(m0)
+folium.LayerControl().add_to(m0)
+m0
+```
+
+## 3. Representative points and TAZ
+
+`representative_point()` is guaranteed to be inside the polygon, unlike the centroid, which can land outside odd shapes.
+
+```{python}
+pts = maz[["MAZID", "geometry"]].copy()
+pts["geometry"] = maz.representative_point()
+
+print("All points inside their own MAZ:", pts.within(maz.geometry).all())
+```
+
+Point-in-polygon join to the TAZ layer.
+
+```{python}
+joined = gpd.sjoin(pts, taz[["TAZID", "geometry"]], how="left", predicate="within")
+
+print("Rows before join:", len(pts), "| after:", len(joined))
+print("Points with no TAZ:       ", joined["TAZID"].isna().sum())
+print("MAZ matching >1 TAZ:      ", joined.index.duplicated().sum())
+```
+
+The join should be exactly one TAZ per MAZ. Anything else needs a look before moving on.
+
+```{python}
+problems = joined[joined["TAZID"].isna() | joined.index.duplicated(keep=False)]
+problems if len(problems) else "No problems: every MAZ has exactly one TAZ."
+```
+
+Attach the result back to the MAZ table, with the point coordinates used for sorting.
+
+```{python}
+df = maz.copy()
+df["TAZID"] = joined["TAZID"]
+df["rep_x"] = pts.geometry.x
+df["rep_y"] = pts.geometry.y
+
+print("MAZ per TAZ:")
+df.groupby("TAZID").size().describe().round(1)
+```
+
+## 4. How the sort order was decided
+
+Sorting on the representative point alone has one weakness: the point sits at an arbitrary spot inside each polygon, so MAZs in the same row of blocks can come out in a slightly scrambled left-to-right order. Four ways to order MAZs **inside each TAZ** were compared (the TAZ-by-TAZ order is the same for all of them) and put to a vote. **Option A won**, and it is the rule used in the numbering below.
+
+| Option | Method | Key (ascending) |
+| --- | --- | --- |
+| A (chosen) | Representative point | Y descending, then X ascending |
+| B | Bounding-box top-left | top-left corner of the bounding box (`maxy`, `minx`) |
+| C | Blend | midpoint of the bounding-box top-left corner and the representative point |
+| D | Space-filling curve | position along a Hilbert curve fitted to each TAZ, starting in its north-west corner |
+
+The Hilbert curve stands in for Esri's "Peano" sort option: both are space-filling curves that finish one neighborhood before moving to the next. It keeps neighbors numbered close together, but it has no strict north-to-south reading order.
+
+```{python}
+#| code-summary: "Compute the alternative sort keys"
+import numpy as np
+
+cmp = df[["TAZID", "rep_x", "rep_y", "geometry"]].copy()
+bounds = cmp.bounds
+bbox_x, bbox_y = bounds["minx"], bounds["maxy"]
+
+# Every method is two ascending sort columns, <method>_1 and <method>_2
+coords = {
+    "rep_point": (cmp["rep_x"], cmp["rep_y"]),
+    "bbox_ul": (bbox_x, bbox_y),
+    "blend": ((bbox_x + cmp["rep_x"]) / 2, (bbox_y + cmp["rep_y"]) / 2),
+}
+for name, (x, y) in coords.items():
+    cmp[f"{name}_1"] = -y  # north to south
+    cmp[f"{name}_2"] = x   # west to east
+
+
+def hilbert_index(x, y, n=2**16):
+    """Distance along the Hilbert curve for integer grid cells (x, y) in an n x n grid."""
+    x, y = x.astype("int64").copy(), y.astype("int64").copy()
+    d = np.zeros_like(x)
+    s = n // 2
+    while s > 0:
+        rx = (x & s) > 0
+        ry = (y & s) > 0
+        d += s * s * ((3 * rx) ^ ry)
+        flip = ~ry & rx
+        x, y = np.where(flip, n - 1 - x, x), np.where(flip, n - 1 - y, y)
+        swap = ~ry
+        x, y = np.where(swap, y, x), np.where(swap, x, y)
+        s //= 2
+    return d
+
+
+# Hilbert key per TAZ: scale into a 65,536 grid using that TAZ's own extent (same scale in
+# X and Y), Y flipped so the curve starts in the north-west corner
+cmp["hilbert_1"] = 0
+for _, g in cmp.groupby("TAZID"):
+    x0, y1 = g["rep_x"].min(), g["rep_y"].max()
+    span = max(g["rep_x"].max() - x0, y1 - g["rep_y"].min(), 1e-9)
+    gx = ((g["rep_x"] - x0) / span * (2**16 - 1)).round().to_numpy()
+    gy = ((y1 - g["rep_y"]) / span * (2**16 - 1)).round().to_numpy()
+    cmp.loc[g.index, "hilbert_1"] = hilbert_index(gx, gy)
+cmp["hilbert_2"] = 0
+
+METHODS = ["rep_point", "bbox_ul", "blend", "hilbert"]
+for m in METHODS:
+    cmp[f"{m}_rank"] = (
+        cmp.sort_values(["TAZID", f"{m}_1", f"{m}_2"], kind="stable")
+           .groupby("TAZID").cumcount().reindex(cmp.index) + 1
+    )
+```
+
+How far does each alternative move MAZs relative to Option A? Rank is the position inside the MAZ's own TAZ.
+
+```{python}
+rows = {}
+for m in METHODS[1:]:
+    shift = (cmp[f"{m}_rank"] - cmp["rep_point_rank"]).abs()
+    rows[m] = {
+        "MAZ with a different rank": f"{(shift > 0).mean():.0%}",
+        "median shift": shift[shift > 0].median(),
+        "95th percentile shift": shift.quantile(0.95),
+        "max shift": shift.max(),
+    }
+pd.DataFrame(rows).T
+```
+
+All four options on the same TAZ: the largest TAZ with more than 10 MAZs. Each MAZ is colored and labelled by its position in the sequence (dark = first, bright = last), so a good order reads as a clean sweep and a bad one looks scrambled.
+
+```{python}
+#| code-summary: "Plot the four options side by side"
+#| out-width: 100%
+import textwrap
+
+counts = cmp["TAZID"].value_counts()
+big = counts[counts > 10].idxmax()
+sub = cmp[cmp["TAZID"] == big]
+
+OPTIONS = {
+    "rep_point": ("Option A: Representative point (chosen)",
+                  "North to south, then west to east, by a point guaranteed inside each polygon"),
+    "bbox_ul": ("Option B: Bounding-box top-left",
+                "North to south, then west to east, by the top-left corner of each polygon's bounding box"),
+    "blend": ("Option C: Blend of the two",
+              "North to south, then west to east, by the midpoint of the bounding-box corner and the representative point"),
+    "hilbert": ("Option D: Space-filling curve",
+                "Follows a Hilbert curve across the TAZ from its north-west corner, keeping neighbors together"),
+}
+
+# Layout is built in absolute inches from the TAZ's own shape, so titles never collide with
+# the figure header and wide or tall TAZs both fit without empty gaps.
+minx, miny, maxx, maxy = sub.total_bounds
+W, pw = 8.5, 3.9                      # figure width, panel width (inches)
+ph = pw * (maxy - miny) / (maxx - minx)  # panel height from the TAZ's aspect ratio
+header, title_block, gap = 0.95, 0.8, 0.15
+H = header + 2 * (title_block + ph) + gap + 0.15
+
+fig = plt.figure(figsize=(W, H))
+for i, (m, (title, subtitle)) in enumerate(OPTIONS.items()):
+    row, col = divmod(i, 2)
+    left = W * (0.25 + 0.5 * col) - pw / 2
+    top = H - header - row * (title_block + ph + gap) - title_block
+    ax = fig.add_axes([left / W, (top - ph) / H, pw / W, ph / H])
+    sub.plot(column=f"{m}_rank", cmap="viridis", edgecolor="#333333", linewidth=0.4, ax=ax)
+    for x, y, r in zip(sub["rep_x"], sub["rep_y"], sub[f"{m}_rank"]):
+        ax.annotate(
+            str(r), (x, y), ha="center", va="center", fontsize=6.5, fontfamily="Poppins SemiBold",
+            color="white", path_effects=[pe.withStroke(linewidth=2, foreground="black")],
+        )
+    ax.set_axis_off()
+    # Titles are offset from the axes top in points, so they never depend on the map's shape
+    ax.annotate("\n".join(textwrap.wrap(subtitle, 62)), (0.5, 1), xycoords="axes fraction",
+                xytext=(0, 6), textcoords="offset points", ha="center", va="bottom",
+                fontsize=7, color=TEXT_MUTED, linespacing=1.4)
+    ax.annotate(title, (0.5, 1), xycoords="axes fraction", xytext=(0, 34),
+                textcoords="offset points", ha="center", va="bottom", fontsize=9.5,
+                color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+fig.text(0.5, 1 - 0.3 / H, "Sort methods considered for MAZ numbering", ha="center", va="center",
+         fontsize=14, color=TEXT_PRIMARY, fontfamily="Poppins SemiBold")
+fig.text(0.5, 1 - 0.6 / H, f"TAZ {big}, {len(sub)} MAZs (number = order within the TAZ)",
+         ha="center", va="center", fontsize=8.5, color=TEXT_MUTED)
+
+PATHS["out"].mkdir(parents=True, exist_ok=True)
+fig.savefig(PATHS["out"] / "sort_methods_considered.png", dpi=200)
+plt.show()
+```
+
+## 5. Sort and number
+
+Strict sort with no tolerance: `TAZID` ascending, `rep_y` descending (north to south), `rep_x` ascending (west to east). This is Option A from the methods compared in [section 4](#how-the-sort-order-was-decided).
+
+```{python}
+df = df.rename(columns={"MAZID": "MAZID_OLD"})
+
+df = (
+    df.sort_values(["TAZID", "rep_y", "rep_x"], ascending=[True, False, True], kind="stable")
+      .reset_index(drop=True)
+)
+df["MAZID"] = df.index + 1
+
+df[["MAZID", "MAZID_OLD", "TAZID", "rep_x", "rep_y"]].head(10)
+```
+
+### Eyeball one TAZ
+
+Map the numbers on the largest TAZ to see if the order makes sense. Each MAZ is labelled with its new `MAZID` at its representative point.
+
+```{python}
+big = df["TAZID"].value_counts().idxmax()
+one = df[df["TAZID"] == big]
+print(f"TAZ {big}: {len(one)} MAZ")
+
+one_poly = one[["MAZID", "MAZID_OLD", "geometry"]].to_crs(4326)
+one_pts = gpd.GeoSeries(gpd.points_from_xy(one["rep_x"], one["rep_y"]), crs=df.crs).to_crs(4326)
+
+minx, miny, maxx, maxy = one_poly.total_bounds
+m1 = new_map()
+m1.fit_bounds([[miny, minx], [maxy, maxx]])
+
+ramp1 = cm.linear.viridis.scale(one["MAZID"].min(), one["MAZID"].max())
+folium.GeoJson(
+    one_poly, name="MAZ",
+    style_function=lambda f: {
+        "fillColor": ramp1(f["properties"]["MAZID"]),
+        "color": "#333333", "weight": 0.6, "fillOpacity": 0.6,
+    },
+    tooltip=folium.GeoJsonTooltip(fields=["MAZID", "MAZID_OLD"]),
+).add_to(m1)
+
+labels = folium.FeatureGroup(name="MAZID labels")
+for pt, mazid in zip(one_pts, one["MAZID"]):
+    folium.Marker(
+        [pt.y, pt.x],
+        icon=folium.DivIcon(html=f'<div style="font-size:9px;font-weight:bold;'
+                                 f'text-align:center;transform:translate(-50%,-50%)">{mazid}</div>'),
+    ).add_to(labels)
+labels.add_to(m1)
+folium.LayerControl().add_to(m1)
+m1
+```
+
+## 6. QC
+
+```{python}
+n = len(df)
+checks = pd.Series({
+    "Row count matches input": n == len(maz),
+    "No null MAZID": df["MAZID"].notna().all(),
+    "MAZID unique": df["MAZID"].is_unique,
+    "MAZID is exactly 1..N": df["MAZID"].tolist() == list(range(1, n + 1)),
+    "Every MAZ has a TAZID": df["TAZID"].notna().all(),
+    "TAZID never decreases as MAZID grows": df["TAZID"].is_monotonic_increasing,
+    "Within each TAZ, Y never increases": (df.groupby("TAZID")["rep_y"].diff().dropna() <= 0).all(),
+    "MAZID_OLD preserved (same set of values)": sorted(df["MAZID_OLD"]) == sorted(maz["MAZID"]),
+    "CRS is EPSG:26912": df.crs.to_epsg() == 26912,
+}, name="pass")
+checks.to_frame()
+```
+
+```{python}
+assert checks.all(), "QC failed, see table above"
+```
+
+How far did IDs move? A quick look at old versus new.
+
+```{python}
+fig, ax = plt.subplots(figsize=(5, 5))
+ax.scatter(df["MAZID_OLD"], df["MAZID"], s=1, alpha=0.3)
+ax.set_xlabel("MAZID_OLD")
+ax.set_ylabel("MAZID (new)")
+plt.show()
+```
+
+## 7. QC map
+
+MAZ colored by new `MAZID`. A smooth ramp across each TAZ and a stepwise change between TAZs means the order worked. The map is reprojected to EPSG:4326 for display only.
+
+```{python}
+view = df[["MAZID", "MAZID_OLD", "TAZID", "geometry"]].copy()
+view["geometry"] = view.simplify(2)          # 2 m, display only; saved shapefile is untouched
+view = view.to_crs(4326)
+taz_view = taz[["TAZID", "geometry"]].to_crs(4326)
+
+ramp = cm.linear.viridis.scale(1, n)
+ramp.caption = "New MAZID (1 to N)"
+
+minx, miny, maxx, maxy = view.total_bounds
+m = new_map()
+m.fit_bounds([[miny, minx], [maxy, maxx]])
+
+folium.GeoJson(
+    view, name="MAZ by new MAZID",
+    style_function=lambda f: {
+        "fillColor": ramp(f["properties"]["MAZID"]),
+        "color": "#333333", "weight": 0.2, "fillOpacity": 0.8,
+    },
+    tooltip=folium.GeoJsonTooltip(fields=["MAZID", "MAZID_OLD", "TAZID"]),
+).add_to(m)
+
+folium.GeoJson(
+    taz_view, name="TAZ boundary",
+    style_function=lambda f: {"fillOpacity": 0, "color": "#d62728", "weight": 1.2},
+    tooltip=folium.GeoJsonTooltip(fields=["TAZID"]),
+).add_to(m)
+
+ramp.add_to(m)
+folium.LayerControl().add_to(m)
+m
+```
+
+## 8. Save
+
+`MAZID_OLD` served its purpose in the QC above, so it is dropped here, along with the helper coordinates, just before export. Shapefile field names are limited to 10 characters, so the names used here are safe.
+
+```{python}
+PATHS["out"].mkdir(parents=True, exist_ok=True)
+out_shp = PATHS["out"] / "WFv1000_MAZ.shp"
+qc_map = PATHS["out"] / "WFv1000_MAZ_qc_map.html"
+df.drop(columns=["rep_x", "rep_y", "MAZID_OLD"]).to_file(out_shp)
+m.save(qc_map)
+
+print("Saved:", out_shp)
+print("Saved:", qc_map)
+```

@@ -28,3 +28,9 @@ Percent of the WFRC-region population within 1/4 mile of a dedicated bike facili
 Scheduled annual transit vehicle miles of travel for UTA in 2026 -- about 21.8 million revenue miles -- split by Local Bus, Express Bus, Bus Rapid, Light Rail, Streetcar, Flex, Commuter Rail, and Ski Bus, built trip by trip from the GTFS schedules in effect on each day of the year. Covers fixed-schedule service only (scheduled Flex routes are their own mode); on-demand/microtransit service is not included.
 
 ![Daily scheduled vehicle miles by mode, 2026. Click to enlarge.](projects/uta-transit-vmt-2026/output/daily_vmt_by_mode.png){.lightbox group="uta-transit-vmt-2026"}
+
+## [MAZ Numbering](projects/maz-numbering/index.qmd)
+
+Assigns a new consecutive `MAZID` (1 to N) to every Wasatch Front microzone (14,165 MAZs), numbered TAZ by TAZ and, within each TAZ, north to south then west to east by each MAZ's representative point. Four ordering methods were compared side by side and the representative-point rule was chosen by vote.
+
+![The four sort methods considered, shown on the largest TAZ with more than 10 MAZs. Click to enlarge.](projects/maz-numbering/output/sort_methods_considered.png){.lightbox group="maz-numbering"}

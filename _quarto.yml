@@ -29,6 +29,8 @@ website:
         href: projects/transportation-choices/index.qmd
       - text: "UTA Transit VMT 2026"
         href: projects/uta-transit-vmt-2026/index.qmd
+      - text: "MAZ Numbering"
+        href: projects/maz-numbering/index.qmd
 
 execute:
   eval: true
