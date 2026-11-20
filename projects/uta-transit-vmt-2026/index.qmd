@@ -1,0 +1,524 @@
+---
+title: "UTA Transit Vehicle Miles of Travel, 2026"
+subtitle: "Scheduled annual revenue vehicle miles by mode, built from archived GTFS feeds"
+date: today
+page-layout: full
+---
+
+## Purpose
+
+How many vehicle miles of travel (VMT) does UTA transit service run in a calendar year, and how does that split across Local Bus, Express Bus, Bus Rapid, Light Rail, and Commuter Rail?
+
+This analysis answers that for **2026** from the *actual* published schedules, not an annualization of one sample week. GTFS feeds change several times a year (service changes, detours, holiday schedules), so every service date is assigned to the feed snapshot that was in effect that day, and the miles of every scheduled trip are added up.
+
+::: callout-note
+## What "VMT" means here
+
+Scheduled **in-service (revenue) vehicle miles**: the distance of each trip scheduled in GTFS, from its first to its last stop. It does **not** include deadhead (garage pull-out/pull-in and repositioning), nor actual operations (missed trips, detours, extra service). Expect it to run somewhat below UTA's reported NTD vehicle revenue miles plus deadhead.
+:::
+
+## Data Sources
+
+| Data | Source | Notes |
+|------------------------|------------------------|------------------------|
+| UTA GTFS snapshots | [Mobility Database](https://mobilitydatabase.org) feed `mdb-170` (Utah Transit Authority) | Every archived snapshot of the feed; those covering 2026 are cached under `_data/remote/gtfs/` |
+| Route -> mode | `route_short_name` lookup supplied by the analyst (below) | Falls back to GTFS `route_type` for rail if a name is missing |
+
+Authentication uses `MOBILITY_DATABASE_REFRESH_TOKEN` from `.env` (see `.env.example`). Downloads are cached; delete a file under `_data/remote/` to re-fetch it.
+
+## Setup
+
+```{python}
+import sys
+import zipfile
+from datetime import date, timedelta
+from pathlib import Path
+
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+from gis_adhoc_analyses.mobility_database import download_dataset, list_datasets
+
+YEAR = 2026
+FEED_ID = "mdb-170"  # Utah Transit Authority (UTA), the active feed
+GTFS_DIR = Path("_data/remote/gtfs")
+OUT_DIR = Path("output")
+
+# Dates after the last published schedule are projected from the same weekday.
+# Thanksgiving is excluded as a projection template (holiday service, not typical Thursday).
+PROJECTION_EXCLUDE = {date(2026, 11, 26)}
+
+# Chart style follows the repo convention: WFRC brand helper (palette + ink roles read from
+# brand.yml), Poppins like the other analyses, on a fixed light surface so charts read the same
+# in the site's light and dark themes. Five brand chart colors = the five requested modes.
+sys.path.append("../../_extensions/WFRCAnalytics/wfrc-brand/assets/charts")
+import wfrc_charts as wfrc
+
+wfrc.use_style()
+brand = wfrc.colors()
+SURFACE = "#fcfcfb"
+INK, INK2, GRID = brand["wfrc-ink"], brand["wfrc-gray"], brand["wfrc-hairline"]
+plt.rcParams.update({
+    "font.family": "Poppins", "figure.facecolor": SURFACE, "axes.facecolor": SURFACE,
+    "savefig.facecolor": SURFACE, "figure.dpi": 110,
+})
+MODE_COLOR = dict(zip(["Local Bus", "Express Bus", "Bus Rapid", "Light Rail", "Commuter Rail"],
+                      wfrc.palette(5)))
+MODE_COLOR |= {"Microtransit": brand["pink"], "Ski Bus": brand["green"], "Unmapped": brand["wfrc-gray"]}
+SOURCE = "Source: UTA GTFS via Mobility Database (WFRC analysis)"
+```
+
+## Route-to-mode lookup
+
+Modes follow the analyst-supplied UTA lookup by `route_short_name`. Core route 35M (COR in the lookup) is folded into Local Bus; Microtransit (MT, on-demand) is reported separately since it was not one of the five requested modes. **Four routes were added to Bus Rapid (BRT)**: OGX and UVX (the supplied lookup's comment names them as the BRT routes but they were missing from its list), and 50X and MVX (the Midvalley Express, UTA's third BRT line, which opened April 12, 2026 and is published under both names). **CS1, CS2 and CS3 are UTA's seasonal canyon ski buses** (to Alta, Snowbird and Brighton), neither local nor express, so they are reported separately as Ski Bus. Any other route not in the lookup is reported as **Unmapped** rather than guessed (except rail: GTFS `route_type` 0 is Light Rail, 2 is Commuter Rail).
+
+```{python}
+MODE_ROUTES = {  # reporting mode -> route_short_names
+    "Local Bus": [
+        "1", "2", "2A", "2B", "3", "4", "6", "9", "11", "17", "21", "33", "35", "39", "41",
+        "45", "47", "54", "62", "72", "126", "200", "201", "205", "209", "213", "217", "218",
+        "219", "220", "223", "227", "228", "232", "240", "248", "307", "313", "320", "354",
+        "417", "453", "454", "455", "456", "460", "461", "462", "463", "470", "471", "500",
+        "509", "516", "519", "520", "525", "526", "601", "602", "603", "604", "606", "608",
+        "612", "613", "616", "625", "626", "627", "628", "630", "640", "645", "650", "667",
+        "674", "675", "677", "710", "809", "811", "821", "823", "831", "833", "834", "841",
+        "850", "862", "863", "864", "871", "880", "901", "902", "919", "920", "953", "972",
+        "994", "F11", "F94", "F94Xtra", "F202", "F202pln", "F232", "F400", "F401", "F402",
+        "F504", "F514a", "F514b", "F518", "F522", "F534", "F546", "F547", "F453", "F514",
+        "F525", "F556", "F570", "F578", "F590", "F618", "F605", "F620", "F638",
+        "35M",  # Core route, folded into Local Bus
+    ],
+    "Express Bus": ["451", "472", "473", "513", "551", "805", "806", "807", "822"],
+    "Bus Rapid": ["2AX", "2BX", "2X", "500X", "603X", "830X", "OGX", "UVX", "50X", "MVX"],  # last four added (see text)
+    "Light Rail": ["701", "703", "704", "720"],
+    "Commuter Rail": ["750"],
+    "Microtransit": ["SLC", "TOO", "SD", "SSLC"],
+    "Ski Bus": ["CS1", "CS2", "CS3"],  # seasonal canyon ski service (Alta, Snowbird, Brighton)
+}
+MODE_ORDER = [*MODE_ROUTES, "Unmapped"]
+NAME_TO_MODE = {n: mode for mode, names in MODE_ROUTES.items() for n in names}
+RAIL_TYPE_TO_MODE = {0: "Light Rail", 2: "Commuter Rail"}  # GTFS route_type fallback
+
+```
+
+## Which feed was in effect each day
+
+The Mobility Database archives each UTA feed as it is republished (about 75 snapshots, many identical). For every date in 2026 we take the **latest snapshot published on or before that date whose service period covers it**. If none was published yet (the very first days of a schedule), the earliest snapshot covering it is used.
+
+First, list the archived snapshots with the local (Mountain) dates they were published and the service period they cover.
+
+```{python}
+datasets = list_datasets(FEED_ID, cache="_data/remote/mdb-170_datasets.json")
+by_id = {d["id"]: d for d in datasets}
+
+cov = pd.DataFrame({"id": [d["id"] for d in datasets]})
+for src, dst in [("service_date_range_start", "start"), ("service_date_range_end", "end"),
+                 ("downloaded_at", "published")]:
+    ts = pd.to_datetime([d[src] for d in datasets], utc=True).tz_convert("America/Denver")
+    cov[dst] = ts.date
+
+cov[cov.end >= date(YEAR, 1, 1)].tail(8)
+```
+
+Then assign every date of the year to a snapshot.
+
+```{python}
+assigned = {}
+d = date(YEAR, 1, 1)
+while d <= date(YEAR, 12, 31):
+    covers = cov[(cov.start <= d) & (cov.end >= d)]
+    if len(covers):
+        before = covers[covers.published <= d]
+        assigned[d] = (before.iloc[-1] if len(before) else covers.iloc[0])["id"]
+    d += timedelta(days=1)
+
+snapshots = sorted(set(assigned.values()))
+last_published = max(assigned)
+print(f"{len(assigned)} of 365 dates covered by published schedules (through {last_published}); "
+      f"{len(snapshots)} snapshots used; {365 - len(assigned)} dates left to project.")
+```
+
+```{python}
+#| label: fig-snapshots
+#| fig-cap: "Which GTFS snapshot supplies each day of 2026. Gray = no published schedule yet (projected)."
+fig, ax = plt.subplots(figsize=(10, 4.8))
+for i, sid in enumerate(snapshots):
+    days = [mdates.date2num(k) for k, v in assigned.items() if v == sid]
+    ax.broken_barh([(x, 1) for x in days], (i - 0.3, 0.6), facecolors=MODE_COLOR["Local Bus"])
+ax.axvspan(mdates.date2num(last_published) + 1, mdates.date2num(date(YEAR, 12, 31)) + 1,
+           color=GRID, zorder=0)
+ax.text(mdates.date2num(last_published) + 3, len(snapshots) - 1, "projected", color=INK2,
+        va="center", fontsize=9)
+ax.set_yticks(range(len(snapshots)))
+ax.set_yticklabels([f"published {s[-12:-8]}-{s[-8:-6]}-{s[-6:-4]}" for s in snapshots])
+ax.invert_yaxis()
+ax.xaxis_date()
+ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+ax.set_xlim(mdates.date2num(date(YEAR, 1, 1)), mdates.date2num(date(YEAR, 12, 31)) + 1)
+ax.grid(axis="x")
+ax.grid(axis="y", visible=False)
+ax.tick_params(length=0)
+fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "Which GTFS feed was in effect each day", ha="left", va="top", fontsize=14,
+         fontfamily="Poppins SemiBold", color=INK)
+fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Latest UTA snapshot published on or before each date; gray = projected", fontsize=9.5, color=INK2,
+         ha="left", va="top")
+fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
+plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+```
+
+Download each snapshot used (cached after the first run).
+
+```{python}
+zips = {s: download_dataset(by_id[s], GTFS_DIR) for s in snapshots}
+```
+
+## Trip miles, step by step
+
+Each step below works on all snapshots at once, keyed by snapshot id.
+
+### Step 1: read the GTFS tables
+
+Only the columns needed are kept. From `stop_times.txt` (the biggest file) we keep just each trip's first-to-last `shape_dist_traveled` span.
+
+```{python}
+routes, trips, shapes, span, cal, cdates = {}, {}, {}, {}, {}, {}
+for sid in snapshots:
+    with zipfile.ZipFile(zips[sid]) as zf:
+        assert "frequencies.txt" not in zf.namelist(), f"{sid}: frequency-based trips not handled"
+        routes[sid] = pd.read_csv(zf.open("routes.txt"), dtype=str)
+        trips[sid] = pd.read_csv(zf.open("trips.txt"), dtype=str)
+        shapes[sid] = pd.read_csv(zf.open("shapes.txt"), dtype={"shape_id": str})
+        cal[sid] = pd.read_csv(zf.open("calendar.txt"), dtype={"service_id": str})
+        cdates[sid] = pd.read_csv(zf.open("calendar_dates.txt"), dtype={"service_id": str})
+        stop_times = pd.read_csv(zf.open("stop_times.txt"),
+                                 usecols=["trip_id", "shape_dist_traveled"],
+                                 dtype={"trip_id": str}, skipinitialspace=True)
+    sdt = (stop_times.dropna(subset=["shape_dist_traveled"]).groupby("trip_id")
+           .shape_dist_traveled.agg(["min", "max"]))
+    span[sid] = (sdt["max"] - sdt["min"]).rename("span")
+
+print(f"{len(snapshots)} snapshots loaded; latest has {len(trips[snapshots[-1]]):,} trips.")
+```
+
+### Step 2: length of each shape
+
+Haversine distance (miles) between consecutive shape points, summed per `shape_id`. `shape_dist_traveled` is in kilometers in UTA's feed, so lengths come from coordinates rather than that column's units.
+
+```{python}
+shape_len = {}
+for sid in snapshots:
+    s = shapes[sid].sort_values(["shape_id", "shape_pt_sequence"]).reset_index(drop=True)
+    lat, lon = np.radians(s.shape_pt_lat.to_numpy()), np.radians(s.shape_pt_lon.to_numpy())
+    a = (np.sin(np.diff(lat) / 2) ** 2
+         + np.cos(lat[:-1]) * np.cos(lat[1:]) * np.sin(np.diff(lon) / 2) ** 2)
+    seg = 2 * 3958.8 * np.arcsin(np.sqrt(a))  # Earth radius in miles
+    same_shape = s.shape_id.to_numpy()[1:] == s.shape_id.to_numpy()[:-1]
+    s["seg"] = np.r_[0.0, np.where(same_shape, seg, 0.0)]
+    shape_len[sid] = s.groupby("shape_id").agg(
+        shape_miles=("seg", "sum"), shape_sdt=("shape_dist_traveled", "max"))
+
+shape_len[snapshots[-1]].shape_miles.describe().round(1)
+```
+
+### Step 3: miles of each trip
+
+A trip may cover only part of its shape (short-turns). The fraction `(last stop - first stop) / full shape` of `shape_dist_traveled` trims the shape length to what the trip actually serves; trips without stop distances use the full shape.
+
+```{python}
+trip_miles = {}
+for sid in snapshots:
+    t = (trips[sid]
+         .merge(shape_len[sid], left_on="shape_id", right_index=True, how="left")
+         .merge(span[sid], left_on="trip_id", right_index=True, how="left"))
+    frac = (t.span / t.shape_sdt).where(t.shape_sdt > 0).clip(upper=1.0).fillna(1.0)
+    t["miles"] = (t.shape_miles * frac).fillna(0.0)
+    if t.shape_miles.isna().any():
+        print(sid, f"-> {int(t.shape_miles.isna().sum())} trips without a shape (0 miles)")
+    trip_miles[sid] = t
+
+trip_miles[snapshots[-1]][["route_id", "trip_id", "shape_miles", "miles"]].head()
+```
+
+### Step 4: trips and miles by service and route
+
+Add up trips by `service_id` x `route_id`, so each date only has to pick its active services. Some snapshots have trips whose `route_id` is missing from `routes.txt` (a feed defect); those routes' names and types are recovered from the same `route_id` in other snapshots.
+
+```{python}
+# route_id -> name/type across all snapshots, to recover routes missing from routes.txt
+route_lookup = (pd.concat([r[["route_id", "route_short_name", "route_type"]]
+                           for r in routes.values()])
+                .drop_duplicates("route_id", keep="last").set_index("route_id"))
+
+service_route = {}
+for sid in snapshots:
+    sr = (trip_miles[sid].groupby(["service_id", "route_id"])
+          .agg(trips=("trip_id", "size"), miles=("miles", "sum")).reset_index()
+          .merge(routes[sid][["route_id", "route_short_name", "route_type"]],
+                 on="route_id", how="left"))
+    orphan = sr.route_short_name.isna()
+    if orphan.any():
+        sr.loc[orphan, ["route_short_name", "route_type"]] = (
+            route_lookup.reindex(sr.loc[orphan, "route_id"]).to_numpy())
+        print(sid, "-> routes missing from routes.txt, recovered:",
+              sorted(sr.loc[orphan, "route_short_name"].unique()))
+    sr["route_type"] = sr.route_type.astype(int)
+    service_route[sid] = sr
+
+service_route[snapshots[-1]].sort_values("miles", ascending=False).head()
+```
+
+### Step 5: miles for each date
+
+For each date, find the services running that day (`calendar.txt` weekday pattern, plus or minus the `calendar_dates.txt` exceptions) in its assigned snapshot and add up their routes.
+
+```{python}
+frames = []
+for d, sid in assigned.items():
+    key, weekday = int(d.strftime("%Y%m%d")), d.strftime("%A").lower()
+    c = cal[sid]
+    active = set(c.loc[(c.start_date <= key) & (c.end_date >= key) & (c[weekday] == 1),
+                       "service_id"])
+    exc = cdates[sid][cdates[sid]["date"] == key]
+    active = ((active | set(exc.loc[exc.exception_type == 1, "service_id"]))
+              - set(exc.loc[exc.exception_type == 2, "service_id"]))
+    sr = service_route[sid]
+    day = (sr[sr.service_id.isin(active)]
+           .groupby(["route_id", "route_short_name", "route_type"], as_index=False)[
+               ["trips", "miles"]].sum())
+    frames.append(day.assign(date=d, snapshot=sid, basis="published"))
+
+actual = pd.concat(frames, ignore_index=True)
+assert set(actual.date) == set(assigned), "a covered date produced no service"
+print(f"{actual.date.nunique()} dates, {actual.miles.sum():,.0f} published-schedule miles")
+```
+
+## Projecting the rest of the year
+
+UTA had not published a schedule past the end of the latest feed when this was run. Remaining dates are **projected**: each copies the most recent *published* day with the same weekday (Dec 25 uses the Sunday pattern, matching UTA's holiday service), excluding Thanksgiving. They are flagged `basis = "projected"` throughout and replaced by real data automatically once newer snapshots are archived (delete `_data/remote/mdb-170_datasets.json` to refresh the listing).
+
+```{python}
+have = sorted(set(actual.date))
+rows = []
+d = max(have) + timedelta(days=1)
+while d <= date(YEAR, 12, 31):
+    wd = 6 if (d.month, d.day) == (12, 25) else d.weekday()
+    ref = max(x for x in have if x.weekday() == wd and x not in PROJECTION_EXCLUDE)
+    rows.append(actual[actual.date == ref].assign(date=d, basis="projected", snapshot=assigned[ref]))
+    d += timedelta(days=1)
+
+daily = pd.concat([actual, *rows], ignore_index=True)
+daily["date"] = pd.to_datetime(daily["date"])
+assert daily.date.nunique() == 365
+```
+
+## Assign modes
+
+Mode comes from the route-name lookup, then rail by `route_type`, otherwise Unmapped.
+
+```{python}
+mode = (daily.route_short_name.str.strip().map(NAME_TO_MODE)
+        .fillna(daily.route_type.map(RAIL_TYPE_TO_MODE)).fillna("Unmapped"))
+daily["mode"] = pd.Categorical(mode, MODE_ORDER, ordered=True)
+daily.groupby("mode", observed=True).route_short_name.unique().apply(sorted).to_frame("routes")
+```
+
+## Results
+
+### Annual VMT by mode
+
+```{python}
+tot = (daily.groupby("mode", observed=True)
+       .agg(annual_miles=("miles", "sum"), annual_trips=("trips", "sum"),
+            routes=("route_short_name", "nunique"))
+       .reset_index())
+proj = daily[daily.basis == "projected"].groupby("mode", observed=True).miles.sum()
+tot["projected_miles"] = tot["mode"].map(proj).fillna(0)
+tot["pct_of_total"] = tot.annual_miles / tot.annual_miles.sum() * 100
+tot.loc[len(tot)] = ["Total", tot.annual_miles.sum(), tot.annual_trips.sum(),
+                     daily.route_short_name.nunique(), tot.projected_miles.sum(), 100.0]
+tot.style.format({"annual_miles": "{:,.0f}", "annual_trips": "{:,.0f}",
+                  "projected_miles": "{:,.0f}", "pct_of_total": "{:.1f}%"}).hide(axis="index")
+```
+
+`projected_miles` is the part of each mode's total that comes from not-yet-published days.
+
+```{python}
+#| label: fig-annual
+#| fig-cap: "Annual scheduled vehicle miles by mode, 2026 (millions)."
+m = tot.iloc[:-1].iloc[::-1]
+fig, ax = plt.subplots(figsize=(10, 3.2))
+ax.barh(m["mode"].astype(str), m.annual_miles / 1e6, height=0.55,
+        color=[MODE_COLOR[x] for x in m["mode"]])
+for y, (v, p) in enumerate(zip(m.annual_miles / 1e6, m.pct_of_total)):
+    ax.text(v + 0.15, y, f"{v:.2f}M  ({p:.1f}%)", va="center", color=INK2, fontsize=9)
+ax.set_xlim(0, m.annual_miles.max() / 1e6 * 1.2)
+ax.set_xlabel("Million vehicle miles")
+ax.grid(axis="x")
+ax.grid(axis="y", visible=False)
+ax.tick_params(length=0)
+fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "Scheduled vehicle miles by mode, 2026", ha="left", va="top", fontsize=14,
+         fontfamily="Poppins SemiBold", color=INK)
+fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Annual revenue vehicle miles in millions (December partly projected)", fontsize=9.5, color=INK2,
+         ha="left", va="top")
+fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
+plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+```
+
+### Monthly VMT by mode
+
+```{python}
+#| label: fig-monthly
+#| fig-cap: "Monthly scheduled vehicle miles by mode (thousands). December is partly projected."
+monthly = (daily.assign(month=daily.date.dt.month)
+           .pivot_table(index="month", columns="mode", values="miles", aggfunc="sum",
+                        observed=True).fillna(0) / 1e3)  # no service that month = 0
+fig, ax = plt.subplots(figsize=(10, 4.5))
+bottom = np.zeros(len(monthly))
+for md in monthly.columns:
+    ax.bar(monthly.index, monthly[md], bottom=bottom, width=0.7, color=MODE_COLOR[md],
+           edgecolor=SURFACE, linewidth=1.5, label=md)
+    bottom += monthly[md].to_numpy()
+for x, v in zip(monthly.index, bottom):
+    ax.text(x, v + 15, f"{v:,.0f}", ha="center", color=INK2, fontsize=8)
+ax.set_xticks(range(1, 13))
+ax.set_xticklabels(["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
+                    "Nov", "Dec*"])
+ax.set_ylabel("Thousand vehicle miles")
+ax.set_ylim(0, bottom.max() * 1.1)
+ax.grid(axis="y")
+ax.grid(axis="x", visible=False)
+ax.tick_params(length=0)
+ax.legend(ncol=len(monthly.columns), loc="upper center", bbox_to_anchor=(0.5, -0.1))
+fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "Monthly scheduled vehicle miles", ha="left", va="top", fontsize=14,
+         fontfamily="Poppins SemiBold", color=INK)
+fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Thousand vehicle miles by mode; *December partly projected", fontsize=9.5, color=INK2,
+         ha="left", va="top")
+fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
+plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+```
+
+### Daily miles by mode
+
+Each mode has its own scale (one axis per panel, no dual axes). Lines are 7-day centered averages, which remove the weekday/Saturday/Sunday cycle so service changes (steps) and holiday weeks (dips) stand out; the gray band is projected.
+
+```{python}
+#| label: fig-daily
+#| fig-cap: "Scheduled vehicle miles per day (7-day average), by mode. Gray band = projected days."
+by_day = daily.pivot_table(index="date", columns="mode", values="miles", aggfunc="sum",
+                           observed=True).fillna(0)  # no service that day = 0 miles
+modes_shown = [md for md in MODE_ORDER if md in by_day.columns and by_day[md].sum() > 0]
+smooth = by_day.rolling(7, center=True).mean()  # removes the weekly cycle; first/last 3 days dropped (partial window)
+fig, axes = plt.subplots(2, 3, figsize=(11, 5.4), sharex=True)
+for ax, md in zip(axes.flat, modes_shown):
+    ax.plot(smooth.index, smooth[md] / 1e3, color=MODE_COLOR[md], linewidth=2)
+    ax.axvspan(pd.Timestamp(last_published) + pd.Timedelta(days=1), by_day.index.max(),
+               color=GRID, zorder=0)
+    ax.set_title(md, loc="left", fontsize=10, color=INK)
+    ax.set_ylim(0, smooth[md].max() / 1e3 * 1.15)
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b"))
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[1, 4, 7, 10]))
+    ax.grid(axis="x", visible=False)
+    ax.tick_params(length=0)
+for ax in axes.flat[len(modes_shown):]:
+    ax.set_visible(False)
+axes[0, 0].set_ylabel("Thousand miles / day")
+axes[1, 0].set_ylabel("Thousand miles / day")
+fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "Daily scheduled vehicle miles by mode", ha="left", va="top", fontsize=14,
+         fontfamily="Poppins SemiBold", color=INK)
+fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "7-day average, thousand miles per day; gray band = projected", fontsize=9.5, color=INK2,
+         ha="left", va="top")
+fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
+plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+```
+
+### Typical day by day of week
+
+```{python}
+#| label: fig-daytype
+#| fig-cap: "Average scheduled vehicle miles per day by day of week and mode (thousands)."
+dow = by_day.copy()
+dow["dow"] = dow.index.dayofweek
+avg = dow.groupby("dow")[modes_shown].mean() / 1e3
+fig, ax = plt.subplots(figsize=(10, 4.2))
+bottom = np.zeros(7)
+for md in modes_shown:
+    ax.bar(range(7), avg[md], bottom=bottom, width=0.65, color=MODE_COLOR[md],
+           edgecolor=SURFACE, linewidth=1.5, label=md)
+    bottom += avg[md].to_numpy()
+for x, v in enumerate(bottom):
+    ax.text(x, v + 1, f"{v:,.0f}", ha="center", color=INK2, fontsize=8)
+ax.set_xticks(range(7))
+ax.set_xticklabels(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
+ax.set_ylabel("Thousand vehicle miles / day")
+ax.set_ylim(0, bottom.max() * 1.1)
+ax.grid(axis="y")
+ax.grid(axis="x", visible=False)
+ax.tick_params(length=0)
+ax.legend(ncol=len(modes_shown), loc="upper center", bbox_to_anchor=(0.5, -0.1))
+fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "A typical day of scheduled vehicle miles", ha="left", va="top", fontsize=14,
+         fontfamily="Poppins SemiBold", color=INK)
+fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Average thousand vehicle miles by day of week, all 2026 dates", fontsize=9.5, color=INK2,
+         ha="left", va="top")
+fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
+plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+```
+
+### Highest-mileage routes
+
+```{python}
+#| label: fig-routes
+#| fig-cap: "The 12 routes with the most scheduled vehicle miles in 2026 (millions)."
+top = (daily.groupby(["route_short_name", "mode"], observed=True).miles.sum()
+       .reset_index().nlargest(12, "miles").iloc[::-1])
+fig, ax = plt.subplots(figsize=(10, 4.8))
+ax.barh(top.route_short_name, top.miles / 1e6, height=0.6,
+        color=[MODE_COLOR[x] for x in top["mode"]])
+for y, v in enumerate(top.miles / 1e6):
+    ax.text(v + 0.015, y, f"{v:.2f}M", va="center", color=INK2, fontsize=9)
+ax.set_xlim(0, top.miles.max() / 1e6 * 1.12)
+ax.set_xlabel("Million vehicle miles")
+ax.grid(axis="x")
+ax.grid(axis="y", visible=False)
+ax.tick_params(length=0)
+handles = [plt.Rectangle((0, 0), 1, 1, color=MODE_COLOR[md]) for md in top["mode"].unique()]
+ax.legend(handles, [str(x) for x in top["mode"].unique()], loc="lower right")
+fig.text(0.01, 1 - 0.08 / fig.get_figheight(), "Highest-mileage routes", ha="left", va="top", fontsize=14,
+         fontfamily="Poppins SemiBold", color=INK)
+fig.text(0.01, 1 - 0.48 / fig.get_figheight(), "Top 12 routes by scheduled vehicle miles, millions, 2026", fontsize=9.5, color=INK2,
+         ha="left", va="top")
+fig.text(0.99, 0.06 / fig.get_figheight(), SOURCE, fontsize=7.5, color=INK2, ha="right", style="italic")
+plt.tight_layout(rect=(0, 0.25 / fig.get_figheight(), 1, 1 - 0.95 / fig.get_figheight()))
+```
+
+### Unmapped routes
+
+Routes whose `route_short_name` is not in the lookup. Review these and extend `MODE_ROUTES` if any belong to a mode.
+
+```{python}
+un = (daily[daily["mode"] == "Unmapped"].groupby("route_short_name")
+      .agg(annual_miles=("miles", "sum")).reset_index().sort_values("annual_miles", ascending=False))
+un.style.format({"annual_miles": "{:,.0f}"}).hide(axis="index") if len(un) else print("None")
+```
+
+## Export
+
+```{python}
+OUT_DIR.mkdir(exist_ok=True)
+tot.to_csv(OUT_DIR / "uta_vmt_2026_by_mode.csv", index=False)
+(daily.groupby(["route_short_name", "mode"], observed=True)
+ .agg(annual_miles=("miles", "sum"), annual_trips=("trips", "sum")).reset_index()
+ .query("annual_miles > 0").to_csv(OUT_DIR / "uta_vmt_2026_by_route.csv", index=False))
+(daily.groupby(["date", "mode", "basis"], observed=True)
+ .agg(miles=("miles", "sum"), trips=("trips", "sum")).reset_index()
+ .query("miles > 0").to_csv(OUT_DIR / "uta_vmt_2026_daily_by_mode.csv", index=False))
+```
+
+## Limitations
+
+-   **Scheduled, not operated.** Based on published GTFS: no deadhead, missed trips, detours, or unscheduled extra service.
+-   **Microtransit / on-demand** miles are only as good as what UTA publishes in GTFS; demand-response service typically has no scheduled trips, so Microtransit may be absent or understated.
+-   **Mode lookup** is by route short name as supplied; routes added or renumbered since are flagged under *Unmapped*.
+-   **Shape-based distance** is straight-line between shape vertices, so slightly shorter than odometer miles on very sparse shapes.
+-   **Projected days** assume the last published schedule continues; a December service change would shift them.
