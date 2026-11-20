@@ -7,7 +7,7 @@ page-layout: full
 
 ## Purpose
 
-How many vehicle miles of travel (VMT) does UTA transit service run in a calendar year, and how does that split across Local Bus, Express Bus, Bus Rapid, Light Rail, and Commuter Rail?
+How many vehicle miles of travel (VMT) does UTA transit service run in a calendar year, and how does that split across Local Bus, Express Bus, Bus Rapid, Light Rail, Streetcar, and Commuter Rail?
 
 This analysis answers that for **2026** from the *actual* published schedules, not an annualization of one sample week. GTFS feeds change several times a year (service changes, detours, holiday schedules), so every service date is assigned to the feed snapshot that was in effect that day, and the miles of every scheduled trip are added up.
 
