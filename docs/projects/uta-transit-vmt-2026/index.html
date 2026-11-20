@@ -1,0 +1,2198 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.11.9">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2026-11-19">
+
+<title>UTA Transit Vehicle Miles of Travel, 2026 – Geospatial Analyses</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="..\..\site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_color_transparent.png" rel="icon" type="image/png">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/scrollable-regions/scrollable-regions.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a7323b02520c6b153f7cba92645f5b7d.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-fb974e37bd816e7371e85ccbeae9b4e3.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-a7323b02520c6b153f7cba92645f5b7d.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/quarto-axe/axe.min.js"></script>
+<script src="../../site_libs/quarto-axe/axe-check.js" type="module"></script>
+<script id="quarto-axe-checker-options" type="text/plain">dHJ1ZQ==</script>
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-037588347e6c9b638878bbe259ea3e76.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-b97d910aff66f2024c61e2e34e712f74.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-037588347e6c9b638878bbe259ea3e76.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+
+<meta property="og:title" content="UTA Transit Vehicle Miles of Travel, 2026 – Geospatial Analyses">
+<meta property="og:description" content="Scheduled annual revenue vehicle miles by mode, built from archived GTFS feeds">
+<meta property="og:image" content="https://wfrcanalytics.github.io/GIS-adhoc-analyses/_extensions/WFRCAnalytics/wfrc-brand/assets/social/wfrc-card.png">
+<meta property="og:site_name" content="Geospatial Analyses">
+<meta property="og:image:alt" content="Wasatch Front Regional Council">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
+<meta name="twitter:title" content="UTA Transit Vehicle Miles of Travel, 2026 – Geospatial Analyses">
+<meta name="twitter:description" content="Scheduled annual revenue vehicle miles by mode, built from archived GTFS feeds">
+<meta name="twitter:image" content="https://wfrcanalytics.github.io/GIS-adhoc-analyses/_extensions/WFRCAnalytics/wfrc-brand/assets/social/wfrc-card.png">
+<meta name="twitter:image:alt" content="Wasatch Front Regional Council">
+<meta name="twitter:creator" content="@wasatchcouncil">
+<meta name="twitter:site" content="@wasatchcouncil">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed quarto-light"><a id="quarto-skip-link" class="visually-hidden-focusable" href="#quarto-document-content">Skip to main content</a><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          toggle.setAttribute("aria-checked", alternate ? "true" : "false");
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455).
+    // Not run on load: stylesheets are set before first paint there, and
+    // scrolling would undo the scroll to a URL fragment (#14973).
+    // The one pixel nudge keeps the reader where they were.
+    const refreshSafariScrollbar = () => {
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        const scrollY = window.scrollY;
+        window.scrollTo(0, scrollY > 0 ? scrollY - 1 : 1);
+        setTimeout(() => {
+          window.scrollTo(0, scrollY);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      refreshSafariScrollbar();
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      refreshSafariScrollbar();
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark" aria-label="Site">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="..\..\site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_color_transparent.png" alt="Wasatch Front Regional Council" class="navbar-logo light-content">
+    <img src="..\..\site_libs\quarto-contrib\quarto-project\WFRCAnalytics\wfrc-brand\assets\logo\abbreviated\WFRC_logo_abbreviated_white_transparent.png" alt="Wasatch Front Regional Council" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Geospatial Analyses</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/center-buildout-capacity/index.html"> 
+<span class="menu-text">Center Buildout Capacity</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/transportation-choices/index.html"> 
+<span class="menu-text">Transportation Choices</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../projects/uta-transit-vmt-2026/index.html" aria-current="page"> 
+<span class="menu-text">UTA Transit VMT 2026</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-follow-us" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Follow Us</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="nav-menu-follow-us">    
+        <li>
+    <a class="dropdown-item" href="https://www.facebook.com/WasatchFrontRegionalCouncil/" target="_blank"><i class="bi bi-facebook" role="img">
+</i> 
+ <span class="dropdown-text">Facebook</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://twitter.com/wasatchcouncil/" target="_blank"><i class="bi bi-twitter-x" role="img">
+</i> 
+ <span class="dropdown-text">X (Twitter)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://www.instagram.com/wasatchfrontregionalcouncil/" target="_blank"><i class="bi bi-instagram" role="img">
+</i> 
+ <span class="dropdown-text">Instagram</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://www.linkedin.com/company/wasatch-front-regional-council/" target="_blank"><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="dropdown-text">LinkedIn</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="https://www.youtube.com/user/wfrcvideo/" target="_blank"><i class="bi bi-youtube" role="img">
+</i> 
+ <span class="dropdown-text">YouTube</span></a>
+  </li>  
+    </ul>
+  </li>
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <div class="dropdown">
+      <a href="" title="GitHub" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" role="link" aria-label="GitHub"><i class="bi bi-github"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/WFRCAnalytics/GIS-adhoc-analyses" target="_blank">
+            Source Code
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item quarto-navbar-tools-item" href="https://github.com/WFRCAnalytics/GIS-adhoc-analyses/issues/new" target="_blank">
+            Report a Bug
+            </a>
+          </li>
+          
+      </ul>
+    </div>
+  <button type="button" role="switch" aria-checked="false" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode" aria-label="Toggle dark mode"><i class="bi"></i></button>
+</div>
+            <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-page-left">
+      <h1 class="title">UTA Transit Vehicle Miles of Travel, 2026</h1>
+            <p class="subtitle lead">Scheduled annual revenue vehicle miles by mode, built from archived GTFS feeds</p>
+                      </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta column-page-left">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 19, 2026</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" aria-labelledby="toc-title" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#purpose" id="toc-purpose" class="nav-link active" data-scroll-target="#purpose">Purpose</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#route-to-mode-lookup" id="toc-route-to-mode-lookup" class="nav-link" data-scroll-target="#route-to-mode-lookup">Route-to-mode lookup</a></li>
+  <li><a href="#which-feed-was-in-effect-each-day" id="toc-which-feed-was-in-effect-each-day" class="nav-link" data-scroll-target="#which-feed-was-in-effect-each-day">Which feed was in effect each day</a></li>
+  <li><a href="#trip-miles-step-by-step" id="toc-trip-miles-step-by-step" class="nav-link" data-scroll-target="#trip-miles-step-by-step">Trip miles, step by step</a>
+  <ul class="collapse">
+  <li><a href="#step-1-read-the-gtfs-tables" id="toc-step-1-read-the-gtfs-tables" class="nav-link" data-scroll-target="#step-1-read-the-gtfs-tables">Step 1: read the GTFS tables</a></li>
+  <li><a href="#step-2-length-of-each-shape" id="toc-step-2-length-of-each-shape" class="nav-link" data-scroll-target="#step-2-length-of-each-shape">Step 2: length of each shape</a></li>
+  <li><a href="#step-3-miles-of-each-trip" id="toc-step-3-miles-of-each-trip" class="nav-link" data-scroll-target="#step-3-miles-of-each-trip">Step 3: miles of each trip</a></li>
+  <li><a href="#step-4-trips-and-miles-by-service-and-route" id="toc-step-4-trips-and-miles-by-service-and-route" class="nav-link" data-scroll-target="#step-4-trips-and-miles-by-service-and-route">Step 4: trips and miles by service and route</a></li>
+  <li><a href="#step-5-miles-for-each-date" id="toc-step-5-miles-for-each-date" class="nav-link" data-scroll-target="#step-5-miles-for-each-date">Step 5: miles for each date</a></li>
+  </ul></li>
+  <li><a href="#projecting-the-rest-of-the-year" id="toc-projecting-the-rest-of-the-year" class="nav-link" data-scroll-target="#projecting-the-rest-of-the-year">Projecting the rest of the year</a></li>
+  <li><a href="#assign-modes" id="toc-assign-modes" class="nav-link" data-scroll-target="#assign-modes">Assign modes</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link" data-scroll-target="#results">Results</a>
+  <ul class="collapse">
+  <li><a href="#annual-vmt-by-mode" id="toc-annual-vmt-by-mode" class="nav-link" data-scroll-target="#annual-vmt-by-mode">Annual VMT by mode</a></li>
+  <li><a href="#monthly-vmt-by-mode" id="toc-monthly-vmt-by-mode" class="nav-link" data-scroll-target="#monthly-vmt-by-mode">Monthly VMT by mode</a></li>
+  <li><a href="#daily-miles-by-mode" id="toc-daily-miles-by-mode" class="nav-link" data-scroll-target="#daily-miles-by-mode">Daily miles by mode</a></li>
+  <li><a href="#typical-day-by-day-of-week" id="toc-typical-day-by-day-of-week" class="nav-link" data-scroll-target="#typical-day-by-day-of-week">Typical day by day of week</a></li>
+  <li><a href="#highest-mileage-routes" id="toc-highest-mileage-routes" class="nav-link" data-scroll-target="#highest-mileage-routes">Highest-mileage routes</a></li>
+  <li><a href="#unmapped-routes" id="toc-unmapped-routes" class="nav-link" data-scroll-target="#unmapped-routes">Unmapped routes</a></li>
+  </ul></li>
+  <li><a href="#export" id="toc-export" class="nav-link" data-scroll-target="#export">Export</a></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content" tabindex="-1">
+
+
+
+
+
+
+<section id="purpose" class="level2">
+<h2 class="anchored" data-anchor-id="purpose">Purpose</h2>
+<p>How many vehicle miles of travel (VMT) does UTA transit service run in a calendar year, and how does that split across Local Bus, Express Bus, Bus Rapid, Light Rail, and Commuter Rail?</p>
+<p>This analysis answers that for <strong>2026</strong> from the <em>actual</em> published schedules, not an annualization of one sample week. GTFS feeds change several times a year (service changes, detours, holiday schedules), so every service date is assigned to the feed snapshot that was in effect that day, and the miles of every scheduled trip are added up.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>What “VMT” means here
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Scheduled <strong>in-service (revenue) vehicle miles</strong>: the distance of each trip scheduled in GTFS, from its first to its last stop. It does <strong>not</strong> include deadhead (garage pull-out/pull-in and repositioning), nor actual operations (missed trips, detours, extra service). Expect it to run somewhat below UTA’s reported NTD vehicle revenue miles plus deadhead.</p>
+</div>
+</div>
+</section>
+<section id="data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Data</th>
+<th>Source</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>UTA GTFS snapshots</td>
+<td><a href="https://mobilitydatabase.org">Mobility Database</a> feed <code>mdb-170</code> (Utah Transit Authority)</td>
+<td>Every archived snapshot of the feed; those covering 2026 are cached under <code>_data/remote/gtfs/</code></td>
+</tr>
+<tr class="even">
+<td>Route -&gt; mode</td>
+<td><code>route_short_name</code> lookup supplied by the analyst (below)</td>
+<td>Falls back to GTFS <code>route_type</code> for rail if a name is missing</td>
+</tr>
+</tbody>
+</table>
+<p>Authentication uses <code>MOBILITY_DATABASE_REFRESH_TOKEN</code> from <code>.env</code> (see <code>.env.example</code>). Downloads are cached; delete a file under <code>_data/remote/</code> to re-fetch it.</p>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<div id="79c5aba2" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date, timedelta</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.dates <span class="im">as</span> mdates</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> gis_adhoc_analyses.mobility_database <span class="im">import</span> download_dataset, list_datasets</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>YEAR <span class="op">=</span> <span class="dv">2026</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>FEED_ID <span class="op">=</span> <span class="st">"mdb-170"</span>  <span class="co"># Utah Transit Authority (UTA), the active feed</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>GTFS_DIR <span class="op">=</span> Path(<span class="st">"_data/remote/gtfs"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>OUT_DIR <span class="op">=</span> Path(<span class="st">"output"</span>)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Dates after the last published schedule are projected from the same weekday.</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Thanksgiving is excluded as a projection template (holiday service, not typical Thursday).</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>PROJECTION_EXCLUDE <span class="op">=</span> {date(<span class="dv">2026</span>, <span class="dv">11</span>, <span class="dv">26</span>)}</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Chart style follows the repo convention: WFRC brand helper (palette + ink roles read from</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># brand.yml), Poppins like the other analyses, on a fixed light surface so charts read the same</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># in the site's light and dark themes. Five brand chart colors = the five requested modes.</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>sys.path.append(<span class="st">"../../_extensions/WFRCAnalytics/wfrc-brand/assets/charts"</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> wfrc_charts <span class="im">as</span> wfrc</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>wfrc.use_style()</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>brand <span class="op">=</span> wfrc.colors()</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>SURFACE <span class="op">=</span> <span class="st">"#fcfcfb"</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>INK, INK2, GRID <span class="op">=</span> brand[<span class="st">"wfrc-ink"</span>], brand[<span class="st">"wfrc-gray"</span>], brand[<span class="st">"wfrc-hairline"</span>]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>plt.rcParams.update({</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"font.family"</span>: <span class="st">"Poppins"</span>, <span class="st">"figure.facecolor"</span>: SURFACE, <span class="st">"axes.facecolor"</span>: SURFACE,</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="st">"savefig.facecolor"</span>: SURFACE, <span class="st">"figure.dpi"</span>: <span class="dv">110</span>,</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>MODE_COLOR <span class="op">=</span> <span class="bu">dict</span>(<span class="bu">zip</span>([<span class="st">"Local Bus"</span>, <span class="st">"Express Bus"</span>, <span class="st">"Bus Rapid"</span>, <span class="st">"Light Rail"</span>, <span class="st">"Commuter Rail"</span>],</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>                      wfrc.palette(<span class="dv">5</span>)))</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>MODE_COLOR <span class="op">|=</span> {<span class="st">"Microtransit"</span>: brand[<span class="st">"pink"</span>], <span class="st">"Ski Bus"</span>: brand[<span class="st">"green"</span>], <span class="st">"Unmapped"</span>: brand[<span class="st">"wfrc-gray"</span>]}</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>SOURCE <span class="op">=</span> <span class="st">"Source: UTA GTFS via Mobility Database (WFRC analysis)"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="route-to-mode-lookup" class="level2">
+<h2 class="anchored" data-anchor-id="route-to-mode-lookup">Route-to-mode lookup</h2>
+<p>Modes follow the analyst-supplied UTA lookup by <code>route_short_name</code>. Core route 35M (COR in the lookup) is folded into Local Bus; Microtransit (MT, on-demand) is reported separately since it was not one of the five requested modes. <strong>Four routes were added to Bus Rapid (BRT)</strong>: OGX and UVX (the supplied lookup’s comment names them as the BRT routes but they were missing from its list), and 50X and MVX (the Midvalley Express, UTA’s third BRT line, which opened April 12, 2026 and is published under both names). <strong>CS1, CS2 and CS3 are UTA’s seasonal canyon ski buses</strong> (to Alta, Snowbird and Brighton), neither local nor express, so they are reported separately as Ski Bus. Any other route not in the lookup is reported as <strong>Unmapped</strong> rather than guessed (except rail: GTFS <code>route_type</code> 0 is Light Rail, 2 is Commuter Rail).</p>
+<div id="abe546dc" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>MODE_ROUTES <span class="op">=</span> {  <span class="co"># reporting mode -&gt; route_short_names</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Local Bus"</span>: [</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"1"</span>, <span class="st">"2"</span>, <span class="st">"2A"</span>, <span class="st">"2B"</span>, <span class="st">"3"</span>, <span class="st">"4"</span>, <span class="st">"6"</span>, <span class="st">"9"</span>, <span class="st">"11"</span>, <span class="st">"17"</span>, <span class="st">"21"</span>, <span class="st">"33"</span>, <span class="st">"35"</span>, <span class="st">"39"</span>, <span class="st">"41"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"45"</span>, <span class="st">"47"</span>, <span class="st">"54"</span>, <span class="st">"62"</span>, <span class="st">"72"</span>, <span class="st">"126"</span>, <span class="st">"200"</span>, <span class="st">"201"</span>, <span class="st">"205"</span>, <span class="st">"209"</span>, <span class="st">"213"</span>, <span class="st">"217"</span>, <span class="st">"218"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"219"</span>, <span class="st">"220"</span>, <span class="st">"223"</span>, <span class="st">"227"</span>, <span class="st">"228"</span>, <span class="st">"232"</span>, <span class="st">"240"</span>, <span class="st">"248"</span>, <span class="st">"307"</span>, <span class="st">"313"</span>, <span class="st">"320"</span>, <span class="st">"354"</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">"417"</span>, <span class="st">"453"</span>, <span class="st">"454"</span>, <span class="st">"455"</span>, <span class="st">"456"</span>, <span class="st">"460"</span>, <span class="st">"461"</span>, <span class="st">"462"</span>, <span class="st">"463"</span>, <span class="st">"470"</span>, <span class="st">"471"</span>, <span class="st">"500"</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">"509"</span>, <span class="st">"516"</span>, <span class="st">"519"</span>, <span class="st">"520"</span>, <span class="st">"525"</span>, <span class="st">"526"</span>, <span class="st">"601"</span>, <span class="st">"602"</span>, <span class="st">"603"</span>, <span class="st">"604"</span>, <span class="st">"606"</span>, <span class="st">"608"</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"612"</span>, <span class="st">"613"</span>, <span class="st">"616"</span>, <span class="st">"625"</span>, <span class="st">"626"</span>, <span class="st">"627"</span>, <span class="st">"628"</span>, <span class="st">"630"</span>, <span class="st">"640"</span>, <span class="st">"645"</span>, <span class="st">"650"</span>, <span class="st">"667"</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"674"</span>, <span class="st">"675"</span>, <span class="st">"677"</span>, <span class="st">"710"</span>, <span class="st">"809"</span>, <span class="st">"811"</span>, <span class="st">"821"</span>, <span class="st">"823"</span>, <span class="st">"831"</span>, <span class="st">"833"</span>, <span class="st">"834"</span>, <span class="st">"841"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"850"</span>, <span class="st">"862"</span>, <span class="st">"863"</span>, <span class="st">"864"</span>, <span class="st">"871"</span>, <span class="st">"880"</span>, <span class="st">"901"</span>, <span class="st">"902"</span>, <span class="st">"919"</span>, <span class="st">"920"</span>, <span class="st">"953"</span>, <span class="st">"972"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"994"</span>, <span class="st">"F11"</span>, <span class="st">"F94"</span>, <span class="st">"F94Xtra"</span>, <span class="st">"F202"</span>, <span class="st">"F202pln"</span>, <span class="st">"F232"</span>, <span class="st">"F400"</span>, <span class="st">"F401"</span>, <span class="st">"F402"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>        <span class="st">"F504"</span>, <span class="st">"F514a"</span>, <span class="st">"F514b"</span>, <span class="st">"F518"</span>, <span class="st">"F522"</span>, <span class="st">"F534"</span>, <span class="st">"F546"</span>, <span class="st">"F547"</span>, <span class="st">"F453"</span>, <span class="st">"F514"</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"F525"</span>, <span class="st">"F556"</span>, <span class="st">"F570"</span>, <span class="st">"F578"</span>, <span class="st">"F590"</span>, <span class="st">"F618"</span>, <span class="st">"F605"</span>, <span class="st">"F620"</span>, <span class="st">"F638"</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"35M"</span>,  <span class="co"># Core route, folded into Local Bus</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Express Bus"</span>: [<span class="st">"451"</span>, <span class="st">"472"</span>, <span class="st">"473"</span>, <span class="st">"513"</span>, <span class="st">"551"</span>, <span class="st">"805"</span>, <span class="st">"806"</span>, <span class="st">"807"</span>, <span class="st">"822"</span>],</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Bus Rapid"</span>: [<span class="st">"2AX"</span>, <span class="st">"2BX"</span>, <span class="st">"2X"</span>, <span class="st">"500X"</span>, <span class="st">"603X"</span>, <span class="st">"830X"</span>, <span class="st">"OGX"</span>, <span class="st">"UVX"</span>, <span class="st">"50X"</span>, <span class="st">"MVX"</span>],  <span class="co"># last four added (see text)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Light Rail"</span>: [<span class="st">"701"</span>, <span class="st">"703"</span>, <span class="st">"704"</span>, <span class="st">"720"</span>],</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Commuter Rail"</span>: [<span class="st">"750"</span>],</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Microtransit"</span>: [<span class="st">"SLC"</span>, <span class="st">"TOO"</span>, <span class="st">"SD"</span>, <span class="st">"SSLC"</span>],</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Ski Bus"</span>: [<span class="st">"CS1"</span>, <span class="st">"CS2"</span>, <span class="st">"CS3"</span>],  <span class="co"># seasonal canyon ski service (Alta, Snowbird, Brighton)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>MODE_ORDER <span class="op">=</span> [<span class="op">*</span>MODE_ROUTES, <span class="st">"Unmapped"</span>]</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>NAME_TO_MODE <span class="op">=</span> {n: mode <span class="cf">for</span> mode, names <span class="kw">in</span> MODE_ROUTES.items() <span class="cf">for</span> n <span class="kw">in</span> names}</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>RAIL_TYPE_TO_MODE <span class="op">=</span> {<span class="dv">0</span>: <span class="st">"Light Rail"</span>, <span class="dv">2</span>: <span class="st">"Commuter Rail"</span>}  <span class="co"># GTFS route_type fallback</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="which-feed-was-in-effect-each-day" class="level2">
+<h2 class="anchored" data-anchor-id="which-feed-was-in-effect-each-day">Which feed was in effect each day</h2>
+<p>The Mobility Database archives each UTA feed as it is republished (about 75 snapshots, many identical). For every date in 2026 we take the <strong>latest snapshot published on or before that date whose service period covers it</strong>. If none was published yet (the very first days of a schedule), the earliest snapshot covering it is used.</p>
+<p>First, list the archived snapshots with the local (Mountain) dates they were published and the service period they cover.</p>
+<div id="4d6d206e" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>datasets <span class="op">=</span> list_datasets(FEED_ID, cache<span class="op">=</span><span class="st">"_data/remote/mdb-170_datasets.json"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>by_id <span class="op">=</span> {d[<span class="st">"id"</span>]: d <span class="cf">for</span> d <span class="kw">in</span> datasets}</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>cov <span class="op">=</span> pd.DataFrame({<span class="st">"id"</span>: [d[<span class="st">"id"</span>] <span class="cf">for</span> d <span class="kw">in</span> datasets]})</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> src, dst <span class="kw">in</span> [(<span class="st">"service_date_range_start"</span>, <span class="st">"start"</span>), (<span class="st">"service_date_range_end"</span>, <span class="st">"end"</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                 (<span class="st">"downloaded_at"</span>, <span class="st">"published"</span>)]:</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    ts <span class="op">=</span> pd.to_datetime([d[src] <span class="cf">for</span> d <span class="kw">in</span> datasets], utc<span class="op">=</span><span class="va">True</span>).tz_convert(<span class="st">"America/Denver"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    cov[dst] <span class="op">=</span> ts.date</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>cov[cov.end <span class="op">&gt;=</span> date(YEAR, <span class="dv">1</span>, <span class="dv">1</span>)].tail(<span class="dv">8</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">id</th>
+<th data-quarto-table-cell-role="th">start</th>
+<th data-quarto-table-cell-role="th">end</th>
+<th data-quarto-table-cell-role="th">published</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">67</th>
+<td>mdb-170-202606250127</td>
+<td>2026-06-21</td>
+<td>2026-08-15</td>
+<td>2026-06-24</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">68</th>
+<td>mdb-170-202607140121</td>
+<td>2026-06-21</td>
+<td>2026-08-15</td>
+<td>2026-07-13</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">69</th>
+<td>mdb-170-202607280109</td>
+<td>2026-06-21</td>
+<td>2026-08-15</td>
+<td>2026-07-27</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">70</th>
+<td>mdb-170-202608080156</td>
+<td>2026-08-16</td>
+<td>2026-12-05</td>
+<td>2026-08-07</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">71</th>
+<td>mdb-170-202608140039</td>
+<td>2026-08-16</td>
+<td>2026-12-05</td>
+<td>2026-08-13</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">72</th>
+<td>mdb-170-202610020142</td>
+<td>2026-08-16</td>
+<td>2026-12-05</td>
+<td>2026-10-01</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">73</th>
+<td>mdb-170-202610130012</td>
+<td>2026-08-16</td>
+<td>2026-12-05</td>
+<td>2026-10-12</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">74</th>
+<td>mdb-170-202611060034</td>
+<td>2026-08-16</td>
+<td>2026-12-05</td>
+<td>2026-11-05</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Then assign every date of the year to a snapshot.</p>
+<div id="f5342e66" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>assigned <span class="op">=</span> {}</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> date(YEAR, <span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> d <span class="op">&lt;=</span> date(YEAR, <span class="dv">12</span>, <span class="dv">31</span>):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    covers <span class="op">=</span> cov[(cov.start <span class="op">&lt;=</span> d) <span class="op">&amp;</span> (cov.end <span class="op">&gt;=</span> d)]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(covers):</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        before <span class="op">=</span> covers[covers.published <span class="op">&lt;=</span> d]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        assigned[d] <span class="op">=</span> (before.iloc[<span class="op">-</span><span class="dv">1</span>] <span class="cf">if</span> <span class="bu">len</span>(before) <span class="cf">else</span> covers.iloc[<span class="dv">0</span>])[<span class="st">"id"</span>]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    d <span class="op">+=</span> timedelta(days<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>snapshots <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">set</span>(assigned.values()))</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>last_published <span class="op">=</span> <span class="bu">max</span>(assigned)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(assigned)<span class="sc">}</span><span class="ss"> of 365 dates covered by published schedules (through </span><span class="sc">{</span>last_published<span class="sc">}</span><span class="ss">); "</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(snapshots)<span class="sc">}</span><span class="ss"> snapshots used; </span><span class="sc">{</span><span class="dv">365</span> <span class="op">-</span> <span class="bu">len</span>(assigned)<span class="sc">}</span><span class="ss"> dates left to project."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>339 of 365 dates covered by published schedules (through 2026-12-05); 15 snapshots used; 26 dates left to project.</code></pre>
+</div>
+</div>
+<div id="cell-fig-snapshots" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">4.8</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, sid <span class="kw">in</span> <span class="bu">enumerate</span>(snapshots):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    days <span class="op">=</span> [mdates.date2num(k) <span class="cf">for</span> k, v <span class="kw">in</span> assigned.items() <span class="cf">if</span> v <span class="op">==</span> sid]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    ax.broken_barh([(x, <span class="dv">1</span>) <span class="cf">for</span> x <span class="kw">in</span> days], (i <span class="op">-</span> <span class="fl">0.3</span>, <span class="fl">0.6</span>), facecolors<span class="op">=</span>MODE_COLOR[<span class="st">"Local Bus"</span>])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ax.axvspan(mdates.date2num(last_published) <span class="op">+</span> <span class="dv">1</span>, mdates.date2num(date(YEAR, <span class="dv">12</span>, <span class="dv">31</span>)) <span class="op">+</span> <span class="dv">1</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>           color<span class="op">=</span>GRID, zorder<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ax.text(mdates.date2num(last_published) <span class="op">+</span> <span class="dv">3</span>, <span class="bu">len</span>(snapshots) <span class="op">-</span> <span class="dv">1</span>, <span class="st">"projected"</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        va<span class="op">=</span><span class="st">"center"</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(snapshots)))</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([<span class="ss">f"published </span><span class="sc">{</span>s[<span class="op">-</span><span class="dv">12</span>:<span class="op">-</span><span class="dv">8</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>s[<span class="op">-</span><span class="dv">8</span>:<span class="op">-</span><span class="dv">6</span>]<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>s[<span class="op">-</span><span class="dv">6</span>:<span class="op">-</span><span class="dv">4</span>]<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> s <span class="kw">in</span> snapshots])</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>ax.invert_yaxis()</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>ax.xaxis_date()</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>ax.xaxis.set_major_formatter(mdates.DateFormatter(<span class="st">"%b"</span>))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(mdates.date2num(date(YEAR, <span class="dv">1</span>, <span class="dv">1</span>)), mdates.date2num(date(YEAR, <span class="dv">12</span>, <span class="dv">31</span>)) <span class="op">+</span> <span class="dv">1</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"x"</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"y"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.08</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Which GTFS feed was in effect each day"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>         fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.48</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Latest UTA snapshot published on or before each date; gray = projected"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>         ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.99</span>, <span class="fl">0.06</span> <span class="op">/</span> fig.get_figheight(), SOURCE, fontsize<span class="op">=</span><span class="fl">7.5</span>, color<span class="op">=</span>INK2, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">0.25</span> <span class="op">/</span> fig.get_figheight(), <span class="dv">1</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.95</span> <span class="op">/</span> fig.get_figheight()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-snapshots" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-snapshots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-snapshots-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Which GTFS snapshot supplies each day of 2026. Gray = no published schedule yet (projected)."><img src="index_files/figure-html/fig-snapshots-output-1.png" width="1100" height="538" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-snapshots-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Which GTFS snapshot supplies each day of 2026. Gray = no published schedule yet (projected).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Download each snapshot used (cached after the first run).</p>
+<div id="1e58be08" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>zips <span class="op">=</span> {s: download_dataset(by_id[s], GTFS_DIR) <span class="cf">for</span> s <span class="kw">in</span> snapshots}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="trip-miles-step-by-step" class="level2">
+<h2 class="anchored" data-anchor-id="trip-miles-step-by-step">Trip miles, step by step</h2>
+<p>Each step below works on all snapshots at once, keyed by snapshot id.</p>
+<section id="step-1-read-the-gtfs-tables" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-read-the-gtfs-tables">Step 1: read the GTFS tables</h3>
+<p>Only the columns needed are kept. From <code>stop_times.txt</code> (the biggest file) we keep just each trip’s first-to-last <code>shape_dist_traveled</code> span.</p>
+<div id="12269539" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>routes, trips, shapes, span, cal, cdates <span class="op">=</span> {}, {}, {}, {}, {}, {}</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sid <span class="kw">in</span> snapshots:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> zipfile.ZipFile(zips[sid]) <span class="im">as</span> zf:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="st">"frequencies.txt"</span> <span class="kw">not</span> <span class="kw">in</span> zf.namelist(), <span class="ss">f"</span><span class="sc">{</span>sid<span class="sc">}</span><span class="ss">: frequency-based trips not handled"</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        routes[sid] <span class="op">=</span> pd.read_csv(zf.<span class="bu">open</span>(<span class="st">"routes.txt"</span>), dtype<span class="op">=</span><span class="bu">str</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        trips[sid] <span class="op">=</span> pd.read_csv(zf.<span class="bu">open</span>(<span class="st">"trips.txt"</span>), dtype<span class="op">=</span><span class="bu">str</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        shapes[sid] <span class="op">=</span> pd.read_csv(zf.<span class="bu">open</span>(<span class="st">"shapes.txt"</span>), dtype<span class="op">=</span>{<span class="st">"shape_id"</span>: <span class="bu">str</span>})</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        cal[sid] <span class="op">=</span> pd.read_csv(zf.<span class="bu">open</span>(<span class="st">"calendar.txt"</span>), dtype<span class="op">=</span>{<span class="st">"service_id"</span>: <span class="bu">str</span>})</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        cdates[sid] <span class="op">=</span> pd.read_csv(zf.<span class="bu">open</span>(<span class="st">"calendar_dates.txt"</span>), dtype<span class="op">=</span>{<span class="st">"service_id"</span>: <span class="bu">str</span>})</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        stop_times <span class="op">=</span> pd.read_csv(zf.<span class="bu">open</span>(<span class="st">"stop_times.txt"</span>),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>                                 usecols<span class="op">=</span>[<span class="st">"trip_id"</span>, <span class="st">"shape_dist_traveled"</span>],</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                                 dtype<span class="op">=</span>{<span class="st">"trip_id"</span>: <span class="bu">str</span>}, skipinitialspace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    sdt <span class="op">=</span> (stop_times.dropna(subset<span class="op">=</span>[<span class="st">"shape_dist_traveled"</span>]).groupby(<span class="st">"trip_id"</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>           .shape_dist_traveled.agg([<span class="st">"min"</span>, <span class="st">"max"</span>]))</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    span[sid] <span class="op">=</span> (sdt[<span class="st">"max"</span>] <span class="op">-</span> sdt[<span class="st">"min"</span>]).rename(<span class="st">"span"</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="bu">len</span>(snapshots)<span class="sc">}</span><span class="ss"> snapshots loaded; latest has </span><span class="sc">{</span><span class="bu">len</span>(trips[snapshots[<span class="op">-</span><span class="dv">1</span>]])<span class="sc">:,}</span><span class="ss"> trips."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>15 snapshots loaded; latest has 11,078 trips.</code></pre>
+</div>
+</div>
+</section>
+<section id="step-2-length-of-each-shape" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-length-of-each-shape">Step 2: length of each shape</h3>
+<p>Haversine distance (miles) between consecutive shape points, summed per <code>shape_id</code>. <code>shape_dist_traveled</code> is in kilometers in UTA’s feed, so lengths come from coordinates rather than that column’s units.</p>
+<div id="adf3bed1" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>shape_len <span class="op">=</span> {}</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sid <span class="kw">in</span> snapshots:</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> shapes[sid].sort_values([<span class="st">"shape_id"</span>, <span class="st">"shape_pt_sequence"</span>]).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    lat, lon <span class="op">=</span> np.radians(s.shape_pt_lat.to_numpy()), np.radians(s.shape_pt_lon.to_numpy())</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    a <span class="op">=</span> (np.sin(np.diff(lat) <span class="op">/</span> <span class="dv">2</span>) <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>         <span class="op">+</span> np.cos(lat[:<span class="op">-</span><span class="dv">1</span>]) <span class="op">*</span> np.cos(lat[<span class="dv">1</span>:]) <span class="op">*</span> np.sin(np.diff(lon) <span class="op">/</span> <span class="dv">2</span>) <span class="op">**</span> <span class="dv">2</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    seg <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> <span class="fl">3958.8</span> <span class="op">*</span> np.arcsin(np.sqrt(a))  <span class="co"># Earth radius in miles</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    same_shape <span class="op">=</span> s.shape_id.to_numpy()[<span class="dv">1</span>:] <span class="op">==</span> s.shape_id.to_numpy()[:<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    s[<span class="st">"seg"</span>] <span class="op">=</span> np.r_[<span class="fl">0.0</span>, np.where(same_shape, seg, <span class="fl">0.0</span>)]</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    shape_len[sid] <span class="op">=</span> s.groupby(<span class="st">"shape_id"</span>).agg(</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        shape_miles<span class="op">=</span>(<span class="st">"seg"</span>, <span class="st">"sum"</span>), shape_sdt<span class="op">=</span>(<span class="st">"shape_dist_traveled"</span>, <span class="st">"max"</span>))</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>shape_len[snapshots[<span class="op">-</span><span class="dv">1</span>]].shape_miles.describe().<span class="bu">round</span>(<span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>count    212.0
+mean      15.7
+std       12.8
+min        0.9
+25%        7.7
+50%       12.5
+75%       17.0
+max       82.4
+Name: shape_miles, dtype: float64</code></pre>
+</div>
+</div>
+</section>
+<section id="step-3-miles-of-each-trip" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-miles-of-each-trip">Step 3: miles of each trip</h3>
+<p>A trip may cover only part of its shape (short-turns). The fraction <code>(last stop - first stop) / full shape</code> of <code>shape_dist_traveled</code> trims the shape length to what the trip actually serves; trips without stop distances use the full shape.</p>
+<div id="5aa58b80" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>trip_miles <span class="op">=</span> {}</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sid <span class="kw">in</span> snapshots:</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> (trips[sid]</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         .merge(shape_len[sid], left_on<span class="op">=</span><span class="st">"shape_id"</span>, right_index<span class="op">=</span><span class="va">True</span>, how<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>         .merge(span[sid], left_on<span class="op">=</span><span class="st">"trip_id"</span>, right_index<span class="op">=</span><span class="va">True</span>, how<span class="op">=</span><span class="st">"left"</span>))</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    frac <span class="op">=</span> (t.span <span class="op">/</span> t.shape_sdt).where(t.shape_sdt <span class="op">&gt;</span> <span class="dv">0</span>).clip(upper<span class="op">=</span><span class="fl">1.0</span>).fillna(<span class="fl">1.0</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    t[<span class="st">"miles"</span>] <span class="op">=</span> (t.shape_miles <span class="op">*</span> frac).fillna(<span class="fl">0.0</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> t.shape_miles.isna().<span class="bu">any</span>():</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(sid, <span class="ss">f"-&gt; </span><span class="sc">{</span><span class="bu">int</span>(t.shape_miles.isna().<span class="bu">sum</span>())<span class="sc">}</span><span class="ss"> trips without a shape (0 miles)"</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    trip_miles[sid] <span class="op">=</span> t</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>trip_miles[snapshots[<span class="op">-</span><span class="dv">1</span>]][[<span class="st">"route_id"</span>, <span class="st">"trip_id"</span>, <span class="st">"shape_miles"</span>, <span class="st">"miles"</span>]].head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="9">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">route_id</th>
+<th data-quarto-table-cell-role="th">trip_id</th>
+<th data-quarto-table-cell-role="th">shape_miles</th>
+<th data-quarto-table-cell-role="th">miles</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>2003</td>
+<td>5911894</td>
+<td>4.489504</td>
+<td>4.301498</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>2003</td>
+<td>5911895</td>
+<td>4.489504</td>
+<td>4.301498</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>2003</td>
+<td>5911896</td>
+<td>4.489504</td>
+<td>4.301498</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">3</th>
+<td>2003</td>
+<td>5911897</td>
+<td>4.489504</td>
+<td>4.301498</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4</th>
+<td>2003</td>
+<td>5911898</td>
+<td>4.489504</td>
+<td>4.301498</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-trips-and-miles-by-service-and-route" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-trips-and-miles-by-service-and-route">Step 4: trips and miles by service and route</h3>
+<p>Add up trips by <code>service_id</code> x <code>route_id</code>, so each date only has to pick its active services. Some snapshots have trips whose <code>route_id</code> is missing from <code>routes.txt</code> (a feed defect); those routes’ names and types are recovered from the same <code>route_id</code> in other snapshots.</p>
+<div id="f3e2e465" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># route_id -&gt; name/type across all snapshots, to recover routes missing from routes.txt</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>route_lookup <span class="op">=</span> (pd.concat([r[[<span class="st">"route_id"</span>, <span class="st">"route_short_name"</span>, <span class="st">"route_type"</span>]]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                           <span class="cf">for</span> r <span class="kw">in</span> routes.values()])</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                .drop_duplicates(<span class="st">"route_id"</span>, keep<span class="op">=</span><span class="st">"last"</span>).set_index(<span class="st">"route_id"</span>))</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>service_route <span class="op">=</span> {}</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> sid <span class="kw">in</span> snapshots:</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    sr <span class="op">=</span> (trip_miles[sid].groupby([<span class="st">"service_id"</span>, <span class="st">"route_id"</span>])</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>          .agg(trips<span class="op">=</span>(<span class="st">"trip_id"</span>, <span class="st">"size"</span>), miles<span class="op">=</span>(<span class="st">"miles"</span>, <span class="st">"sum"</span>)).reset_index()</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>          .merge(routes[sid][[<span class="st">"route_id"</span>, <span class="st">"route_short_name"</span>, <span class="st">"route_type"</span>]],</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                 on<span class="op">=</span><span class="st">"route_id"</span>, how<span class="op">=</span><span class="st">"left"</span>))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    orphan <span class="op">=</span> sr.route_short_name.isna()</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> orphan.<span class="bu">any</span>():</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>        sr.loc[orphan, [<span class="st">"route_short_name"</span>, <span class="st">"route_type"</span>]] <span class="op">=</span> (</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>            route_lookup.reindex(sr.loc[orphan, <span class="st">"route_id"</span>]).to_numpy())</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(sid, <span class="st">"-&gt; routes missing from routes.txt, recovered:"</span>,</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>              <span class="bu">sorted</span>(sr.loc[orphan, <span class="st">"route_short_name"</span>].unique()))</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    sr[<span class="st">"route_type"</span>] <span class="op">=</span> sr.route_type.astype(<span class="bu">int</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    service_route[sid] <span class="op">=</span> sr</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>service_route[snapshots[<span class="op">-</span><span class="dv">1</span>]].sort_values(<span class="st">"miles"</span>, ascending<span class="op">=</span><span class="va">False</span>).head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>mdb-170-202604130143 -&gt; routes missing from routes.txt, recovered: ['602', '701', '703', '704', '720', '750']
+mdb-170-202604220144 -&gt; routes missing from routes.txt, recovered: ['602', '701', '703', '704', '720', '750']
+mdb-170-202606240136 -&gt; routes missing from routes.txt, recovered: ['F453', 'F618', 'F620', 'F638']</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">service_id</th>
+<th data-quarto-table-cell-role="th">route_id</th>
+<th data-quarto-table-cell-role="th">trips</th>
+<th data-quarto-table-cell-role="th">miles</th>
+<th data-quarto-table-cell-role="th">route_short_name</th>
+<th data-quarto-table-cell-role="th">route_type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">168</th>
+<td>303.2279.2</td>
+<td>8246</td>
+<td>156</td>
+<td>3427.775413</td>
+<td>703</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">98</th>
+<td>303.0.4</td>
+<td>8246</td>
+<td>156</td>
+<td>3427.775413</td>
+<td>703</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">78</th>
+<td>303.0.4</td>
+<td>41065</td>
+<td>49</td>
+<td>3319.541923</td>
+<td>750</td>
+<td>2</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">33</th>
+<td>303.0.4</td>
+<td>19930</td>
+<td>68</td>
+<td>3092.190159</td>
+<td>470</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">32</th>
+<td>303.0.4</td>
+<td>19906</td>
+<td>60</td>
+<td>3068.419084</td>
+<td>455</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="step-5-miles-for-each-date" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-miles-for-each-date">Step 5: miles for each date</h3>
+<p>For each date, find the services running that day (<code>calendar.txt</code> weekday pattern, plus or minus the <code>calendar_dates.txt</code> exceptions) in its assigned snapshot and add up their routes.</p>
+<div id="65dd5eae" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>frames <span class="op">=</span> []</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> d, sid <span class="kw">in</span> assigned.items():</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    key, weekday <span class="op">=</span> <span class="bu">int</span>(d.strftime(<span class="st">"%Y%m</span><span class="sc">%d</span><span class="st">"</span>)), d.strftime(<span class="st">"%A"</span>).lower()</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    c <span class="op">=</span> cal[sid]</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    active <span class="op">=</span> <span class="bu">set</span>(c.loc[(c.start_date <span class="op">&lt;=</span> key) <span class="op">&amp;</span> (c.end_date <span class="op">&gt;=</span> key) <span class="op">&amp;</span> (c[weekday] <span class="op">==</span> <span class="dv">1</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"service_id"</span>])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    exc <span class="op">=</span> cdates[sid][cdates[sid][<span class="st">"date"</span>] <span class="op">==</span> key]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    active <span class="op">=</span> ((active <span class="op">|</span> <span class="bu">set</span>(exc.loc[exc.exception_type <span class="op">==</span> <span class="dv">1</span>, <span class="st">"service_id"</span>]))</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>              <span class="op">-</span> <span class="bu">set</span>(exc.loc[exc.exception_type <span class="op">==</span> <span class="dv">2</span>, <span class="st">"service_id"</span>]))</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    sr <span class="op">=</span> service_route[sid]</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    day <span class="op">=</span> (sr[sr.service_id.isin(active)]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>           .groupby([<span class="st">"route_id"</span>, <span class="st">"route_short_name"</span>, <span class="st">"route_type"</span>], as_index<span class="op">=</span><span class="va">False</span>)[</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>               [<span class="st">"trips"</span>, <span class="st">"miles"</span>]].<span class="bu">sum</span>())</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    frames.append(day.assign(date<span class="op">=</span>d, snapshot<span class="op">=</span>sid, basis<span class="op">=</span><span class="st">"published"</span>))</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>actual <span class="op">=</span> pd.concat(frames, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">set</span>(actual.date) <span class="op">==</span> <span class="bu">set</span>(assigned), <span class="st">"a covered date produced no service"</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>actual<span class="sc">.</span>date<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss"> dates, </span><span class="sc">{</span>actual<span class="sc">.</span>miles<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">:,.0f}</span><span class="ss"> published-schedule miles"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>339 dates, 20,244,661 published-schedule miles</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="projecting-the-rest-of-the-year" class="level2">
+<h2 class="anchored" data-anchor-id="projecting-the-rest-of-the-year">Projecting the rest of the year</h2>
+<p>UTA had not published a schedule past the end of the latest feed when this was run. Remaining dates are <strong>projected</strong>: each copies the most recent <em>published</em> day with the same weekday (Dec 25 uses the Sunday pattern, matching UTA’s holiday service), excluding Thanksgiving. They are flagged <code>basis = "projected"</code> throughout and replaced by real data automatically once newer snapshots are archived (delete <code>_data/remote/mdb-170_datasets.json</code> to refresh the listing).</p>
+<div id="4c51e037" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>have <span class="op">=</span> <span class="bu">sorted</span>(<span class="bu">set</span>(actual.date))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>rows <span class="op">=</span> []</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>d <span class="op">=</span> <span class="bu">max</span>(have) <span class="op">+</span> timedelta(days<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> d <span class="op">&lt;=</span> date(YEAR, <span class="dv">12</span>, <span class="dv">31</span>):</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    wd <span class="op">=</span> <span class="dv">6</span> <span class="cf">if</span> (d.month, d.day) <span class="op">==</span> (<span class="dv">12</span>, <span class="dv">25</span>) <span class="cf">else</span> d.weekday()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    ref <span class="op">=</span> <span class="bu">max</span>(x <span class="cf">for</span> x <span class="kw">in</span> have <span class="cf">if</span> x.weekday() <span class="op">==</span> wd <span class="kw">and</span> x <span class="kw">not</span> <span class="kw">in</span> PROJECTION_EXCLUDE)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    rows.append(actual[actual.date <span class="op">==</span> ref].assign(date<span class="op">=</span>d, basis<span class="op">=</span><span class="st">"projected"</span>, snapshot<span class="op">=</span>assigned[ref]))</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    d <span class="op">+=</span> timedelta(days<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>daily <span class="op">=</span> pd.concat([actual, <span class="op">*</span>rows], ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"date"</span>] <span class="op">=</span> pd.to_datetime(daily[<span class="st">"date"</span>])</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> daily.date.nunique() <span class="op">==</span> <span class="dv">365</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="assign-modes" class="level2">
+<h2 class="anchored" data-anchor-id="assign-modes">Assign modes</h2>
+<p>Mode comes from the route-name lookup, then rail by <code>route_type</code>, otherwise Unmapped.</p>
+<div id="baa3119f" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>mode <span class="op">=</span> (daily.route_short_name.<span class="bu">str</span>.strip().<span class="bu">map</span>(NAME_TO_MODE)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>        .fillna(daily.route_type.<span class="bu">map</span>(RAIL_TYPE_TO_MODE)).fillna(<span class="st">"Unmapped"</span>))</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>daily[<span class="st">"mode"</span>] <span class="op">=</span> pd.Categorical(mode, MODE_ORDER, ordered<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>daily.groupby(<span class="st">"mode"</span>, observed<span class="op">=</span><span class="va">True</span>).route_short_name.unique().<span class="bu">apply</span>(<span class="bu">sorted</span>).to_frame(<span class="st">"routes"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">routes</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">mode</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Local Bus</th>
+<td>[1, 126, 17, 2, 200, 201, 205, 209, 21, 213, 2...</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Express Bus</th>
+<td>[451, 472, 473, 513, 551, 805, 806, 807, 822]</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Bus Rapid</th>
+<td>[50X, 603X, 830X, MVX, OGX, UVX]</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Light Rail</th>
+<td>[701, 703, 704, 720]</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">Commuter Rail</th>
+<td>[750]</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">Ski Bus</th>
+<td>[CS1, CS2, CS3]</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="results" class="level2">
+<h2 class="anchored" data-anchor-id="results">Results</h2>
+<section id="annual-vmt-by-mode" class="level3">
+<h3 class="anchored" data-anchor-id="annual-vmt-by-mode">Annual VMT by mode</h3>
+<div id="0005c963" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>tot <span class="op">=</span> (daily.groupby(<span class="st">"mode"</span>, observed<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>       .agg(annual_miles<span class="op">=</span>(<span class="st">"miles"</span>, <span class="st">"sum"</span>), annual_trips<span class="op">=</span>(<span class="st">"trips"</span>, <span class="st">"sum"</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>            routes<span class="op">=</span>(<span class="st">"route_short_name"</span>, <span class="st">"nunique"</span>))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>       .reset_index())</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>proj <span class="op">=</span> daily[daily.basis <span class="op">==</span> <span class="st">"projected"</span>].groupby(<span class="st">"mode"</span>, observed<span class="op">=</span><span class="va">True</span>).miles.<span class="bu">sum</span>()</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>tot[<span class="st">"projected_miles"</span>] <span class="op">=</span> tot[<span class="st">"mode"</span>].<span class="bu">map</span>(proj).fillna(<span class="dv">0</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>tot[<span class="st">"pct_of_total"</span>] <span class="op">=</span> tot.annual_miles <span class="op">/</span> tot.annual_miles.<span class="bu">sum</span>() <span class="op">*</span> <span class="dv">100</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>tot.loc[<span class="bu">len</span>(tot)] <span class="op">=</span> [<span class="st">"Total"</span>, tot.annual_miles.<span class="bu">sum</span>(), tot.annual_trips.<span class="bu">sum</span>(),</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                     daily.route_short_name.nunique(), tot.projected_miles.<span class="bu">sum</span>(), <span class="fl">100.0</span>]</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>tot.style.<span class="bu">format</span>({<span class="st">"annual_miles"</span>: <span class="st">"</span><span class="sc">{:,.0f}</span><span class="st">"</span>, <span class="st">"annual_trips"</span>: <span class="st">"</span><span class="sc">{:,.0f}</span><span class="st">"</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"projected_miles"</span>: <span class="st">"</span><span class="sc">{:,.0f}</span><span class="st">"</span>, <span class="st">"pct_of_total"</span>: <span class="st">"</span><span class="sc">{:.1f}</span><span class="st">%"</span>}).hide(axis<span class="op">=</span><span class="st">"index"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<style type="text/css">
+</style>
+
+<table id="T_3219c" class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th id="T_3219c_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">mode</th>
+<th id="T_3219c_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">annual_miles</th>
+<th id="T_3219c_level0_col2" class="col_heading level0 col2" data-quarto-table-cell-role="th">annual_trips</th>
+<th id="T_3219c_level0_col3" class="col_heading level0 col3" data-quarto-table-cell-role="th">routes</th>
+<th id="T_3219c_level0_col4" class="col_heading level0 col4" data-quarto-table-cell-role="th">projected_miles</th>
+<th id="T_3219c_level0_col5" class="col_heading level0 col5" data-quarto-table-cell-role="th">pct_of_total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td id="T_3219c_row0_col0" class="data row0 col0">Local Bus</td>
+<td id="T_3219c_row0_col1" class="data row0 col1">15,920,668</td>
+<td id="T_3219c_row0_col2" class="data row0 col2">1,331,135</td>
+<td id="T_3219c_row0_col3" class="data row0 col3">73</td>
+<td id="T_3219c_row0_col4" class="data row0 col4">1,105,691</td>
+<td id="T_3219c_row0_col5" class="data row0 col5">73.2%</td>
+</tr>
+<tr class="even">
+<td id="T_3219c_row1_col0" class="data row1 col0">Express Bus</td>
+<td id="T_3219c_row1_col1" class="data row1 col1">591,794</td>
+<td id="T_3219c_row1_col2" class="data row1 col2">21,762</td>
+<td id="T_3219c_row1_col3" class="data row1 col3">9</td>
+<td id="T_3219c_row1_col4" class="data row1 col4">43,044</td>
+<td id="T_3219c_row1_col5" class="data row1 col5">2.7%</td>
+</tr>
+<tr class="odd">
+<td id="T_3219c_row2_col0" class="data row2 col0">Bus Rapid</td>
+<td id="T_3219c_row2_col1" class="data row2 col1">1,212,066</td>
+<td id="T_3219c_row2_col2" class="data row2 col2">187,005</td>
+<td id="T_3219c_row2_col3" class="data row2 col3">6</td>
+<td id="T_3219c_row2_col4" class="data row2 col4">89,651</td>
+<td id="T_3219c_row2_col5" class="data row2 col5">5.6%</td>
+</tr>
+<tr class="even">
+<td id="T_3219c_row3_col0" class="data row3 col0">Light Rail</td>
+<td id="T_3219c_row3_col1" class="data row3 col1">2,735,012</td>
+<td id="T_3219c_row3_col2" class="data row3 col2">217,330</td>
+<td id="T_3219c_row3_col3" class="data row3 col3">4</td>
+<td id="T_3219c_row3_col4" class="data row3 col4">193,417</td>
+<td id="T_3219c_row3_col5" class="data row3 col5">12.6%</td>
+</tr>
+<tr class="odd">
+<td id="T_3219c_row4_col0" class="data row4 col0">Commuter Rail</td>
+<td id="T_3219c_row4_col1" class="data row4 col1">1,232,008</td>
+<td id="T_3219c_row4_col2" class="data row4 col2">17,931</td>
+<td id="T_3219c_row4_col3" class="data row4 col3">1</td>
+<td id="T_3219c_row4_col4" class="data row4 col4">84,503</td>
+<td id="T_3219c_row4_col5" class="data row4 col5">5.7%</td>
+</tr>
+<tr class="even">
+<td id="T_3219c_row5_col0" class="data row5 col0">Ski Bus</td>
+<td id="T_3219c_row5_col1" class="data row5 col1">69,420</td>
+<td id="T_3219c_row5_col2" class="data row5 col2">4,740</td>
+<td id="T_3219c_row5_col3" class="data row5 col3">3</td>
+<td id="T_3219c_row5_col4" class="data row5 col4">0</td>
+<td id="T_3219c_row5_col5" class="data row5 col5">0.3%</td>
+</tr>
+<tr class="odd">
+<td id="T_3219c_row6_col0" class="data row6 col0">Total</td>
+<td id="T_3219c_row6_col1" class="data row6 col1">21,760,968</td>
+<td id="T_3219c_row6_col2" class="data row6 col2">1,779,903</td>
+<td id="T_3219c_row6_col3" class="data row6 col3">96</td>
+<td id="T_3219c_row6_col4" class="data row6 col4">1,516,306</td>
+<td id="T_3219c_row6_col5" class="data row6 col5">100.0%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><code>projected_miles</code> is the part of each mode’s total that comes from not-yet-published days.</p>
+<div id="cell-fig-annual" class="cell" data-execution_count="15">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>m <span class="op">=</span> tot.iloc[:<span class="op">-</span><span class="dv">1</span>].iloc[::<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">3.2</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>ax.barh(m[<span class="st">"mode"</span>].astype(<span class="bu">str</span>), m.annual_miles <span class="op">/</span> <span class="fl">1e6</span>, height<span class="op">=</span><span class="fl">0.55</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>[MODE_COLOR[x] <span class="cf">for</span> x <span class="kw">in</span> m[<span class="st">"mode"</span>]])</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> y, (v, p) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(m.annual_miles <span class="op">/</span> <span class="fl">1e6</span>, m.pct_of_total)):</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    ax.text(v <span class="op">+</span> <span class="fl">0.15</span>, y, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.2f}</span><span class="ss">M  (</span><span class="sc">{</span>p<span class="sc">:.1f}</span><span class="ss">%)"</span>, va<span class="op">=</span><span class="st">"center"</span>, color<span class="op">=</span>INK2, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, m.annual_miles.<span class="bu">max</span>() <span class="op">/</span> <span class="fl">1e6</span> <span class="op">*</span> <span class="fl">1.2</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Million vehicle miles"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"x"</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"y"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.08</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Scheduled vehicle miles by mode, 2026"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>         fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.48</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Annual revenue vehicle miles in millions (December partly projected)"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>         ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.99</span>, <span class="fl">0.06</span> <span class="op">/</span> fig.get_figheight(), SOURCE, fontsize<span class="op">=</span><span class="fl">7.5</span>, color<span class="op">=</span>INK2, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">0.25</span> <span class="op">/</span> fig.get_figheight(), <span class="dv">1</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.95</span> <span class="op">/</span> fig.get_figheight()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-annual" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-annual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-annual-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: Annual scheduled vehicle miles by mode, 2026 (millions)."><img src="index_files/figure-html/fig-annual-output-1.png" width="1100" height="362" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-annual-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Annual scheduled vehicle miles by mode, 2026 (millions).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="monthly-vmt-by-mode" class="level3">
+<h3 class="anchored" data-anchor-id="monthly-vmt-by-mode">Monthly VMT by mode</h3>
+<div id="cell-fig-monthly" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>monthly <span class="op">=</span> (daily.assign(month<span class="op">=</span>daily.date.dt.month)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>           .pivot_table(index<span class="op">=</span><span class="st">"month"</span>, columns<span class="op">=</span><span class="st">"mode"</span>, values<span class="op">=</span><span class="st">"miles"</span>, aggfunc<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                        observed<span class="op">=</span><span class="va">True</span>).fillna(<span class="dv">0</span>) <span class="op">/</span> <span class="fl">1e3</span>)  <span class="co"># no service that month = 0</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">4.5</span>))</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>bottom <span class="op">=</span> np.zeros(<span class="bu">len</span>(monthly))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> md <span class="kw">in</span> monthly.columns:</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    ax.bar(monthly.index, monthly[md], bottom<span class="op">=</span>bottom, width<span class="op">=</span><span class="fl">0.7</span>, color<span class="op">=</span>MODE_COLOR[md],</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>           edgecolor<span class="op">=</span>SURFACE, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span>md)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    bottom <span class="op">+=</span> monthly[md].to_numpy()</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, v <span class="kw">in</span> <span class="bu">zip</span>(monthly.index, bottom):</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    ax.text(x, v <span class="op">+</span> <span class="dv">15</span>, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, color<span class="op">=</span>INK2, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">13</span>))</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([<span class="st">"Jan"</span>, <span class="st">"Feb"</span>, <span class="st">"Mar"</span>, <span class="st">"Apr"</span>, <span class="st">"May"</span>, <span class="st">"Jun"</span>, <span class="st">"Jul"</span>, <span class="st">"Aug"</span>, <span class="st">"Sep"</span>, <span class="st">"Oct"</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Nov"</span>, <span class="st">"Dec*"</span>])</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Thousand vehicle miles"</span>)</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, bottom.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.1</span>)</span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"x"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>ax.legend(ncol<span class="op">=</span><span class="bu">len</span>(monthly.columns), loc<span class="op">=</span><span class="st">"upper center"</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.1</span>))</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.08</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Monthly scheduled vehicle miles"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>         fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.48</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Thousand vehicle miles by mode; *December partly projected"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>         ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.99</span>, <span class="fl">0.06</span> <span class="op">/</span> fig.get_figheight(), SOURCE, fontsize<span class="op">=</span><span class="fl">7.5</span>, color<span class="op">=</span>INK2, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">0.25</span> <span class="op">/</span> fig.get_figheight(), <span class="dv">1</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.95</span> <span class="op">/</span> fig.get_figheight()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-monthly" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-monthly-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-monthly-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;3: Monthly scheduled vehicle miles by mode (thousands). December is partly projected."><img src="index_files/figure-html/fig-monthly-output-1.png" width="1100" height="505" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-monthly-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Monthly scheduled vehicle miles by mode (thousands). December is partly projected.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="daily-miles-by-mode" class="level3">
+<h3 class="anchored" data-anchor-id="daily-miles-by-mode">Daily miles by mode</h3>
+<p>Each mode has its own scale (one axis per panel, no dual axes). Lines are 7-day centered averages, which remove the weekday/Saturday/Sunday cycle so service changes (steps) and holiday weeks (dips) stand out; the gray band is projected.</p>
+<div id="cell-fig-daily" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>by_day <span class="op">=</span> daily.pivot_table(index<span class="op">=</span><span class="st">"date"</span>, columns<span class="op">=</span><span class="st">"mode"</span>, values<span class="op">=</span><span class="st">"miles"</span>, aggfunc<span class="op">=</span><span class="st">"sum"</span>,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>                           observed<span class="op">=</span><span class="va">True</span>).fillna(<span class="dv">0</span>)  <span class="co"># no service that day = 0 miles</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>modes_shown <span class="op">=</span> [md <span class="cf">for</span> md <span class="kw">in</span> MODE_ORDER <span class="cf">if</span> md <span class="kw">in</span> by_day.columns <span class="kw">and</span> by_day[md].<span class="bu">sum</span>() <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>smooth <span class="op">=</span> by_day.rolling(<span class="dv">7</span>, center<span class="op">=</span><span class="va">True</span>).mean()  <span class="co"># removes the weekly cycle; first/last 3 days dropped (partial window)</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">11</span>, <span class="fl">5.4</span>), sharex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, md <span class="kw">in</span> <span class="bu">zip</span>(axes.flat, modes_shown):</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    ax.plot(smooth.index, smooth[md] <span class="op">/</span> <span class="fl">1e3</span>, color<span class="op">=</span>MODE_COLOR[md], linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    ax.axvspan(pd.Timestamp(last_published) <span class="op">+</span> pd.Timedelta(days<span class="op">=</span><span class="dv">1</span>), by_day.index.<span class="bu">max</span>(),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>               color<span class="op">=</span>GRID, zorder<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    ax.set_title(md, loc<span class="op">=</span><span class="st">"left"</span>, fontsize<span class="op">=</span><span class="dv">10</span>, color<span class="op">=</span>INK)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    ax.set_ylim(<span class="dv">0</span>, smooth[md].<span class="bu">max</span>() <span class="op">/</span> <span class="fl">1e3</span> <span class="op">*</span> <span class="fl">1.15</span>)</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    ax.xaxis.set_major_formatter(mdates.DateFormatter(<span class="st">"%b"</span>))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth<span class="op">=</span>[<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>, <span class="dv">10</span>]))</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>    ax.grid(axis<span class="op">=</span><span class="st">"x"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes.flat[<span class="bu">len</span>(modes_shown):]:</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    ax.set_visible(<span class="va">False</span>)</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>, <span class="dv">0</span>].set_ylabel(<span class="st">"Thousand miles / day"</span>)</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>, <span class="dv">0</span>].set_ylabel(<span class="st">"Thousand miles / day"</span>)</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.08</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Daily scheduled vehicle miles by mode"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>         fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.48</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"7-day average, thousand miles per day; gray band = projected"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>         ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.99</span>, <span class="fl">0.06</span> <span class="op">/</span> fig.get_figheight(), SOURCE, fontsize<span class="op">=</span><span class="fl">7.5</span>, color<span class="op">=</span>INK2, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">0.25</span> <span class="op">/</span> fig.get_figheight(), <span class="dv">1</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.95</span> <span class="op">/</span> fig.get_figheight()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-daily" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-daily-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-daily-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-4" title="Figure&nbsp;4: Scheduled vehicle miles per day (7-day average), by mode. Gray band = projected days."><img src="index_files/figure-html/fig-daily-output-1.png" width="1207" height="604" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-daily-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Scheduled vehicle miles per day (7-day average), by mode. Gray band = projected days.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="typical-day-by-day-of-week" class="level3">
+<h3 class="anchored" data-anchor-id="typical-day-by-day-of-week">Typical day by day of week</h3>
+<div id="cell-fig-daytype" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>dow <span class="op">=</span> by_day.copy()</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>dow[<span class="st">"dow"</span>] <span class="op">=</span> dow.index.dayofweek</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>avg <span class="op">=</span> dow.groupby(<span class="st">"dow"</span>)[modes_shown].mean() <span class="op">/</span> <span class="fl">1e3</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">4.2</span>))</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>bottom <span class="op">=</span> np.zeros(<span class="dv">7</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> md <span class="kw">in</span> modes_shown:</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    ax.bar(<span class="bu">range</span>(<span class="dv">7</span>), avg[md], bottom<span class="op">=</span>bottom, width<span class="op">=</span><span class="fl">0.65</span>, color<span class="op">=</span>MODE_COLOR[md],</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>           edgecolor<span class="op">=</span>SURFACE, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span>md)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    bottom <span class="op">+=</span> avg[md].to_numpy()</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x, v <span class="kw">in</span> <span class="bu">enumerate</span>(bottom):</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    ax.text(x, v <span class="op">+</span> <span class="dv">1</span>, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:,.0f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, color<span class="op">=</span>INK2, fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="dv">7</span>))</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([<span class="st">"Mon"</span>, <span class="st">"Tue"</span>, <span class="st">"Wed"</span>, <span class="st">"Thu"</span>, <span class="st">"Fri"</span>, <span class="st">"Sat"</span>, <span class="st">"Sun"</span>])</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Thousand vehicle miles / day"</span>)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">0</span>, bottom.<span class="bu">max</span>() <span class="op">*</span> <span class="fl">1.1</span>)</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"y"</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"x"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>ax.legend(ncol<span class="op">=</span><span class="bu">len</span>(modes_shown), loc<span class="op">=</span><span class="st">"upper center"</span>, bbox_to_anchor<span class="op">=</span>(<span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.1</span>))</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.08</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"A typical day of scheduled vehicle miles"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>         fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.48</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Average thousand vehicle miles by day of week, all 2026 dates"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>         ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.99</span>, <span class="fl">0.06</span> <span class="op">/</span> fig.get_figheight(), SOURCE, fontsize<span class="op">=</span><span class="fl">7.5</span>, color<span class="op">=</span>INK2, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">0.25</span> <span class="op">/</span> fig.get_figheight(), <span class="dv">1</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.95</span> <span class="op">/</span> fig.get_figheight()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-daytype" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-daytype-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-daytype-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-5" title="Figure&nbsp;5: Average scheduled vehicle miles per day by day of week and mode (thousands)."><img src="index_files/figure-html/fig-daytype-output-1.png" width="1100" height="472" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-daytype-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Average scheduled vehicle miles per day by day of week and mode (thousands).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="highest-mileage-routes" class="level3">
+<h3 class="anchored" data-anchor-id="highest-mileage-routes">Highest-mileage routes</h3>
+<div id="cell-fig-routes" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>top <span class="op">=</span> (daily.groupby([<span class="st">"route_short_name"</span>, <span class="st">"mode"</span>], observed<span class="op">=</span><span class="va">True</span>).miles.<span class="bu">sum</span>()</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>       .reset_index().nlargest(<span class="dv">12</span>, <span class="st">"miles"</span>).iloc[::<span class="op">-</span><span class="dv">1</span>])</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">4.8</span>))</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>ax.barh(top.route_short_name, top.miles <span class="op">/</span> <span class="fl">1e6</span>, height<span class="op">=</span><span class="fl">0.6</span>,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>        color<span class="op">=</span>[MODE_COLOR[x] <span class="cf">for</span> x <span class="kw">in</span> top[<span class="st">"mode"</span>]])</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> y, v <span class="kw">in</span> <span class="bu">enumerate</span>(top.miles <span class="op">/</span> <span class="fl">1e6</span>):</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    ax.text(v <span class="op">+</span> <span class="fl">0.015</span>, y, <span class="ss">f"</span><span class="sc">{</span>v<span class="sc">:.2f}</span><span class="ss">M"</span>, va<span class="op">=</span><span class="st">"center"</span>, color<span class="op">=</span>INK2, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">0</span>, top.miles.<span class="bu">max</span>() <span class="op">/</span> <span class="fl">1e6</span> <span class="op">*</span> <span class="fl">1.12</span>)</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Million vehicle miles"</span>)</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"x"</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>ax.grid(axis<span class="op">=</span><span class="st">"y"</span>, visible<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>ax.tick_params(length<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>handles <span class="op">=</span> [plt.Rectangle((<span class="dv">0</span>, <span class="dv">0</span>), <span class="dv">1</span>, <span class="dv">1</span>, color<span class="op">=</span>MODE_COLOR[md]) <span class="cf">for</span> md <span class="kw">in</span> top[<span class="st">"mode"</span>].unique()]</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>ax.legend(handles, [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> top[<span class="st">"mode"</span>].unique()], loc<span class="op">=</span><span class="st">"lower right"</span>)</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.08</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Highest-mileage routes"</span>, ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>, fontsize<span class="op">=</span><span class="dv">14</span>,</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>         fontfamily<span class="op">=</span><span class="st">"Poppins SemiBold"</span>, color<span class="op">=</span>INK)</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.01</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.48</span> <span class="op">/</span> fig.get_figheight(), <span class="st">"Top 12 routes by scheduled vehicle miles, millions, 2026"</span>, fontsize<span class="op">=</span><span class="fl">9.5</span>, color<span class="op">=</span>INK2,</span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>         ha<span class="op">=</span><span class="st">"left"</span>, va<span class="op">=</span><span class="st">"top"</span>)</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>fig.text(<span class="fl">0.99</span>, <span class="fl">0.06</span> <span class="op">/</span> fig.get_figheight(), SOURCE, fontsize<span class="op">=</span><span class="fl">7.5</span>, color<span class="op">=</span>INK2, ha<span class="op">=</span><span class="st">"right"</span>, style<span class="op">=</span><span class="st">"italic"</span>)</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>plt.tight_layout(rect<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">0.25</span> <span class="op">/</span> fig.get_figheight(), <span class="dv">1</span>, <span class="dv">1</span> <span class="op">-</span> <span class="fl">0.95</span> <span class="op">/</span> fig.get_figheight()))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-routes" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-routes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="index_files/figure-html/fig-routes-output-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-6" title="Figure&nbsp;6: The 12 routes with the most scheduled vehicle miles in 2026 (millions)."><img src="index_files/figure-html/fig-routes-output-1.png" width="1100" height="538" class="figure-img"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-routes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: The 12 routes with the most scheduled vehicle miles in 2026 (millions).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="unmapped-routes" class="level3">
+<h3 class="anchored" data-anchor-id="unmapped-routes">Unmapped routes</h3>
+<p>Routes whose <code>route_short_name</code> is not in the lookup. Review these and extend <code>MODE_ROUTES</code> if any belong to a mode.</p>
+<div id="dcccc7aa" class="cell" data-execution_count="20">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>un <span class="op">=</span> (daily[daily[<span class="st">"mode"</span>] <span class="op">==</span> <span class="st">"Unmapped"</span>].groupby(<span class="st">"route_short_name"</span>)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>      .agg(annual_miles<span class="op">=</span>(<span class="st">"miles"</span>, <span class="st">"sum"</span>)).reset_index().sort_values(<span class="st">"annual_miles"</span>, ascending<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>un.style.<span class="bu">format</span>({<span class="st">"annual_miles"</span>: <span class="st">"</span><span class="sc">{:,.0f}</span><span class="st">"</span>}).hide(axis<span class="op">=</span><span class="st">"index"</span>) <span class="cf">if</span> <span class="bu">len</span>(un) <span class="cf">else</span> <span class="bu">print</span>(<span class="st">"None"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>None</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="export" class="level2">
+<h2 class="anchored" data-anchor-id="export">Export</h2>
+<div id="d82e3812" class="cell" data-execution_count="21">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>OUT_DIR.mkdir(exist_ok<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>tot.to_csv(OUT_DIR <span class="op">/</span> <span class="st">"uta_vmt_2026_by_mode.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>(daily.groupby([<span class="st">"route_short_name"</span>, <span class="st">"mode"</span>], observed<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a> .agg(annual_miles<span class="op">=</span>(<span class="st">"miles"</span>, <span class="st">"sum"</span>), annual_trips<span class="op">=</span>(<span class="st">"trips"</span>, <span class="st">"sum"</span>)).reset_index()</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a> .query(<span class="st">"annual_miles &gt; 0"</span>).to_csv(OUT_DIR <span class="op">/</span> <span class="st">"uta_vmt_2026_by_route.csv"</span>, index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>(daily.groupby([<span class="st">"date"</span>, <span class="st">"mode"</span>, <span class="st">"basis"</span>], observed<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a> .agg(miles<span class="op">=</span>(<span class="st">"miles"</span>, <span class="st">"sum"</span>), trips<span class="op">=</span>(<span class="st">"trips"</span>, <span class="st">"sum"</span>)).reset_index()</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a> .query(<span class="st">"miles &gt; 0"</span>).to_csv(OUT_DIR <span class="op">/</span> <span class="st">"uta_vmt_2026_daily_by_mode.csv"</span>, index<span class="op">=</span><span class="va">False</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<ul>
+<li><strong>Scheduled, not operated.</strong> Based on published GTFS: no deadhead, missed trips, detours, or unscheduled extra service.</li>
+<li><strong>Microtransit / on-demand</strong> miles are only as good as what UTA publishes in GTFS; demand-response service typically has no scheduled trips, so Microtransit may be absent or understated.</li>
+<li><strong>Mode lookup</strong> is by route short name as supplied; routes added or renumbered since are flagged under <em>Unmapped</em>.</li>
+<li><strong>Shape-based distance</strong> is straight-line between shape vertices, so slightly shorter than odometer miles on very sparse shapes.</li>
+<li><strong>Projected days</strong> assume the last published schedule continues; a December service change would shift them.</li>
+</ul>
+
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script>
+// Accessibility fixes for things Quarto and its libraries render but cannot configure.
+// Included on every page through wfrc-shared.yml (format.html.include-after-body).
+(function () {
+  function fix(root) {
+    // Listing banners are decorative; Quarto drops an empty `image-alt`.
+    root.querySelectorAll('img.thumbnail-image:not([alt])').forEach(function (img) {
+      img.setAttribute('alt', '');
+    });
+    // Quarto only sets `title` on the color-scheme toggle: add an accessible name and a clearer tooltip.
+    root.querySelectorAll('.quarto-color-scheme-toggle:not([aria-label])').forEach(function (a) {
+      a.setAttribute('aria-label', 'Toggle light and dark mode');
+      a.setAttribute('title', 'Toggle light / dark');
+    });
+    // Collapsible callouts put aria-expanded on a plain div: make it a real, keyboard-operable button.
+    root.querySelectorAll('.callout-header[aria-expanded]:not([role])').forEach(function (h) {
+      h.setAttribute('role', 'button');
+      h.setAttribute('tabindex', '0');
+      h.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h.click(); }
+      });
+    });
+    // The announcement's dismiss control is a bare <i> with a click handler: give it a role, a name
+    // and keyboard operation (Enter and Space).
+    root.querySelectorAll('#quarto-announcement .quarto-announcement-action:not([role])').forEach(function (i) {
+      i.setAttribute('role', 'button');
+      i.setAttribute('tabindex', '0');
+      i.setAttribute('aria-label', 'Dismiss announcement');
+      i.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); i.click(); }
+      });
+    });
+    // Quarto's "Back to top" is an <a role="button"> without an href, so the keyboard cannot reach it.
+    root.querySelectorAll('#quarto-back-to-top:not([tabindex])').forEach(function (a) {
+      a.setAttribute('tabindex', '0');
+      a.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.scrollTo(0, 0); }
+      });
+    });
+    // Observable Plot labels bare <g> marks; aria-label is not allowed on a role-less element.
+    root.querySelectorAll('[class^="plot-"] g[aria-label]:not([role])').forEach(function (g) {
+      g.removeAttribute('aria-label');
+    });
+    // Scrollable regions must be reachable by keyboard.
+    root.querySelectorAll('pre, div.sourceCode, .card, .card-body, .table-striped, table, .cell-output-display').forEach(function (el) {
+      if (el.hasAttribute('tabindex') || el.matches('a, button, input, select, textarea')) return;
+      var o = getComputedStyle(el);
+      var scrolls = /(auto|scroll)/.test(o.overflowX + o.overflowY) &&
+        (el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1);
+      if (scrolls) el.setAttribute('tabindex', '0');
+    });
+  }
+  var queued = false;
+  function schedule() {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(function () { queued = false; fix(document); });
+  }
+  fix(document);
+  new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+  window.addEventListener('resize', schedule);
+  window.addEventListener('load', function () { setTimeout(schedule, 800); setTimeout(schedule, 2500); });
+})();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const toggle = window.document.createElement('button');
+      toggle.type = "button";
+      toggle.setAttribute("role", "switch");
+      toggle.setAttribute("aria-checked", "false");
+      toggle.classList.add('top-right');
+      toggle.classList.add('quarto-color-scheme-toggle');
+      toggle.setAttribute("aria-label", "Toggle dark mode");
+      toggle.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      toggle.appendChild(i);
+      // Put the toggle in a landmark of its own, so that landmark navigation
+      // can reach it.
+      //
+      // The container is always a fresh direct child of body, and the toggle is
+      // never moved into page furniture that the theme or the author controls.
+      // The toggle is positioned against the page, so any ancestor that
+      // establishes a containing block captures it: a positioned element or a
+      // grid for position: absolute, and transform, filter, will-change or
+      // contain for position: fixed. A direct child of body has none of these
+      // to inherit, and the shift when one appears is silent and visual.
+      //
+      // ARIA says a document should have at most one banner, and axe reports a
+      // duplicate whether or not the banners carry distinct labels. So use a
+      // header when the page has no banner yet, and a named region otherwise.
+      //
+      // A header is a banner wherever it sits, unless it is inside sectioning
+      // content, so this cannot just look at the children of body: a custom
+      // page layout wraps the title block header in a plain div. An explicit
+      // role="banner" always counts.
+      const sectioning = 'article, aside, main, nav, section, [role="article"], [role="complementary"], [role="main"], [role="navigation"], [role="region"]';
+      const hasBanner = Array.from(
+        window.document.querySelectorAll('header:not([role]), [role="banner"]')
+      ).some(function(el) {
+        return el.hasAttribute("role") || el.closest(sectioning) === null;
+      });
+      const container = window.document.createElement(hasBanner ? "div" : "header");
+      if (hasBanner) {
+        container.setAttribute("role", "region");
+        container.setAttribute("aria-label", "Toggle dark mode");
+      }
+      container.classList.add('quarto-color-scheme-toggle-container');
+      container.appendChild(toggle);
+      window.document.body.appendChild(container);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/wfrcanalytics\.github\.io\/GIS-adhoc-analyses");
+      const newWindowLabel = "(opens in a new tab)";
+      const newWindowNoteId = "quarto-ext-newwindow-label";
+      // Links reference one hidden label through aria-describedby, so the
+      // announcement never changes their accessible name.
+      var describeNewWindow = (link) => {
+        if (!window.document.getElementById(newWindowNoteId)) {
+          var newWindowNote = window.document.createElement("span");
+          newWindowNote.id = newWindowNoteId;
+          newWindowNote.hidden = true;
+          newWindowNote.textContent = newWindowLabel;
+          window.document.body.appendChild(newWindowNote);
+        }
+        var describedBy = (link.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean);
+        if (!describedBy.includes(newWindowNoteId)) {
+          describedBy.push(newWindowNoteId);
+          link.setAttribute("aria-describedby", describedBy.join(" "));
+        }
+      }
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+      window.quartoDecorateExternalLinks = function (root) {
+     var links = (root || window.document).querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+            describeNewWindow(link);
+          if (!link.classList.contains('no-external-icon')) {
+          }
+        }
+      }
+      };
+      window.quartoDecorateExternalLinks(window.document);
+    // Esc closes the popup (WCAG 1.4.13) and focus leaving both trigger and
+    // popup closes it (WCAG 2.4.11); tippy handles neither for interactive popups.
+    const hideOnEscAndFocusOut = {
+      name: 'hideOnEscAndFocusOut',
+      defaultValue: true,
+      fn(instance) {
+        const dismiss = () => {
+          // A show scheduled by the trigger delay would otherwise reopen it
+          instance.clearDelayTimeouts();
+          instance.hide();
+        };
+        const onKeyDown = (event) => {
+          if (event.key !== 'Escape') {
+            return;
+          }
+          // Keep Esc from also reaching page handlers (e.g. reveal.js overview),
+          // except an open reveal.js slide menu, which Esc should close too.
+          // The menu handles keys only when its keyboard option is on.
+          const menuHandlesEsc = window.Reveal?.getPlugin?.('menu')?.isOpen() &&
+            window.Reveal.getConfig().menu?.keyboard !== false;
+          if (!menuHandlesEsc) {
+            event.stopPropagation();
+          }
+          if (instance.popper.contains(window.document.activeElement)) {
+            // Disabled while refocusing so the focus trigger does not reopen it
+            instance.disable();
+            instance.reference.focus();
+            instance.enable();
+          }
+          dismiss();
+        };
+        const onFocusOut = (event) => {
+          const target = event.relatedTarget;
+          if (target && !instance.reference.contains(target) &&
+              !instance.popper.contains(target)) {
+            dismiss();
+          }
+        };
+        // On the trigger too: a click trigger (code-annotations: select) has no
+        // blur handling. Attached for the instance's lifetime so leaving the
+        // trigger also cancels a show still pending on the trigger delay.
+        instance.reference.addEventListener('focusout', onFocusOut);
+        return {
+          onShow() {
+            window.document.addEventListener('keydown', onKeyDown, true);
+            instance.popper.addEventListener('focusout', onFocusOut);
+          },
+          onHide() {
+            window.document.removeEventListener('keydown', onKeyDown, true);
+            instance.popper.removeEventListener('focusout', onFocusOut);
+          },
+          onDestroy() {
+            instance.reference.removeEventListener('focusout', onFocusOut);
+          },
+        };
+      },
+    };
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+        plugins: [hideOnEscAndFocusOut],
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          // Each band is positioned against its own containing block, which is
+          // not the offsetParent of the lines, so place it from client rects.
+          const placeBand = (band, firstEl, lastEl, codeBlock) => {
+            const container = band.offsetParent;
+            if (container === null) {
+              return;
+            }
+            const containerRect = container.getBoundingClientRect();
+            // Reveal.js scales slides with a transform, so convert client
+            // pixels back to the CSS pixels of the container.
+            const scale = containerRect.height / container.offsetHeight || 1;
+            const firstRect = firstEl.getBoundingClientRect();
+            const lastRect = lastEl.getBoundingClientRect();
+            const top = (firstRect.top - containerRect.top) / scale - container.clientTop + container.scrollTop;
+            const height = (lastRect.bottom - firstRect.top) / scale;
+            band.style.top = top - 2 + "px";
+            band.style.height = height + 4 + "px";
+            if (codeBlock) {
+              // Without the copy button wrapper, the containing block is wider
+              // than the code block, so span the code block explicitly.
+              const blockRect = codeBlock.getBoundingClientRect();
+              band.style.left = (blockRect.left - containerRect.left) / scale - container.clientLeft + container.scrollLeft + "px";
+              band.style.width = blockRect.width / scale + "px";
+            }
+          };
+          if (lineIds.length > 0) {
+            const el = window.document.getElementById(lineIds[0]);
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const parent = el.parentElement.parentElement;
+            // cook up a div (if necessary) and position it
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            placeBand(div, el, lastEl, parent.closest("div.sourceCode") || parent);
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            placeBand(gutterDiv, el, lastEl);
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+  <script type="application/javascript">
+  window.quartoScrollableRegionsLabels = {"code":"Scrollable code","output":"Scrollable output"};
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>© 2026 <a href="https://wfrc.utah.gov/">Wasatch Front Regional Council</a></p>
+</div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/WFRCAnalytics/" target="_blank">
+      <i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.facebook.com/WasatchFrontRegionalCouncil/" target="_blank">
+      <i class="bi bi-facebook" role="img" aria-label="Facebook">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://twitter.com/wasatchcouncil/" target="_blank">
+      <i class="bi bi-twitter-x" role="img" aria-label="X (Twitter)">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.instagram.com/wasatchfrontregionalcouncil/" target="_blank">
+      <i class="bi bi-instagram" role="img" aria-label="Instagram">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/company/wasatch-front-regional-council/" target="_blank">
+      <i class="bi bi-linkedin" role="img" aria-label="LinkedIn">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://www.youtube.com/user/wfrcvideo/" target="_blank">
+      <i class="bi bi-youtube" role="img" aria-label="YouTube">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="https://wfrcanalytics.github.io/contact/">
+<p>Contact</p>
+</a>
+  </li>  
+    <li class="nav-item">
+    <a class="nav-link" href="https://wfrcanalytics.github.io/terms/">
+<p>Terms of use</p>
+</a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+</body></html>

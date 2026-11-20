@@ -27,6 +27,8 @@ website:
         href: projects/center-buildout-capacity/index.qmd
       - text: "Transportation Choices"
         href: projects/transportation-choices/index.qmd
+      - text: "UTA Transit VMT 2026"
+        href: projects/uta-transit-vmt-2026/index.qmd
 
 execute:
   eval: true
