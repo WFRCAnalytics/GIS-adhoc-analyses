@@ -135,6 +135,8 @@ def ensure_layers(
                 fetch_kwargs["pagination"] = entry["pagination"]
             if "order_by" in entry:
                 fetch_kwargs["order_by"] = entry["order_by"]
+            if "out_sr" in entry:
+                fetch_kwargs["out_sr"] = int(entry["out_sr"])
             download_layer(cache_path, url, force=should_force, token=layer_token, **fetch_kwargs)
 
         paths[key] = cache_path

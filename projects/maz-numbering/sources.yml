@@ -10,3 +10,4 @@ layers:
     url: https://services1.arcgis.com/taguadKoI1XFwivx/ArcGIS/rest/services/WasatchFrontTAZ/FeatureServer/0
     cache: _data/remote/wftdm_taz.gpkg
     description: WFTDM Transportation Analysis Zones
+    out_sr: 26912  # service is natively 3857; ask for the analysis CRS directly, no 4326 round trip
