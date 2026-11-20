@@ -48,7 +48,5 @@ format:
     code-fold: true
     code-summary: "Show the code"
     lightbox: auto
-    grid:
-      sidebar-width: 260px  # left navigation; the brand default (350px) is too wide for it
 
 title-block-banner: true

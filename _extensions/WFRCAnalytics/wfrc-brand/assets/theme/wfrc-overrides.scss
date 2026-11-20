@@ -521,6 +521,11 @@ details > summary { color: $wfrc-h1; font-family: $headings-font-family; font-we
   .sidebar-link, .sidebar-item-toggle {
     border-radius: 6px;
   }
+  // Room around the text, so the hover/active highlight is a comfortable pill instead of
+  // hugging the first letter. Applied to every link so Home, headings and items stay aligned.
+  .sidebar-item .sidebar-link {
+    padding: 0.35rem 0.75rem;
+  }
   .sidebar-link:hover { background: $wfrc-surface-2; color: $wfrc-h1; }
   .sidebar-link.active, .active > .sidebar-link {
     background: $wfrc-surface-2;
@@ -529,8 +534,21 @@ details > summary { color: $wfrc-h1; font-family: $headings-font-family; font-we
     box-shadow: inset 3px 0 0 $wfrc-rule;
   }
   .sidebar-title, .menu-text.sidebar-section-title { color: $wfrc-ink-2; font-family: $headings-font-family; }
+  // Section headings (e.g. a year group) read as headings, not as dimmed links
+  .sidebar-item-section > .sidebar-item-container .sidebar-item-text {
+    color: $wfrc-ink;
+    font-weight: 600;
+  }
+  // Children sit under their heading on a thin rule
+  ul.sidebar-section {
+    margin-left: 0.5rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid $wfrc-line;
+  }
 }
-.breadcrumb .breadcrumb-item a, .quarto-title-breadcrumbs .breadcrumb-item a, .quarto-title-breadcrumbs .breadcrumb li:last-of-type a { color: $wfrc-ink-2; &:hover { color: $wfrc-h1; } }
+// The header already carries the logo, so don't repeat it at the top of a docked sidebar.
+#quarto-sidebar .sidebar-logo-link { display: none; }
+.breadcrumb .breadcrumb-item a, .quarto-title-breadcrumbs .breadcrumb-item a, .quarto-title-breadcrumbs .breadcrumb li:last-of-type a { color: $wfrc-ink-2; &:hover { color: $wfrc-h1; text-decoration: underline !important; } }
 .breadcrumb-item.active, .breadcrumb-item + .breadcrumb-item::before { color: $wfrc-ink-2; }
 .page-link {
   color: $wfrc-h1;
@@ -544,6 +562,15 @@ details > summary { color: $wfrc-h1; font-family: $headings-font-family; font-we
 
   .title, .subtitle, .quarto-title-author-name, .quarto-title-affiliation, .quarto-title-meta-heading, .quarto-title-meta-contents, .description { color: #fff !important; }
   a { color: $wfrc-footer-link; }
+  // Breadcrumbs sit on the navy banner: the body-text grey is unreadable there in light mode
+  .breadcrumb-item a, .breadcrumb-item.active, .breadcrumb-item + .breadcrumb-item::before,
+  .quarto-title-breadcrumbs .breadcrumb li:last-of-type a { color: #fff !important; }
+  // Hover on the links only (a `::before:hover` in the list above would make the rule invalid).
+  // Same underline as the links on the page background (ice blue alone is too close to white).
+  .breadcrumb-item a:hover, .quarto-title-breadcrumbs .breadcrumb li:last-of-type a:hover {
+    color: $wfrc-footer-link !important;
+    text-decoration: underline !important;
+  }
 }
 .quarto-title-meta-heading { font-family: $headings-font-family; font-size: 0.72rem; }
 
