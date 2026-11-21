@@ -18,15 +18,14 @@ All spatial work is in EPSG:26912.
 
 ## Data sources
 
-See `sources.yml` / `sources.md`. TAZ is REST-downloaded via
-`ensure_layers()`; the cleaned MAZ is a manual zipped shapefile in `_data/raw/`.
+See `sources.md`. The official `WFv1000_TAZ.shp` (from `TDM-GEO-AnalysisZones`) and the cleaned MAZ (zipped shapefile) are both manual files in `_data/raw/`; nothing is downloaded.
 
 ## Layout
 
 ```
 _data/
-  raw/         Microzones_Clean_20261120.zip -- cleaned MAZ (zipped shapefile) (git-tracked)
-  remote/      TAZ REST cache -- gitignored
+  raw/         WFv1000_TAZ.* -- official TAZ shapefile; Microzones_Clean_20261120.zip -- cleaned MAZ (git-tracked)
+  remote/      (unused -- no REST layers)
   processed/   intermediate outputs -- gitignored
 output/        WFv1000_MAZ.shp, WFv1000_MAZ_qc_map.html
 index.qmd      renders as a page on the site

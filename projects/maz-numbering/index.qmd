@@ -35,9 +35,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
 
-from gis_adhoc_analyses.layer_cache import ensure_layers
-
 PATHS = {
+    "taz": "_data/raw/WFv1000_TAZ.shp",  # official TAZ (TDM-GEO-AnalysisZones), already EPSG:26912
     "maz": "/vsizip/_data/raw/Microzones_Clean_20261120.zip/Microzones_Clean.shp",  # read in place via GDAL vsizip, no extraction
     "out": Path("output"),
 }
@@ -66,11 +65,10 @@ TEXT_PRIMARY, TEXT_MUTED = "#151515", "#7f7a76"
 
 ## 1. Load the data
 
-The TAZ layer is downloaded once from the WFRC REST service and cached (see `sources.yml`); delete the cached `.gpkg` to refresh. The cleaned MAZ layer is a manual zipped shapefile in `_data/raw/` (read in place via GDAL `/vsizip/`, never extracted).
+The TAZ layer is the **official `WFv1000_TAZ.shp`** from the `TDM-GEO-AnalysisZones` releases repo, copied unchanged into `_data/raw/` (already EPSG:26912). It is used instead of the REST copy because the REST service is natively EPSG:3857 and cannot reproduce the official geometry exactly. The cleaned MAZ layer is a manual zipped shapefile in `_data/raw/` (read in place via GDAL `/vsizip/`, never extracted).
 
 ```{python}
-L = ensure_layers(["wftdm_taz"])
-taz = gpd.read_file(L["wftdm_taz"]).to_crs(CRS)
+taz = gpd.read_file(PATHS["taz"]).to_crs(CRS)  # no-op: already 26912
 taz["TAZID"] = taz["TAZID"].astype(int)
 maz = gpd.read_file(PATHS["maz"]).to_crs(CRS)
 

@@ -2,12 +2,7 @@
 # Registry of ArcGIS REST data sources used by this analysis only.
 # See projects/_template/sources.yml for the full schema.
 #
-# To re-download: ensure_layers(["wftdm_taz"], force=["wftdm_taz"])
+# None: both inputs are manual files in _data/raw/ (official WFv1000_TAZ.shp
+# and the cleaned MAZ zip). See sources.md.
 
-layers:
-
-  wftdm_taz:
-    url: https://services1.arcgis.com/taguadKoI1XFwivx/ArcGIS/rest/services/WasatchFrontTAZ/FeatureServer/0
-    cache: _data/remote/wftdm_taz.gpkg
-    description: WFTDM Transportation Analysis Zones
-    out_sr: 26912  # service is natively 3857; ask for the analysis CRS directly, no 4326 round trip
+layers: {}
